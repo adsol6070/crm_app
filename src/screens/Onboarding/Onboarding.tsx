@@ -17,7 +17,7 @@ const OnboardingScreen = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.COLORS.white }}>
       <View>
         <Text>Onboarding Screen</Text>
-        <Button title="Sign In" onPress={() => navigation.navigate("SignIn")} />
+        <Button title="Welcome" onPress={() => navigation.navigate("SignIn")} />
       </View>
     </SafeAreaView>
   );
