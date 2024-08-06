@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ViewStyle, StyleProp } from "react-native";
+import { View, Text, TouchableOpacity, ViewStyle } from "react-native";
 import React from "react";
 import { theme } from "../constants/theme";
 
@@ -10,7 +10,7 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = ({ title, onPress, containerStyle }) => {
   return (
-    <View style={[{ width: "100%" }, containerStyle]}>
+    <View style={{ ...containerStyle, width: "100%" }}>
       <TouchableOpacity
         style={{
           width: "100%",

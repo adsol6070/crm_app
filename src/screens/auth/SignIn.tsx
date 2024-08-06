@@ -101,6 +101,7 @@ const renderContent = () => {
 }
 
 const SignIn = () => {
+  const navigation = useNavigation<OnboardingScreenNavigationProp>();
   return (
     <SafeAreaView style={styles.safeArea}>
       {renderContent()}

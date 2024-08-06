@@ -1,9 +1,11 @@
-import CheckSvg from "./CheckSvg";
+import CheckSvg from "./Check";
 import EyeOffSvg from "./EyeOffSvg";
+import GoBackSvg from "./GoBackSvg";
 
 const svg = {
-    EyeOffSvg,
-    CheckSvg
+  CheckSvg,
+  EyeOffSvg,
+  GoBackSvg,
 };
 
-export { svg }
+export { svg };

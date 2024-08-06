@@ -1,9 +1,11 @@
+import InputField from "./InputField";
 import Button from "./Button";
-import InputField from "./InputFields";
+import Header from "./Header";
 
 const components = {
   InputField,
-  Button
+  Button,
+  Header,
 };
 
 export { components };
