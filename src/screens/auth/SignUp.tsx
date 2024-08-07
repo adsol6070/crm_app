@@ -1,5 +1,12 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { theme } from "../../constants/theme";
@@ -10,6 +17,8 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as ImagePicker from "expo-image-picker";
+import { authService } from "../../api/auth";
 
 const schema = yup.object().shape({
   tenantId: yup.string().required("Tenant ID is required"),
@@ -20,23 +29,87 @@ const schema = yup.object().shape({
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+  phone: yup.string().required("Phone number is required"),
+  profileImage: yup.mixed(),
 });
 
-type FormData = yup.InferType<typeof schema>;
+type SignUpFormData = yup.InferType<typeof schema>;
+
+interface ImageObject {
+  uri: string;
+  name: string;
+  type: string;
+  size: number;
+}
 
 const SignUp = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const [image, setImage] = useState<ImageObject | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+    reset,
+  } = useForm<SignUpFormData>({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Form Data:", data);
-    // Handle form submission logic here
+  const resetSignUpForm = () => {
+    reset();
+    setImage(null);
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    resetSignUpForm();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
+
+  const handleImagePicker = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const profileImage: ImageObject = {
+        uri: result.assets[0].uri,
+        name: result.assets[0].fileName || "unknown",
+        type: result.assets[0].mimeType || "image/jpeg",
+        size: result.assets[0].fileSize || 0,
+      };
+
+      setImage(profileImage);
+    }
+  };
+
+  const onSubmit = async (data: SignUpFormData) => {
+    try {
+      const formData = new FormData();
+      formData.append("tenantID", data.tenantId);
+      formData.append("firstname", data.firstname);
+      formData.append("lastname", data.lastname);
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("phone", data.phone);
+      formData.append("role", "superAdmin");
+      formData.append("uploadType", "User");
+
+      if (image) {
+        formData.append("profileImage", image);
+      }
+
+      const response = await authService.register(formData);
+      console.log("Response:", response);
+    } catch (error) {
+      console.error("Registration Error:", error);
+    }
   };
 
   const renderHeader = () => {
@@ -48,7 +121,7 @@ const SignUp = () => {
       <KeyboardAwareScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
-          paddingVertical: theme.SIZES.height * 0.06,
+          paddingVertical: theme.SIZES.height * 0.04,
           flexGrow: 1,
         }}
         enableOnAndroid={true}
@@ -65,6 +138,31 @@ const SignUp = () => {
         >
           Sign up
         </Text>
+
+        <TouchableOpacity
+          onPress={handleImagePicker}
+          style={{ marginBottom: 20, alignItems: "center" }}
+        >
+          <View
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              backgroundColor: theme.COLORS.lightGray,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {image ? (
+              <Image
+                source={{ uri: image.uri }}
+                style={{ width: "100%", height: "100%", borderRadius: 50 }}
+              />
+            ) : (
+              <Text style={{ color: theme.COLORS.gray1 }}>Select Image</Text>
+            )}
+          </View>
+        </TouchableOpacity>
 
         <Controller
           control={control}
@@ -138,12 +236,29 @@ const SignUp = () => {
               title="Password"
               placeholder="Enter your password"
               containerStyle={{ marginBottom: 20 }}
+              eyeOffSvg={true}
               onChangeText={onChange}
               onBlur={onBlur}
-              eyeOffSvg={true}
               value={value}
               secureTextEntry={true}
               error={errors.password?.message}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="phone"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <components.InputField
+              title="Phone Number"
+              placeholder="Enter your phone number"
+              containerStyle={{ marginBottom: 20 }}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              value={value}
+              keyboardType="phone-pad"
+              error={errors.phone?.message}
             />
           )}
         />
@@ -188,8 +303,14 @@ const SignUp = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.COLORS.white }}>
-      {renderHeader()}
-      {renderContent()}
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* {renderHeader()} */}
+        {renderContent()}
+      </ScrollView>
     </SafeAreaView>
   );
 };
