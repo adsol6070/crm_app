@@ -6,7 +6,7 @@ import { theme } from "../../constants/theme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { components } from "../../components";
 import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../types"; 
+import { RootStackParamList } from "../../types";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -17,39 +17,44 @@ type OnboardingScreenNavigationProp = StackNavigationProp<
 >;
 
 const schema = yup.object().shape({
-  email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().required('Password is required'),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup.string().required("Password is required"),
 });
 
-const renderContent = () => {
+const SignIn = () => {
   const navigation = useNavigation<OnboardingScreenNavigationProp>();
-  const { control, handleSubmit, formState: { errors } } = useForm({
-    resolver: yupResolver(schema),
-  });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
-    // Handle form submission
-  };
-  
-  return (
-    <KeyboardAwareScrollView
-      contentContainerStyle={styles.scrollViewContent}
-      enableOnAndroid={true}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.logoContainer}>
-        <Image 
-          source={require('../../../assets/logo.png')} 
-          style={styles.logo} 
-        />
-      </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.subtitle}>
-          Sign in to continue
-        </Text>
-      </View>
-      <View>
+  const renderContent = () => {
+    const navigation = useNavigation<OnboardingScreenNavigationProp>();
+    const {
+      control,
+      handleSubmit,
+      formState: { errors },
+    } = useForm({
+      resolver: yupResolver(schema),
+    });
+
+    const onSubmit = (data: any) => {
+      console.log(data);
+      // Handle form submission
+    };
+
+    return (
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        enableOnAndroid={true}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../../assets/logo.png")}
+            style={styles.logo}
+          />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.subtitle}>Sign in to continue</Text>
+        </View>
+        <View>
           <Controller
             control={control}
             name="email"
@@ -84,29 +89,21 @@ const renderContent = () => {
             )}
           />
         </View>
-      <View style={styles.forgotPasswordContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-          <Text style={styles.forgotPasswordText}>
-            Forgot password?
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <components.Button
-        title="Sign in"
-        containerStyle={styles.button}
-        onPress={handleSubmit(onSubmit)}
-      />
-    </KeyboardAwareScrollView>
-  );
-}
+        <View style={styles.forgotPasswordContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+          </TouchableOpacity>
+        </View>
+        <components.Button
+          title="Sign in"
+          containerStyle={styles.button}
+          onPress={handleSubmit(onSubmit)}
+        />
+      </KeyboardAwareScrollView>
+    );
+  };
 
-const SignIn = () => {
-  const navigation = useNavigation<OnboardingScreenNavigationProp>();
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      {renderContent()}
-    </SafeAreaView>
-  );
+  return <SafeAreaView style={styles.safeArea}>{renderContent()}</SafeAreaView>;
 };
 
 // Styles
@@ -120,14 +117,14 @@ const styles = StyleSheet.create({
     paddingVertical: theme.SIZES.height * 0.05,
   },
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   logo: {
-    width: 150, 
-    resizeMode: 'contain', 
+    width: 150,
+    resizeMode: "contain",
   },
   textContainer: {
-    alignItems: 'center', 
+    alignItems: "center",
     marginBottom: 20,
   },
   subtitle: {
@@ -142,7 +139,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordContainer: {
     marginBottom: 20,
-    alignItems: 'center', 
+    alignItems: "center",
   },
   forgotPasswordText: {
     ...theme.FONTS.Mulish_400Regular,
