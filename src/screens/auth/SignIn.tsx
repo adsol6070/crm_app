@@ -1,15 +1,15 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import React from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { theme } from "../../constants/theme";
+import { constants } from '../../constants';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { components } from "../../components";
 import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../types"; 
+import { RootStackParamList } from "../../types";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type OnboardingScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -21,35 +21,53 @@ const schema = yup.object().shape({
   password: yup.string().required('Password is required'),
 });
 
-const renderContent = () => {
+const { theme } = constants;
+
+const SignIn = () => {
   const navigation = useNavigation<OnboardingScreenNavigationProp>();
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const [refreshing, setRefreshing] = React.useState(false);
+  const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
   });
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    reset();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
+
   const onSubmit = (data: any) => {
     console.log(data);
-    // Handle form submission
   };
-  
-  return (
-    <KeyboardAwareScrollView
-      contentContainerStyle={styles.scrollViewContent}
-      enableOnAndroid={true}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.logoContainer}>
-        <Image 
-          source={require('../../../assets/logo.png')} 
-          style={styles.logo} 
-        />
-      </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.subtitle}>
-          Sign in to continue
-        </Text>
-      </View>
-      <View>
+
+  const renderContent = () => {
+    return (
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        enableOnAndroid={true}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.logoContainer}>
+          <Text
+            style={{
+              textAlign: "center",
+              ...theme.FONTS.H1,
+              marginBottom: 30,
+              textTransform: "capitalize",
+              color: theme.COLORS.black,
+            }}
+          >
+            Sign In
+          </Text>
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.subtitle}>
+            Sign in to continue
+          </Text>
+        </View>
+        <View>
           <Controller
             control={control}
             name="email"
@@ -58,7 +76,6 @@ const renderContent = () => {
                 title="Email"
                 placeholder="example@mail.com"
                 containerStyle={styles.inputField}
-                check={true}
                 onChangeText={onChange}
                 onBlur={onBlur}
                 value={value}
@@ -84,27 +101,61 @@ const renderContent = () => {
             )}
           />
         </View>
-      <View style={styles.forgotPasswordContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-          <Text style={styles.forgotPasswordText}>
-            Forgot password?
+        <View style={styles.forgotPasswordContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
+            <Text style={styles.forgotPasswordText}>
+              Forgot password?
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <components.Button
+          title="Sign in"
+          containerStyle={styles.button}
+          onPress={handleSubmit(onSubmit)}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 40,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "Mulish_400Regular",
+              fontSize: 16,
+              color: theme.COLORS.gray1,
+              marginRight: 3,
+            }}
+          >
+            Don't have an account?
           </Text>
-        </TouchableOpacity>
-      </View>
-      <components.Button
-        title="Sign in"
-        containerStyle={styles.button}
-        onPress={handleSubmit(onSubmit)}
-      />
-    </KeyboardAwareScrollView>
-  );
-}
+          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <Text
+              style={{
+                ...theme.FONTS.Mulish_400Regular,
+                fontSize: 16,
+                color: theme.COLORS.black,
+              }}
+            >
+              Sign Up.
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAwareScrollView>
+    );
+  };
 
-const SignIn = () => {
-  const navigation = useNavigation<OnboardingScreenNavigationProp>();
   return (
     <SafeAreaView style={styles.safeArea}>
-      {renderContent()}
+      <ScrollView
+        contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {renderContent()}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -115,19 +166,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.COLORS.white,
   },
-  scrollViewContent: {
+  scrollView: {
+    flexGrow: 1,
+    justifyContent: 'center',
     paddingHorizontal: 20,
     paddingVertical: theme.SIZES.height * 0.05,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   logoContainer: {
     alignItems: 'center',
   },
   logo: {
-    width: 150, 
-    resizeMode: 'contain', 
+    width: 150,
+    resizeMode: 'contain',
   },
   textContainer: {
-    alignItems: 'center', 
+    alignItems: 'center',
     marginBottom: 20,
   },
   subtitle: {
@@ -142,7 +199,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordContainer: {
     marginBottom: 20,
-    alignItems: 'center', 
+    alignItems: 'center',
   },
   forgotPasswordText: {
     ...theme.FONTS.Mulish_400Regular,

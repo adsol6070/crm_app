@@ -140,8 +140,9 @@ const SignUp = () => {
               containerStyle={{ marginBottom: 20 }}
               onChangeText={onChange}
               onBlur={onBlur}
+              eyeOffSvg={true}
               value={value}
-              secureTextEntry
+              secureTextEntry={true}
               error={errors.password?.message}
             />
           )}

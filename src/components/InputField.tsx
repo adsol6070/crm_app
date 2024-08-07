@@ -6,7 +6,7 @@ import {
   ViewStyle,
   TextInputProps,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { theme } from "../constants/theme";
 import { svg } from "../svg";
 
@@ -25,13 +25,19 @@ const InputField: React.FC<InputFieldProps> = ({
   title,
   placeholder,
   containerStyle,
-  secureTextEntry,
+  secureTextEntry = false,
   keyboardType,
   check,
-  eyeOffSvg,
+  eyeOffSvg = false,
   error,
   ...rest
 }) => {
+  const [isSecure, setIsSecure] = useState(secureTextEntry);
+
+  const toggleSecureEntry = () => {
+    setIsSecure(!isSecure);
+  };
+  
   return (
     <View
       style={{
@@ -59,7 +65,7 @@ const InputField: React.FC<InputFieldProps> = ({
         }}
         keyboardType={keyboardType}
         placeholder={placeholder}
-        secureTextEntry={secureTextEntry}
+        secureTextEntry={isSecure}
         placeholderTextColor={theme.COLORS.lightGray}
         {...rest}
       />
@@ -91,9 +97,9 @@ const InputField: React.FC<InputFieldProps> = ({
           <svg.CheckSvg />
         </View>
       )}
-      {eyeOffSvg && (
-        <TouchableOpacity style={{ paddingHorizontal: 20 }}>
-          <svg.EyeOffSvg />
+       {eyeOffSvg && (
+        <TouchableOpacity onPress={toggleSecureEntry} style={{ paddingHorizontal: 20 }}>
+          {isSecure ? <svg.EyeOffSvg /> : <svg.EyeSvg />}
         </TouchableOpacity>
       )}
       {error && (
