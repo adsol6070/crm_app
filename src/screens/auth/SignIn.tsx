@@ -10,6 +10,7 @@ import { RootStackParamList } from "../../types";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { authService } from "../../api/auth";
 
 type OnboardingScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -34,9 +35,13 @@ const SignIn = () => {
       resolver: yupResolver(schema),
     });
 
-    const onSubmit = (data: any) => {
-      console.log(data);
-      // Handle form submission
+    const onSubmit = async (data: any) => {
+      try {
+        const response = await authService.login(data);
+        console.log("Response:", response);
+      } catch (error) {
+        console.error("Registration Error:", error);
+      }
     };
 
     return (
