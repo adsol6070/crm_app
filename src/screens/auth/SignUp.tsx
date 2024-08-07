@@ -240,7 +240,7 @@ const SignUp = () => {
               onChangeText={onChange}
               onBlur={onBlur}
               value={value}
-              secureTextEntry
+              secureTextEntry={true}
               error={errors.password?.message}
             />
           )}

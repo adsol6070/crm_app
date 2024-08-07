@@ -1,8 +1,14 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import React from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { theme } from "../../constants/theme";
+import { constants } from "../../constants";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { components } from "../../components";
 import { useNavigation } from "@react-navigation/native";
@@ -11,6 +17,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { authService } from "../../api/auth";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type OnboardingScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -22,28 +29,38 @@ const schema = yup.object().shape({
   password: yup.string().required("Password is required"),
 });
 
+const { theme } = constants;
+
 const SignIn = () => {
   const navigation = useNavigation<OnboardingScreenNavigationProp>();
+  const [refreshing, setRefreshing] = React.useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    reset();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
+
+  const onSubmit = async (data: any) => {
+    try {
+      const response = await authService.login(data);
+      console.log("Response:", response);
+    } catch (error) {
+      console.error("Registration Error:", error);
+    }
+  };
 
   const renderContent = () => {
-    const navigation = useNavigation<OnboardingScreenNavigationProp>();
-    const {
-      control,
-      handleSubmit,
-      formState: { errors },
-    } = useForm({
-      resolver: yupResolver(schema),
-    });
-
-    const onSubmit = async (data: any) => {
-      try {
-        const response = await authService.login(data);
-        console.log("Response:", response);
-      } catch (error) {
-        console.error("Registration Error:", error);
-      }
-    };
-
     return (
       <KeyboardAwareScrollView
         contentContainerStyle={styles.scrollViewContent}
@@ -51,10 +68,17 @@ const SignIn = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.logoContainer}>
-          <Image
-            source={require("../../../assets/logo.png")}
-            style={styles.logo}
-          />
+          <Text
+            style={{
+              textAlign: "center",
+              ...theme.FONTS.H1,
+              marginBottom: 30,
+              textTransform: "capitalize",
+              color: theme.COLORS.black,
+            }}
+          >
+            Sign In
+          </Text>
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.subtitle}>Sign in to continue</Text>
@@ -68,7 +92,6 @@ const SignIn = () => {
                 title="Email"
                 placeholder="example@mail.com"
                 containerStyle={styles.inputField}
-                check={true}
                 onChangeText={onChange}
                 onBlur={onBlur}
                 value={value}
@@ -95,7 +118,9 @@ const SignIn = () => {
           />
         </View>
         <View style={styles.forgotPasswordContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("ForgotPassword")}
+          >
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
         </View>
@@ -104,11 +129,51 @@ const SignIn = () => {
           containerStyle={styles.button}
           onPress={handleSubmit(onSubmit)}
         />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 40,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "Mulish_400Regular",
+              fontSize: 16,
+              color: theme.COLORS.gray1,
+              marginRight: 3,
+            }}
+          >
+            Don't have an account?
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <Text
+              style={{
+                ...theme.FONTS.Mulish_400Regular,
+                fontSize: 16,
+                color: theme.COLORS.black,
+              }}
+            >
+              Sign Up.
+            </Text>
+          </TouchableOpacity>
+        </View>
       </KeyboardAwareScrollView>
     );
   };
 
-  return <SafeAreaView style={styles.safeArea}>{renderContent()}</SafeAreaView>;
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {renderContent()}
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
 // Styles
@@ -117,9 +182,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.COLORS.white,
   },
-  scrollViewContent: {
+  scrollView: {
+    flexGrow: 1,
+    justifyContent: "center",
     paddingHorizontal: 20,
     paddingVertical: theme.SIZES.height * 0.05,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   logoContainer: {
     alignItems: "center",

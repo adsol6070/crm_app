@@ -8,6 +8,16 @@ const FONTS = {
     fontSize: 32,
     lineHeight: 32 * 1.2,
   },
+  H2: {
+    fontFamily: "Mulish_700Bold",
+    fontSize: 22,
+    lineHeight: 22 * 1.2,
+  },
+  H3: {
+    fontFamily: "Mulish_700Bold",
+    fontSize: 20,
+    lineHeight: 20 * 1.2,
+  },
   H4: {
     fontFamily: "Mulish_600SemiBold",
     fontSize: 18,
