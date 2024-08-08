@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AuthNavigator from "./src/navigation/AuthNavigator";
-import AppNavigator from "./src/navigation/MainNavigator";
+import AppNavigator from "./src/navigation/AppNavigator";
 import {
   Mulish_400Regular,
   Mulish_600SemiBold,
@@ -21,8 +21,8 @@ export default function App() {
     return (
       <NavigationContainer>
         <SafeAreaProvider>
-          <AuthNavigator />
-          {/* <AppNavigator /> */}
+          {/* <AuthNavigator /> */}
+          <AppNavigator />
         </SafeAreaProvider>
       </NavigationContainer>
     );

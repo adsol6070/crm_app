@@ -19,6 +19,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from "expo-image-picker";
 import { authService } from "../../api/auth";
+import Toast from "react-native-toast-message";
+import AwesomeAlert from "react-native-awesome-alerts";
 
 const schema = yup.object().shape({
   tenantId: yup.string().required("Tenant ID is required"),
@@ -107,6 +109,14 @@ const SignUp = () => {
 
       const response = await authService.register(formData);
       console.log("Response:", response);
+
+      Toast.show({
+        type: "success",
+        position: "top",
+        text1: "Success",
+        text2: "You have successfully signed up!",
+        autoHide: true,
+      });
     } catch (error) {
       console.error("Registration Error:", error);
     }
@@ -310,6 +320,7 @@ const SignUp = () => {
       >
         {/* {renderHeader()} */}
         {renderContent()}
+        <Toast />
       </ScrollView>
     </SafeAreaView>
   );
