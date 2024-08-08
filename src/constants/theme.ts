@@ -23,6 +23,11 @@ const FONTS = {
     fontSize: 18,
     lineHeight: 18 * 1.2,
   },
+  H5: {
+    fontFamily: "Mulish_600SemiBold",
+    fontSize: 16,
+    lineHeight: 16 * 1.2,
+  },
   Mulish_400Regular: {
     fontFamily: "Mulish_400Regular",
   },
