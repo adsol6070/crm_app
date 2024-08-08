@@ -19,23 +19,27 @@ const BottomTabNavigator = () => {
 };
 
 const DrawerNavigator = () => {
+  return ( 
   <Drawer.Navigator screenOptions={{ drawerPosition: "right" }}>
     <Drawer.Screen name="Main" component={BottomTabNavigator} />
     <Drawer.Screen name="Settings" component={Home} />
-  </Drawer.Navigator>;
+  </Drawer.Navigator>
+  );
 };
 
-// const MainNavigator = () => {
-//   <Stack.Navigator screenOptions={{ headerShown: false }}>
-//     <Stack.Screen name="Tabs" component={BottomTabNavigator} />
-//     <Stack.Screen name="Drawer" component={DrawerNavigator} />
-//   </Stack.Navigator>;
-// };
+const MainNavigator = () => {
+  return ( 
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Tabs" component={BottomTabNavigator} />
+    <Stack.Screen name="Drawer" component={DrawerNavigator} />
+  </Stack.Navigator>
+  );
+};
 
 const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="rahul" component={Home} />
+      <Stack.Screen name="Main" component={MainNavigator} />
     </Stack.Navigator>
   );
 };

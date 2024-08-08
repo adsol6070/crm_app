@@ -6,4 +6,5 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   ForgotPasswordSentEmail: undefined;
   Profile: undefined;
+  Main: undefined;
 };

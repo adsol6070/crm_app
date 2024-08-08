@@ -6,7 +6,7 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { constants } from "../../constants";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -18,6 +18,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { authService } from "../../api/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "../../common/context/AuthContext";
+import { Dialog, Portal, Button } from "react-native-paper";
 
 type OnboardingScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -33,7 +35,10 @@ const { theme } = constants;
 
 const SignIn = () => {
   const navigation = useNavigation<OnboardingScreenNavigationProp>();
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const {
     control,
     handleSubmit,
@@ -51,14 +56,23 @@ const SignIn = () => {
     }, 500);
   }, []);
 
+  const { login } = useAuth();
+
   const onSubmit = async (data: any) => {
     try {
-      const response = await authService.login(data);
-      console.log("Response:", response);
+      const response = await login(data);
+      if (response == "Invalid email or password") {
+        setErrorMessage("Invalid email or password");
+        setVisible(true);
+      }
     } catch (error) {
-      console.error("Registration Error:", error);
+      console.error('Login Error:', error);
+      setErrorMessage("An error occurred. Please try again.");
+      setVisible(true);
     }
   };
+
+  const hideDialog = () => setVisible(false);
 
   const renderContent = () => {
     return (
@@ -172,6 +186,17 @@ const SignIn = () => {
       >
         {renderContent()}
       </ScrollView>
+      <Portal>
+        <Dialog visible={visible} onDismiss={hideDialog}>
+          <Dialog.Title style={{color: "red"}}>Login Failed!</Dialog.Title>
+          <Dialog.Content>
+            <Text>{errorMessage}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialog}>OK</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 };
