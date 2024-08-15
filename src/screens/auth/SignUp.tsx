@@ -122,10 +122,6 @@ const SignUp = () => {
     }
   };
 
-  const renderHeader = () => {
-    return <components.Header title="Sign up" goBack={true} />;
-  };
-
   const renderContent = () => {
     return (
       <KeyboardAwareScrollView
@@ -318,7 +314,6 @@ const SignUp = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* {renderHeader()} */}
         {renderContent()}
         <Toast />
       </ScrollView>

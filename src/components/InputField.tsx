@@ -7,6 +7,7 @@ import {
   TextInputProps,
 } from "react-native";
 import React, { useState } from "react";
+import RNPickerSelect from "react-native-picker-select";
 import { theme } from "../constants/theme";
 import { svg } from "../svg";
 
@@ -19,6 +20,10 @@ interface InputFieldProps extends TextInputProps {
   check?: boolean;
   eyeOffSvg?: boolean;
   error?: string;
+  dropdown?: boolean;
+  items?: Array<{ label: string; value: string }>;
+  selectedValue?: string;
+  onValueChange?: (value: any, index: number) => void;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -30,6 +35,10 @@ const InputField: React.FC<InputFieldProps> = ({
   check,
   eyeOffSvg = false,
   error,
+  dropdown = false,
+  items = [],
+  selectedValue,
+  onValueChange,
   ...rest
 }) => {
   const [isSecure, setIsSecure] = useState(secureTextEntry);
@@ -37,12 +46,12 @@ const InputField: React.FC<InputFieldProps> = ({
   const toggleSecureEntry = () => {
     setIsSecure(!isSecure);
   };
-  
+
   return (
     <View
       style={{
         paddingLeft: 30,
-        height: 50,
+        height: dropdown ? "auto" : 50,
         width: "100%",
         borderWidth: 1,
         borderColor: error ? "red" : theme.COLORS.lightBlue1,
@@ -53,22 +62,62 @@ const InputField: React.FC<InputFieldProps> = ({
         ...containerStyle,
       }}
     >
-      <TextInput
-        style={{
-          flex: 1,
-          height: "100%",
-          width: "100%",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          ...theme.FONTS.Mulish_400Regular,
-          fontSize: 16,
-        }}
-        keyboardType={keyboardType}
-        placeholder={placeholder}
-        secureTextEntry={isSecure}
-        placeholderTextColor={theme.COLORS.lightGray}
-        {...rest}
-      />
+      {dropdown ? (
+        <RNPickerSelect
+          placeholder={{ label: placeholder || "Select...", value: "" }}
+          items={items}
+          onValueChange={onValueChange as (value: any, index: number) => void}
+          value={selectedValue}
+          style={{
+            inputIOS: {
+              flex: 1,
+              height: 50,
+              width: "100%",
+              ...theme.FONTS.Mulish_400Regular,
+              fontSize: 16,
+            },
+            inputAndroid: {
+              flex: 1,
+              height: 50,
+              width: "100%",
+              ...theme.FONTS.Mulish_400Regular,
+              fontSize: 16,
+            },
+            placeholder: {
+              color: theme.COLORS.lightGray,
+            },
+          }}
+          useNativeAndroidPickerStyle={false}
+        />
+      ) : (
+        <>
+          <TextInput
+            style={{
+              flex: 1,
+              height: "100%",
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              ...theme.FONTS.Mulish_400Regular,
+              fontSize: 16,
+            }}
+            keyboardType={keyboardType}
+            placeholder={placeholder}
+            secureTextEntry={isSecure}
+            placeholderTextColor={theme.COLORS.lightGray}
+            {...rest}
+          />
+          {eyeOffSvg && (
+            <TouchableOpacity
+              onPress={toggleSecureEntry}
+              style={{ paddingHorizontal: 20 }}
+            >
+              {isSecure ? <svg.EyeOffSvg /> : <svg.EyeSvg />}
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+
       {title && (
         <View
           style={{
@@ -96,11 +145,6 @@ const InputField: React.FC<InputFieldProps> = ({
         <View style={{ paddingHorizontal: 20 }}>
           <svg.CheckSvg />
         </View>
-      )}
-       {eyeOffSvg && (
-        <TouchableOpacity onPress={toggleSecureEntry} style={{ paddingHorizontal: 20 }}>
-          {isSecure ? <svg.EyeOffSvg /> : <svg.EyeSvg />}
-        </TouchableOpacity>
       )}
       {error && (
         <Text

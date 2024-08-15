@@ -11,6 +11,7 @@ import Home from "../screens/Home";
 import Profile from "../screens/Profile";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../constants/theme";
+import Chat from "../screens/Chat";
 
 const BottomTab = createBottomTabNavigator();
 
@@ -47,6 +48,7 @@ const BottomTabNavigation = () => {
         },
         tabBarActiveTintColor: theme.COLORS.black,
         tabBarInactiveTintColor: theme.COLORS.gray1,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           position: "absolute",
           bottom: 0,
@@ -84,7 +86,7 @@ const BottomTabNavigation = () => {
       />
       <BottomTab.Screen
         name="Chat"
-        component={Profile}
+        component={Chat}
         options={{ title: "Chat" }}
       />
       <BottomTab.Screen
