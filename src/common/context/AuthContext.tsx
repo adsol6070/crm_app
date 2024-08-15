@@ -1,8 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../../api/auth/index';
+import { jwtDecode } from 'jwt-decode';
+
+interface DecodedToken {
+    tenantID?: string;
+    sub?: string;
+    [key: string]: any;
+}
+
 
 interface AuthContextProps {
+    user: DecodedToken | undefined;
     isAuthenticated: boolean
     token: string | null;
     login: (data: any) => Promise<string | null>;
@@ -13,6 +22,7 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [user, setUser] = useState<DecodedToken | undefined>(undefined);
     const [token, setToken] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -21,6 +31,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             const storedToken = await AsyncStorage.getItem('accessToken');
             if (storedToken) {
                 setToken(storedToken);
+                try {
+                    const decodedToken = jwtDecode<DecodedToken>(storedToken);
+                    setUser(decodedToken);
+                } catch (err) {
+                    console.error('Token decoding failed:', err);
+                }
             }
         };
 
@@ -34,16 +50,18 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             if (token) {
                 await AsyncStorage.setItem('accessToken', token);
                 setToken(token);
-                setError(null); 
+                const decodedToken = jwtDecode<DecodedToken>(token);
+                setUser(decodedToken);
+                setError(null);
                 return null;
             } else {
                 console.error('Login Error: Token is undefined');
-                setError('Login Error: Token is undefined'); 
+                setError('Login Error: Token is undefined');
                 return 'Login Error: Token is undefined';
             }
         } catch (error) {
             console.error('Login Error:', error);
-            setError('Invalid email or password'); 
+            setError('Invalid email or password');
             return 'Invalid email or password';
         }
     };
@@ -52,13 +70,14 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         try {
             await AsyncStorage.removeItem('accessToken');
             setToken(null);
+            setUser(undefined);
         } catch (error) {
             console.error('Logout Error:', error);
         }
     };
 
     return (
-        <AuthContext.Provider value={{ token, login, logout, isAuthenticated: Boolean(token), error }}>
+        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: Boolean(token), error }}>
             {children}
         </AuthContext.Provider>
     );

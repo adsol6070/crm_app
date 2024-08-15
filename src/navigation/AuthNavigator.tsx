@@ -6,7 +6,6 @@ import SignUp from "../screens/auth/SignUp";
 import ForgotPassword from "../screens/auth/ForgotPassword";
 import NewPassword from "../screens/auth/NewPassword";
 import ForgotPasswordSentEmail from "../screens/auth/ForgotPasswordSentEmail";
-import Profile from "../screens/main/Profile";
 
 const Stack = createStackNavigator();
 

@@ -42,6 +42,7 @@ const FONTS = {
 const COLORS = {
   black: "#111111",
   white: "#FFFFFF",
+  primary: "#2980b9",
   gray1: "#626262",
   lightGray: "#BABABA",
   lightBlue1: "#DBE3F5",
