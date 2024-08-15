@@ -1,13 +1,11 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { theme } from "../constants/theme";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Dashboard } from "./Dashboard/";
+import { ScrollView } from "react-native-gesture-handler";
+import { components } from "../components";
 
-const Home = ({ navigation }) => {
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.COLORS.white }}>
-      <View
+/* <View
         style={{ flex: 1, backgroundColor: theme.COLORS.white, padding: 16 }}
       >
         <TouchableOpacity
@@ -23,7 +21,32 @@ const Home = ({ navigation }) => {
         >
           <MaterialIcons name="menu" size={24} color={theme.COLORS.gray1} />
         </TouchableOpacity>
+      </View> */
+
+const Home = () => {
+  const renderHeader = () => {
+    return <components.Header title="Home" burger={true} />;
+  };
+
+  const renderContent = () => {
+    return (
+      <View>
+        <Dashboard.DetailCard />
+        <Dashboard.LeadStatusReport />
+        <Dashboard.LeadSourceReport />
+        <Dashboard.LeadWeekReport />
+        <Dashboard.LeadMonthReport />
+        <Dashboard.LeadHalfYearlyReport />
+        <Dashboard.LeadYearlyReport />
+        <Dashboard.LeadCustomTimeReport />
       </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={{ marginBottom: 50 }}>
+      {renderHeader()}
+      <ScrollView>{renderContent()}</ScrollView>
     </SafeAreaView>
   );
 };

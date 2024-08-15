@@ -44,6 +44,7 @@ const COLORS = {
   white: "#FFFFFF",
   secondaryWhite: "#F7F7FC",
   tertiaryWhite: "#fafafa",
+  primary: "#2980b9",
   gray1: "#626262",
   lightGray: "#BABABA",
   lightBlue1: "#DBE3F5",

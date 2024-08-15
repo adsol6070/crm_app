@@ -6,21 +6,38 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
-
 import { components } from "../components";
 import { constants } from "../constants";
 import { svg } from "../svg";
 import { useAuth } from "../common/context/AuthContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { userService } from "../api/user";
 
 const Profile = () => {
   const navigation = useNavigation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const { theme } = constants;
   const [showModal, setShowModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState<ProfileResponse | undefined>(undefined);
   const [avatarLoading, setAvatarLoading] = useState(true);
+
+  useEffect(()=>{
+    const fetchProfile = async ()=>{
+    try {
+      const userId = user?.sub
+      console.log("UserId:", userId);
+      const response = await userService.getProfile({userId})
+      console.log("Profile Response ", response)
+      setCurrentUser(response)
+    } catch (error) {
+      console.log("Profile Fetching error ", error)
+    }
+  }
+  fetchProfile();
+  },[])
 
   const renderHeader = () => {
     return (
@@ -30,18 +47,10 @@ const Profile = () => {
     );
   };
 
-
   const renderContent = () => {
-    const user = {
-      userId: "54eb0690-554a-4847-b3a1-a086d6f4f069",
-      username: "Admin 123",
-      role: "Super Admin",
-      email: "admin123@gmail.com",
-      phone: "9898989898",
-      city: "Delhi",
-      address: "Mall Road",
+    if (!currentUser) {
+      return <ActivityIndicator size="large" color={theme.COLORS.lightGray} />;
     }
-
     return (
       <ScrollView
         contentContainerStyle={{
@@ -93,7 +102,7 @@ const Profile = () => {
         </TouchableOpacity>
 
         <Text style={{ ...theme.FONTS.H3, color: theme.COLORS.black }}>
-          {user.username}
+          {currentUser.firstname}
         </Text>
         <Text
           style={{
@@ -104,31 +113,31 @@ const Profile = () => {
             marginBottom: 22,
           }}
         >
-          {user.email}
+          {currentUser.email}
         </Text>
         <View style={{ width: "100%" }}>
           <components.ProfileCategory
-            title={user.userId}
+            title={currentUser.id === "null" ? "N/A": currentUser.id}
             icon={<svg.UserIdSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={user.role}
+            title={currentUser.role === "null" ? "N/A": currentUser.role}
             icon={<svg.RoleSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={user.phone}
+            title={currentUser.phone === "null" ? "N/A": currentUser.phone}
             icon={<svg.PhoneSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={user.city}
+            title={currentUser.city === "null" ? "N/A": currentUser.city}
             icon={<svg.CitySvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={user.address}
+            title={currentUser.address === "null" ? "N/A": currentUser.address}
             icon={<svg.MapPinSvg />}
             categoryNavigation={false}
           />
@@ -145,7 +154,7 @@ const Profile = () => {
 
 
   const renderModal = () => {
-    const hanldeLogout = async ()=>{
+    const hanldeLogout = async () => {
       try {
         await logout();
       } catch (error) {
@@ -245,11 +254,15 @@ const Profile = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      {renderHeader()}
-      {renderContent()}
-      {renderModal()}
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView>
+        <View style={{ flex: 1, marginBottom: 50 }}>
+          {renderHeader()}
+          {renderContent()}
+          {renderModal()}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
