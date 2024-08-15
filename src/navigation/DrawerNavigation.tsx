@@ -35,6 +35,14 @@ const CustomDrawerContent = (props: any) => {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <DrawerItemList {...props} />
         <DrawerItemWithSubItems
+          label="Users"
+          icon="people-outline"
+          subItems={[
+            { label: "Add Users", screen: "AddUsers" },
+            { label: "View Users", screen: "ViewUsers" },
+          ]}
+        />
+        <DrawerItemWithSubItems
           label="Blogs"
           icon="book-outline"
           subItems={[
@@ -75,7 +83,7 @@ const DrawerNavigation = () => {
       }}
     >
       <Drawer.Screen
-        name="Home"
+        name="DrawerHome"
         options={{
           drawerLabel: "Home",
           drawerIcon: () => (

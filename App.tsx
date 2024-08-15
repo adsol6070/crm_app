@@ -22,7 +22,7 @@ const AppContent = () => {
     <NavigationContainer>
       <SafeAreaProvider>
         <PaperProvider>
-          {isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
+          {!isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
         </PaperProvider>
       </SafeAreaProvider>
     </NavigationContainer>

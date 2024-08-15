@@ -66,7 +66,7 @@ const SignIn = () => {
         setVisible(true);
       }
     } catch (error) {
-      console.error('Login Error:', error);
+      console.error("Login Error:", error);
       setErrorMessage("An error occurred. Please try again.");
       setVisible(true);
     }
@@ -188,7 +188,7 @@ const SignIn = () => {
       </ScrollView>
       <Portal>
         <Dialog visible={visible} onDismiss={hideDialog}>
-          <Dialog.Title style={{color: "red"}}>Login Failed!</Dialog.Title>
+          <Dialog.Title style={{ color: "red" }}>Login Failed!</Dialog.Title>
           <Dialog.Content>
             <Text>{errorMessage}</Text>
           </Dialog.Content>
