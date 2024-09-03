@@ -1,36 +1,53 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import moment from 'moment';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { dashboardService } from '../../api/dashboard';
 
-const LeadHalfYearlyReport = () => {
-  // Get the current date
+const LeadHalfYearlyReport = ({ refreshKey }: any) => {
+  const [halfYearlyReport, setHalfYearlyReport] = useState<any>([]);
+
   const currentDate = moment();
-
-  // Generate data for the previous 6 months
-  const months = [];
-  for (let i = 5; i >= 0; i--) {
-    const startDate = currentDate.clone().subtract(i, 'months').startOf('month');
-    const endDate = startDate.clone().endOf('month');
-    months.push({
-      label: startDate.format('MMM YYYY'),
-      population: Math.floor(Math.random() * 200) 
-    });
-  }
-
-  // Data for the PieChart
-  const data = months.map(month => ({
-    name: month.label,
-    population: month.population,
-    color: `#${Math.floor(Math.random()*16777215).toString(16)}`, 
-    legendFontColor: '#7F7F7F',
-    legendFontSize: 14
-  }));
-
+  const startDate = currentDate.clone().subtract(5, 'months').startOf('month');
+  const endDate = currentDate.clone().endOf('month');
+  
   const screenWidth = Dimensions.get('window').width;
-  const startDateText = months[0].label;
-  const endDateText = currentDate.format('MMM YYYY');
+  const startDateText = startDate.format('MMM YYYY');
+  const endDateText = endDate.format('MMM YYYY');
+  
+  const getHalfYearlyReportData = async () => {
+    try {
+      const startOfMonth = startDate;
+      const endOfMonth = endDate;
+
+      const response: any = await dashboardService.getLeadReportBasedTime(startOfMonth, endOfMonth);
+
+      const aggregatedData = response.reduce((acc: any, item: any) => {
+        const monthLabel = moment(item.date).format('MMM YYYY');
+        if (!acc[monthLabel]) {
+          acc[monthLabel] = {
+            name: monthLabel,
+            population: 0,
+            color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+            legendFontColor: '#7F7F7F',
+            legendFontSize: 14,
+          };
+        }
+        acc[monthLabel].population += parseInt(item.lead_count, 10);
+        return acc;
+      }, {});
+
+      const processedData = Object.values(aggregatedData);
+      setHalfYearlyReport(processedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getHalfYearlyReportData();
+  }, [refreshKey]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -40,7 +57,7 @@ const LeadHalfYearlyReport = () => {
          ({startDateText} - {endDateText})
         </Text>
         <PieChart
-          data={data}
+          data={halfYearlyReport} 
           width={screenWidth - 32}
           height={220}
           chartConfig={{

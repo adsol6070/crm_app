@@ -10,7 +10,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 interface CollectedData {
     [key: string]: any;
-  }
+}
 
 const labels = ["Personal Details", "Academic Details", "Immigration Details", "Final Details", "View Lead Details"];
 
@@ -18,15 +18,6 @@ const AddLead = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [step, setStep] = useState(1);
     const [refreshing, setRefreshing] = useState(false);
-    const [selectedGender, setSelectedGender] = useState<string | null>(null);
-    const [selectedMaritalStatus, setSelectedMaritalStatus] = useState<string | null>(null);
-    const [selectedNationality, setSelectedNationality] = useState<string | null>(null);
-    const [selectedVisaCategory, setSelectedVisaCategory] = useState<string | null>(null);
-    const [selectedCountryOfInterest, setSelectedCountryOfInterest] = useState<string | null>(null);
-    const [selectedCountry, setSlectedCountry] = useState<string | null>(null);
-    const [selectedState, setSelectedState] = useState<string | null>(null);
-    const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
-    const [selectedCity, setSelectedCity] = useState<string | null>(null);
     const [collectedData, setCollectedData] = useState<CollectedData>({});
 
     const stepSchemas = [
@@ -52,20 +43,35 @@ const AddLead = () => {
         yup
             .object({
                 highestQualification: yup.string().required('Please enter your Highest Qualification').trim(),
-                fieldOfStudy: yup.string().required('Please enter your field of study').trim(),
-                institutionName: yup.string().required('Please enter your Institution Name'),
-                // phone: yup.string().required('Please enter your Phone Number').matches(/^[0-9]{10}$/, 'Phone number must be exactly 10 digits').trim(),
-                // dob: yup.date().required('Please select your Date of Birth'),
-                // gender: yup.string().required('Please select your Gender'),
-                // nationality: yup.string().required('Please enter your Nationality'),
-                // maritalStatus: yup.string().required('Please select your Marital Status'),
-                // country: yup.string().required('Please enter your Country'),
-                // state: yup.string().required('Please enter your State'),
-                // district: yup.string().required('Please enter your District'),
-                // city: yup.string().required('Please enter your City'),
-                // pincode: yup.string().required('Please enter your Pincode').matches(/^[0-9]{6}$/, 'Pincode must be exactly 6 digits').trim(),
-                // currentAddress: yup.string().required('Please enter your Current Address').trim(),
-                // permanentAddress: yup.string().required('Please enter your Permanent Address').trim(),
+                fieldOfStudy: yup.string().nullable(),
+                institutionName: yup.string().nullable(),
+                graduationYear: yup.string().nullable(),
+                grade: yup.string().nullable(),
+                testType: yup.string().nullable(),
+                testScore: yup.string().nullable(),
+            })
+            .required(),
+        yup
+            .object({
+                passportNumber: yup.string().nullable().matches(/(^$)|(^[A-PR-WYa-pr-wy][0-9]\d\s?\d{4}[0-9]$)/, 'Passport number must be exactly 8 characters').trim(),
+                courseOfInterest: yup.string().nullable(),
+                desiredFieldOfStudy: yup.string().nullable(),
+                preferredInstitutions: yup.string().nullable(),
+                intakeSession: yup.string().nullable(),
+                reasonForImmigration: yup.string().nullable(),
+                financialSupport: yup.string().nullable(),
+                sponsorDetails: yup.string().nullable(),
+                scholarships: yup.string().nullable(),
+            })
+            .required(),
+        yup
+            .object({
+                communicationMode: yup.string().nullable(),
+                preferredContactTime: yup.string().nullable(),
+                leadSource: yup.string().nullable(),
+                referralContact: yup.string().nullable(),
+                followUpDates: yup.string().required('Please select the Follow Ups Date'),
+                leadRating: yup.string().nullable(),
             })
             .required(),
     ];
@@ -84,43 +90,15 @@ const AddLead = () => {
         }, 500);
     }, []);
 
-    const handleSelectGender = (value: string) => {
-        setSelectedGender(value);
-    };
-    const handleSelectMaritalStatus = (value: string) => {
-        setSelectedMaritalStatus(value);
-    };
-    const handleSelectNationality = (value: string) => {
-        setSelectedNationality(value);
-    };
-    const handleSelectCountryOfInterest = (value: string) => {
-        setSelectedCountryOfInterest(value);
-    };
-    const handleSelectVisaCategory = (value: string) => {
-        setSelectedVisaCategory(value);
-    };
-    const handleSelectCountry = (value: string) => {
-        setSlectedCountry(value);
-    };
-    const handleSelectState = (value: string) => {
-        setSelectedState(value);
-    };
-    const handleSelectDistrict = (value: string) => {
-        setSelectedDistrict(value);
-    };
-    const handleSelectCity = (value: string) => {
-        setSelectedCity(value);
-    };
-
     const handleNextStep = async () => {
         const isValid = await trigger();
         console.log(isValid)
 
-        // if (isValid) {
+        if (isValid) {
         if (currentStep < labels.length - 1) {
             setCurrentStep(currentStep + 1);
         }
-        // }
+        }
     };
 
     const handlePreviousStep = () => {
@@ -199,6 +177,29 @@ const AddLead = () => {
                                 />
                             )}
                         />
+                        <Controller
+                            control={control}
+                            name="gender"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Gender"
+                                    placeholder="Select gender"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    error={errors.gender?.message}
+                                />
+                            )}
+                        />
                         <components.DatepickerField
                             title="DOB"
                             placeholder="11-11-1990"
@@ -207,120 +208,139 @@ const AddLead = () => {
                         />
                         <Controller
                             control={control}
-                            name="gender"
-                            render={({ field: { onChange } }) => (
-                                <components.Dropdown
-                                    options={['Male', 'Female', 'Other']}
-                                    selectedValue={selectedGender}
-                                    onSelect={(value: string) => {
-                                        handleSelectGender(value);
-                                        onChange(value);
-                                    }}
-                                    error={errors.gender?.message}
-                                    placeholder="Select an option"
-                                    label="Gender"
-                                />
-                            )}
-                        />
-                        <Controller
-                            control={control}
                             name="nationality"
-                            render={({ field: { onChange } }) => (
-                                <components.Dropdown
-                                    options={['Indian', 'Other']}
-                                    selectedValue={selectedNationality}
-                                    onSelect={(value: string) => {
-                                        handleSelectNationality(value);
-                                        onChange(value);
-                                    }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Nationality"
+                                    placeholder="Select nationality"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
                                     error={errors.nationality?.message}
-                                    placeholder="Select an option"
-                                    label="Nationality"
                                 />
                             )}
                         />
                         <Controller
                             control={control}
                             name="maritalStatus"
-                            render={({ field: { onChange } }) => (
-                                <components.Dropdown
-                                    options={['Single', 'Married', 'Divorced', 'Widowed', 'Separated', ]}
-                                    selectedValue={selectedMaritalStatus}
-                                    onSelect={(value: string) => {
-                                        handleSelectMaritalStatus(value);
-                                        onChange(value);
-                                    }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Marital Status"
+                                    placeholder="Select Marital Status"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
                                     error={errors.maritalStatus?.message}
-                                    placeholder="Select an option"
-                                    label="Marital Status"
                                 />
                             )}
                         />
                         <Controller
                             control={control}
                             name="country"
-                            render={({ field: { onChange } }) => (
-                                <components.Dropdown
-                                    options={['Option 1', 'Option 2', 'Option 3']}
-                                    selectedValue={selectedCountry}
-                                    onSelect={(value: string) => {
-                                        handleSelectCountry(value);
-                                        onChange(value);
-                                    }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Country"
+                                    placeholder="Select country"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
                                     error={errors.country?.message}
-                                    placeholder="Select an option"
-                                    label="Country"
                                 />
                             )}
                         />
                         <Controller
                             control={control}
                             name="state"
-                            render={({ field: { onChange } }) => (
-                                <components.Dropdown
-                                    options={['Option 1', 'Option 2', 'Option 3']}
-                                    selectedValue={selectedState}
-                                    onSelect={(value: string) => {
-                                        handleSelectState(value);
-                                        onChange(value);
-                                    }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="State"
+                                    placeholder="Select state"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
                                     error={errors.state?.message}
-                                    placeholder="Select an option"
-                                    label="State"
                                 />
                             )}
                         />
                         <Controller
                             control={control}
                             name="district"
-                            render={({ field: { onChange } }) => (
-                                <components.Dropdown
-                                    options={['Option 1', 'Option 2', 'Option 3']}
-                                    selectedValue={selectedDistrict}
-                                    onSelect={(value: string) => {
-                                        handleSelectDistrict(value);
-                                        onChange(value);
-                                    }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="District"
+                                    placeholder="Select district"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
                                     error={errors.district?.message}
-                                    placeholder="Select an option"
-                                    label="District"
                                 />
                             )}
                         />
                         <Controller
                             control={control}
                             name="city"
-                            render={({ field: { onChange } }) => (
-                                <components.Dropdown
-                                    options={['Option 1', 'Option 2', 'Option 3']}
-                                    selectedValue={selectedCity}
-                                    onSelect={(value: string) => {
-                                        handleSelectCity(value);
-                                        onChange(value);
-                                    }}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="City"
+                                    placeholder="Select city"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
                                     error={errors.city?.message}
-                                    placeholder="Select an option"
-                                    label="City"
                                 />
                             )}
                         />
@@ -377,7 +397,7 @@ const AddLead = () => {
                         </View>
                     </View>
                 );
-            case 1: 
+            case 1:
                 return (
                     <View style={styles.stepContainer}>
                         <Text style={styles.stepTitle}>Academic Information</Text>
@@ -413,55 +433,85 @@ const AddLead = () => {
                                 />
                             )}
                         />
-                        <components.InputField
-                            title="Institution Name"
-                            placeholder="Enter Institution Name"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="institutionName"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Institution Name"
+                                    placeholder="Enter Institution Name"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.institutionName?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Graduation Year"
-                            placeholder="Enter Graduation Year"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="graduationYear"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Graduation Year"
+                                    placeholder="Enter Graduation Year"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.graduationYear?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Grade/Percentage/CGPA"
-                            placeholder="Enter Grade/Percentage/CGPA"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="grade"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Grade/Percentage/CGPA"
+                                    placeholder="Enter Grade/Percentage/CGPA"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.grade?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Test Type"
-                            placeholder="Enter Test Type"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="testType"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Test Type"
+                                    placeholder="Enter Test Type"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.grade?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Test Score"
-                            placeholder="Enter Test Score"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="testScore"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Test Score"
+                                    placeholder="Enter Test Score"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.testType?.message}
+                                />
+                            )}
                         />
                         <View style={styles.buttonContainer}>
                             <Button title="Previous" onPress={handlePreviousStep} color="black" />
@@ -473,15 +523,21 @@ const AddLead = () => {
                 return (
                     <View style={styles.stepContainer}>
                         <Text style={styles.stepTitle}>Immigration Information</Text>
-                        <components.InputField
-                            title="Passport Number"
-                            placeholder="A12345678"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="passportNumber"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Passport Number"
+                                    placeholder="A12345678"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.passportNumber?.message}
+                                />
+                            )}
                         />
                         <components.DatepickerField
                             title="Passport Expiry Date"
@@ -489,107 +545,179 @@ const AddLead = () => {
                             customBorderColor="#ddd"
                             customBackgroundColor="#f5f5f5"
                         />
-                        <components.Dropdown
-                            options={['Option 1', 'Option 2', 'Option 3']}
-                            selectedValue={selectedVisaCategory}
-                            onSelect={(value: string) => {
-                                handleSelectVisaCategory(value);
-                                // onChange(value);
-                            }}
-                            // error={errors.category?.message}
-                            placeholder="Select an option"
-                            label="Choose Visa Category"
+                        <Controller
+                            control={control}
+                            name="visaCategory"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Visa Category"
+                                    placeholder="Select visa category"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    error={errors.visaCategory?.message}
+                                />
+                            )}
                         />
-                        <components.Dropdown
-                            options={['Option 1', 'Option 2', 'Option 3']}
-                            selectedValue={selectedCountryOfInterest}
-                            onSelect={(value: string) => {
-                                handleSelectCountryOfInterest(value);
-                                // onChange(value);
-                            }}
-                            // error={errors.category?.message}
-                            placeholder="Select an option"
-                            label="Country of Interest"
+                        <Controller
+                            control={control}
+                            name="countryOfInterest"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Country of interest"
+                                    placeholder="Select country of interest"
+                                    containerStyle={{ marginBottom: 20 }}
+                                    dropdown={true}
+                                    items={[
+                                        { label: "Male", value: "male" },
+                                        { label: "Female", value: "female" },
+                                        { label: "Other", value: "other" },
+                                    ]}
+                                    selectedValue={value}
+                                    onValueChange={(val) => onChange(val)}
+                                    onBlur={onBlur}
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    error={errors.countryOfInterest?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Course of Interest"
-                            placeholder="Enter Course of Interest"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="courseOfInterest"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Course of Interest"
+                                    placeholder="Enter Course of Interest"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.courseOfInterest?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Desired Field of Study"
-                            placeholder="Enter Desired Field of Study"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="fieldOfStudy"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Desired Field of Study"
+                                    placeholder="Enter Desired Field of Study"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.fieldOfStudy?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Preferred Institutions"
-                            placeholder="Enter Preferred Institutions"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="preferredInstitutions"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Preferred Institutions"
+                                    placeholder="Enter Preferred Institutions"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.preferredInstitutions?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Intake Session"
-                            placeholder="Enter Intake Session"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="intakeSession"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Intake Session"
+                                    placeholder="Enter Intake Session"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.intakeSession?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Reason for Immigration"
-                            placeholder="Enter Reason for Immigration"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="reasonforImmigration"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Reason for Immigration"
+                                    placeholder="Enter Reason for Immigration"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.reasonforImmigration?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Financial Support"
-                            placeholder="Enter Financial Support"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="financialSupport"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Financial Support"
+                                    placeholder="Enter Financial Support"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.financialSupport?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Sponsor Details"
-                            placeholder="Enter Sponsor Details"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="sponsorDetails"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Sponsor Details"
+                                    placeholder="Enter Sponsor Details"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.sponsorDetails?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Scholarships/Grants"
-                            placeholder="Enter Scholarships/Grants"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="scholarships"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Scholarships/Grants"
+                                    placeholder="Enter Scholarships/Grants"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.scholarships?.message}
+                                />
+                            )}
                         />
                         <View style={styles.buttonContainer}>
                             <Button title="Previous" onPress={handlePreviousStep} color="black" />
@@ -601,45 +729,69 @@ const AddLead = () => {
                 return (
                     <View style={styles.stepContainer}>
                         <Text style={styles.stepTitle}>Final Details</Text>
-                        <components.InputField
-                            title="Preferred Mode of Communication"
-                            placeholder="Write Here"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="preferredModeofCommunication"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Preferred Mode of Communication"
+                                    placeholder="Write Here"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.preferredModeofCommunication?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Preferred Time for Contact"
-                            placeholder="Write Here"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="preferredTimeforContact"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Preferred Time for Contact"
+                                    placeholder="Write Here"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.preferredTimeforContact?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Source of Lead"
-                            placeholder="Enter DSource of Lead"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="sourceofLead"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Source of Lead"
+                                    placeholder="Enter Source of Lead"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.sourceofLead?.message}
+                                />
+                            )}
                         />
-                        <components.InputField
-                            title="Referral Name/Contact"
-                            placeholder="Enter Referral Name/Contact"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="referral"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Referral Name/Contact"
+                                    placeholder="Enter Referral Name/Contact"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.referral?.message}
+                                />
+                            )}
                         />
                         <components.DatepickerField
                             title="FollowUp Dates"
@@ -647,15 +799,21 @@ const AddLead = () => {
                             customBorderColor="#ddd"
                             customBackgroundColor="#f5f5f5"
                         />
-                        <components.InputField
-                            title="Lead Rating"
-                            placeholder="Enter Lead Rating"
-                            customBorderColor="#ddd"
-                            customBackgroundColor="#f5f5f5"
-                        // onChangeText={onChange}
-                        // onBlur={onBlur}
-                        // value={value}
-                        // error={errors.title?.message}
+                        <Controller
+                            control={control}
+                            name="leadRating"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <components.InputField
+                                    title="Lead Rating"
+                                    placeholder="Enter Lead Rating"
+                                    customBorderColor="#ddd"
+                                    customBackgroundColor="#f5f5f5"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.leadRating?.message}
+                                />
+                            )}
                         />
                         <View style={styles.buttonContainer}>
                             <Button title="Previous" onPress={handlePreviousStep} color="black" />

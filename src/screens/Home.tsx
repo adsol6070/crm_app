@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dashboard } from "./Dashboard/";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView , RefreshControl } from "react-native-gesture-handler";
 import { components } from "../components";
 
 /* <View
@@ -24,6 +24,15 @@ import { components } from "../components";
       </View> */
 
 const Home = () => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); 
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setRefreshing(false);
+  };
+  
   const renderHeader = () => {
     return <components.Header title="Home" burger={true} />;
   };
@@ -31,22 +40,24 @@ const Home = () => {
   const renderContent = () => {
     return (
       <View>
-        <Dashboard.DetailCard />
-        <Dashboard.LeadStatusReport />
-        <Dashboard.LeadSourceReport />
-        <Dashboard.LeadWeekReport />
-        <Dashboard.LeadMonthReport />
-        <Dashboard.LeadHalfYearlyReport />
-        <Dashboard.LeadYearlyReport />
-        <Dashboard.LeadCustomTimeReport />
+        <Dashboard.DetailCard refreshKey={refreshKey}/>
+        <Dashboard.LeadStatusReport refreshKey={refreshKey}/>
+        <Dashboard.LeadSourceReport refreshKey={refreshKey}/>
+        <Dashboard.LeadWeekReport refreshKey={refreshKey}/>
+        <Dashboard.LeadMonthReport refreshKey={refreshKey}/>
+        <Dashboard.LeadHalfYearlyReport refreshKey={refreshKey}/>
+        <Dashboard.LeadYearlyReport refreshKey={refreshKey}/>
+        <Dashboard.LeadCustomTimeReport refreshKey={refreshKey}/>
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={{ marginBottom: 50 }}>
+    <SafeAreaView style={{ marginBottom: 100 }}>
       {renderHeader()}
-      <ScrollView>{renderContent()}</ScrollView>
+      <ScrollView refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>{renderContent()}</ScrollView>
     </SafeAreaView>
   );
 };

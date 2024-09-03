@@ -14,6 +14,7 @@ import { useFonts } from "expo-font";
 import { Text } from "react-native";
 import { AuthProvider, useAuth } from "./src/common/context/AuthContext";
 import { Provider as PaperProvider } from "react-native-paper";
+import { PermissionsProvider } from "./src/common/context/PermissionContext";
 
 const AppContent = () => {
   const { isAuthenticated } = useAuth();
@@ -22,7 +23,7 @@ const AppContent = () => {
     <NavigationContainer>
       <SafeAreaProvider>
         <PaperProvider>
-          {!isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
+          {isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
         </PaperProvider>
       </SafeAreaProvider>
     </NavigationContainer>
@@ -42,7 +43,9 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <AppContent />
+      <PermissionsProvider>
+        <AppContent />
+      </PermissionsProvider>
     </AuthProvider>
   );
 }

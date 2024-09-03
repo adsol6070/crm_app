@@ -3,9 +3,13 @@ import { View, Button, Image, StyleSheet, Alert, Text, TouchableOpacity } from '
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
 
-const ImagePickerComponent: React.FC = () => {
-  const [imageUri, setImageUri] = useState<string | null>(null);
+interface ImagePickerProps {
+  image: any | null;
+  setImage: (image: any | null) => void;
+}
 
+const ImagePickerComponent: React.FC<ImagePickerProps> = ({ image, setImage }) => {
+  
   const pickImage = async () => {
     const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -22,7 +26,14 @@ const ImagePickerComponent: React.FC = () => {
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0]?.uri || null);
+      const image = result.assets[0]
+      const imgData = {
+        uri: image.uri,
+        name: image.fileName || "unknown",
+        type: image.mimeType || "image/jpeg",
+        size: image.fileSize || 0,
+      }
+      setImage(imgData);
     }
   };
 
@@ -41,12 +52,19 @@ const ImagePickerComponent: React.FC = () => {
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0]?.uri || null);
+      const image = result.assets[0]
+      const imgData = {
+        uri: image.uri,
+        name: image.fileName || "unknown",
+        type: image.mimeType || "image/jpeg",
+        size: image.fileSize || 0,
+      }
+      setImage(imgData);
     }
   };
 
   const removeImage = () => {
-    setImageUri(null);
+    setImage(null);
   };
 
   return (
@@ -59,9 +77,9 @@ const ImagePickerComponent: React.FC = () => {
           <Ionicons name="camera" size={24} color="white" />
         </TouchableOpacity>
       </View>
-      {imageUri ? (
+      {image ? (
         <View style={styles.imageContainer}>
-          <Image source={{ uri: imageUri }} style={styles.image} />
+          <Image source={{ uri: image.uri }} style={styles.image} />
           <TouchableOpacity style={styles.removeButton} onPress={removeImage}>
             <MaterialIcons name="cancel" size={24} color="white" />
           </TouchableOpacity>

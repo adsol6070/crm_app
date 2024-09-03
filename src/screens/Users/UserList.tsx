@@ -90,7 +90,7 @@ const UserList = () => {
     setFilteredUsers(filteredData);
   };
 
-  const renderItem = ({ item, index }) => (
+  const renderItem = ({ item, index }: any) => (
     <TouchableOpacity
       key={item.id}
       onPress={() =>

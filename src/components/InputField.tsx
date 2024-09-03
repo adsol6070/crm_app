@@ -4,14 +4,19 @@ import {
   TextInput,
   TouchableOpacity,
   ViewStyle,
+  ScrollView,
   TextInputProps,
+  StyleSheet,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import RNPickerSelect from "react-native-picker-select";
 import { theme } from "../constants/theme";
 import { svg } from "../svg";
+import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface InputFieldProps extends TextInputProps {
+  date?: Date;
   title?: string;
   placeholder?: string;
   containerStyle?: ViewStyle;
@@ -19,7 +24,7 @@ interface InputFieldProps extends TextInputProps {
   keyboardType?: TextInputProps["keyboardType"];
   check?: boolean;
   eyeOffSvg?: boolean;
-  error?: string;
+  error?: any;
   dropdown?: boolean;
   items?: Array<{ label: string; value: string }>;
   selectedValue?: string;
@@ -28,9 +33,20 @@ interface InputFieldProps extends TextInputProps {
   numberOfLines?: number;
   customBorderColor?: string;
   customBackgroundColor?: string;
+  useRichTextEditor?: boolean;
+  richEditorPlaceholder?: string;
+  initialContent?: string;
+  richEditorStyle?: ViewStyle;
+  richEditorToolbarStyle?: ViewStyle;
+  onRichTextChange?: (content: string) => void;
+  datePicker?: boolean;
+  clearContent?: boolean;
+  onDateChange?: (date: Date) => void;
+  disableFutureDates?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
+  date,
   title,
   placeholder,
   containerStyle,
@@ -47,25 +63,95 @@ const InputField: React.FC<InputFieldProps> = ({
   numberOfLines,
   customBorderColor,
   customBackgroundColor,
+  useRichTextEditor = false,
+  richEditorPlaceholder,
+  richEditorStyle,
+  richEditorToolbarStyle,
+  onRichTextChange,
+  initialContent,
+  clearContent,
+  datePicker = false,
+  onDateChange,
+  disableFutureDates = false,
   ...rest
 }) => {
   const [isSecure, setIsSecure] = useState(secureTextEntry);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const richText = useRef(null);
 
   const toggleSecureEntry = () => {
     setIsSecure(!isSecure);
   };
 
+  if (clearContent) {
+    richText.current?.setContentHTML('');
+  }
+
+  // const handleDateChange = (event: any, selectedDate: any) => {
+  //   if (event.type === 'set') {
+  //     if (selectedDate) {
+  //       setShowDatePicker(false);
+  //       setDate(selectedDate);
+  //       if (onDateChange) {
+  //         onDateChange(selectedDate);
+  //       }
+  //     } else {
+  //       console.warn('Selected date is invalid');
+  //     }
+  //   } else if (event.type === 'dismissed') {
+  //     setShowDatePicker(false);
+  //   } else {
+  //     console.warn('Unexpected event type:', event.type);
+  //   }
+  // };
+
+  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+    if (event.type === 'set' && selectedDate) {
+      setShowDatePicker(false);
+      onDateChange && onDateChange(selectedDate);
+    } else if (event.type === 'dismissed') {
+      setShowDatePicker(false);
+    }
+  };
+
+
+
   return (
     <View>
-      <View
+      {useRichTextEditor ? <ScrollView contentContainerStyle={styles.scrollView}>
+        <Text style={{ marginBottom: 10 }}>{title}</Text>
+        <RichToolbar
+          editor={richText}
+          actions={[
+            actions.setBold,
+            actions.setItalic,
+            actions.setUnderline,
+            actions.heading1,
+            actions.insertBulletsList,
+            actions.insertOrderedList,
+            actions.insertLink,
+            actions.alignLeft,
+            actions.alignCenter,
+            actions.alignRight,
+          ]}
+          style={[styles.toolbar]}
+        />
+        <RichEditor
+          ref={richText}
+          style={[styles.editor]}
+          placeholder={placeholder}
+          onChange={onRichTextChange}
+          initialContentHTML={initialContent || ''}
+        />
+      </ScrollView> : <View
         style={{
           paddingLeft: 30,
-          height: dropdown && multiline ? "auto" : 50,
+          height: dropdown || multiline ? "auto" : 50,
           width: "100%",
           borderWidth: 1,
           borderColor:
             customBorderColor || (error ? "red" : theme.COLORS.lightBlue1),
-          borderRadius: 50,
+          borderRadius: 5,
           justifyContent: "center",
           flexDirection: "row",
           alignItems: "center",
@@ -101,6 +187,51 @@ const InputField: React.FC<InputFieldProps> = ({
             }}
             useNativeAndroidPickerStyle={false}
           />
+        ) : datePicker ? (
+          <View
+            style={{
+              paddingLeft: 30,
+              height: 50,
+              width: "100%",
+              borderRadius: 50,
+              justifyContent: "center",
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: 10,
+              marginBottom: 10,
+              ...containerStyle,
+            }}
+          >
+            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={{ flex: 1 }}>
+              <TextInput
+                editable={false}
+                style={{
+                  flex: 1,
+                  height: "100%",
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  ...theme.FONTS.Mulish_400Regular,
+                  fontSize: 16,
+                  textAlignVertical: "center",
+                  paddingVertical: 0,
+                  color: theme.COLORS.gray1,
+                }}
+                value={date ? new Date(date).toDateString() : ''}
+                placeholder={placeholder}
+                placeholderTextColor={theme.COLORS.lightGray}
+              />
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date || new Date()}
+                mode="date"
+                display="default"
+                onChange={handleDateChange}
+                maximumDate={disableFutureDates ? new Date() : undefined}
+              />
+            )}
+          </View>
         ) : (
           <>
             <TextInput
@@ -141,7 +272,7 @@ const InputField: React.FC<InputFieldProps> = ({
               top: -12,
               left: 20,
               paddingHorizontal: 10,
-              backgroundColor: customBackgroundColor || theme.COLORS.white,
+              backgroundColor: theme.COLORS.white,
             }}
           >
             <Text
@@ -162,7 +293,7 @@ const InputField: React.FC<InputFieldProps> = ({
             <svg.CheckSvg />
           </View>
         )}
-      </View>
+      </View>}
       {error && (
         <Text
           style={{
@@ -177,5 +308,29 @@ const InputField: React.FC<InputFieldProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  scrollView: {
+    flexGrow: 1,
+    height: 280,
+  },
+  editor: {
+    borderColor: theme.COLORS.lightBlue1,
+    borderWidth: 1,
+    borderRadius: 8,
+    minHeight: 200,
+    backgroundColor: theme.COLORS.white,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    ...theme.FONTS.Mulish_400Regular,
+    fontSize: 16,
+  },
+  toolbar: {
+    borderBottomColor: theme.COLORS.lightBlue1,
+    borderBottomWidth: 1,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+});
 
 export default InputField;

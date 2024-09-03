@@ -8,6 +8,10 @@ import Dropdown from "./Dropdown";
 import ImagePickerComponent from "./ImagePicker";
 import TextEditor from "./TextEditor";
 import DatepickerField from "./DatepickerField";
+import Spinner from "./Spinner";
+import FilePicker from "./FilePicker";
+import PdfViewer from "./PdfViewer";
+import Header1 from "./Header1";
 
 const components = {
   InputField,
@@ -19,7 +23,11 @@ const components = {
   Dropdown,
   ImagePickerComponent,
   TextEditor,
-  DatepickerField
+  DatepickerField,
+  Spinner,
+  FilePicker,
+  PdfViewer,
+  Header1,
 };
 
 export { components };

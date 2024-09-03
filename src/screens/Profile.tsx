@@ -27,10 +27,8 @@ const Profile = () => {
   useEffect(()=>{
     const fetchProfile = async ()=>{
     try {
-      const userId = user?.sub
-      console.log("UserId:", userId);
+      const userId = user?.sub;
       const response = await userService.getProfile({userId})
-      console.log("Profile Response ", response)
       setCurrentUser(response)
     } catch (error) {
       console.log("Profile Fetching error ", error)

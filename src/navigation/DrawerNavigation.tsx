@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   createDrawerNavigator,
   DrawerItemList,
   DrawerItem,
+  useDrawerStatus,
 } from "@react-navigation/drawer";
 import Settings from "../screens/Settings";
 import BottomTabNavigation from "./BottomTabNavigation";
@@ -18,10 +19,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../constants/theme";
 import DrawerItemWithSubItems from "./DrawerItemWithSubItems";
+import { usePermissions } from "../common/context/PermissionContext";
+import { hasPermission } from "../utils/HasPermission";
 
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props: any) => {
+  const { permissions, refreshPermissions } = usePermissions();
+  const drawerStatus = useDrawerStatus();
+
+  
+  useEffect(()=>{
+    if(drawerStatus == 'open'){
+      refreshPermissions();
+    }
+  }, [drawerStatus]);
+
   return (
     <SafeAreaView style={styles.drawerContent}>
       <View style={styles.profileSection}>
@@ -42,22 +55,24 @@ const CustomDrawerContent = (props: any) => {
             { label: "View Users", screen: "ViewUsers" },
           ]}
         />
+        {(hasPermission(permissions, "Blogs", "Create")  || hasPermission(permissions, "Blogs", "Read")) &&
         <DrawerItemWithSubItems
           label="Blogs"
           icon="book-outline"
           subItems={[
-            { label: "Add Blog", screen: "AddBlog" },
-            { label: "List Blogs", screen: "ListBlogs" },
-          ]}
-        />
+            ...(hasPermission(permissions, "Blogs", "Create") ? [{ label: "Add Blog", screen: "AddBlog" }] : []),
+            ...(hasPermission(permissions, "Blogs", "Read") ? [{ label: "List Blogs", screen: "ListBlogs" }] : []),
+            ]}
+        />}
+        {(hasPermission(permissions, "Leads", "Create")  || hasPermission(permissions, "Leads", "View")) &&
         <DrawerItemWithSubItems
           label="Leads"
           icon="people-outline"
           subItems={[
-            { label: "Add Lead", screen: "AddLead" },
-            { label: "List Leads", screen: "ListLeads" },
-          ]}
-        />
+            ...(hasPermission(permissions, "Leads", "Create") ? [{ label: "Add Lead", screen: "AddLead" }] : []),
+            ...(hasPermission(permissions, "Leads", "View") ? [{ label: "List Leads", screen: "ListLeads" }] : []),
+            ]}
+        />}
       </ScrollView>
     </SafeAreaView>
   );
@@ -96,7 +111,7 @@ const DrawerNavigation = () => {
         }}
         component={BottomTabNavigation}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Settings"
         options={{
           drawerLabel: "Settings",
@@ -109,7 +124,7 @@ const DrawerNavigation = () => {
           ),
         }}
         component={Settings}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 };

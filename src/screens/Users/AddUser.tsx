@@ -42,7 +42,7 @@ const AddUser = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: any) => {
     console.log("Data:", data);
   };
 

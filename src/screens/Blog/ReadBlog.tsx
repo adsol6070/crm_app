@@ -1,10 +1,34 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
-import React from 'react'
+import { View, Text, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { components } from '../../components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useRoute } from '@react-navigation/native';
+import { blogService } from '../../api/blog';
+import HTMLView from 'react-native-htmlview';
+import { theme } from '../../constants/theme';
+import { skeletonLoader } from '../../components/skeletonLoaders';
 
 const ReadBlog = () => {
+    const route = useRoute();
+    const { blogId }: any = route.params;
+    const [loading, setLoading] = useState<boolean>(true);
+    const [blogDetail, setBlogDetail] = useState<any>(null);
+
+    const getBlogDetail = async () => {
+        try {
+            const response: any = await blogService.getBlogById(blogId);
+            setBlogDetail(response);
+        } catch (error) {
+            console.error("Error fetching blogs:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        getBlogDetail();
+    }, []);
 
     const renderHeader = () => {
         return (
@@ -14,33 +38,64 @@ const ReadBlog = () => {
             />
         );
     };
+
     const renderContent = () => {
+        if (!blogDetail) return null;
+
         return (
             <View style={styles.blogContainer}>
-                <Image source={{ uri: "https://wallpaperaccess.com/full/266471.jpg" }} style={styles.image} />
+                <Image
+                    source={{ uri: blogDetail.blogImageUrl || 'https://tse2.mm.bing.net/th?id=OIP.sWCvltMZF_s3mjA5sL-RdgHaE8&pid=Api&P=0&h=180' }}
+                    style={styles.image}
+                />
                 <View style={styles.textContainer}>
                     <View style={styles.titleContainer}>
-                <Text style={styles.title}>Technology is the best Tool</Text>
+                        <Text style={styles.title}>{blogDetail.title}</Text>
                     </View>
-                <Text style={styles.textDesign}>Date | Category</Text>
-                <Text style={styles.shortDescription}>Technology is a driving force behind modern innovation and progress, continually reshaping the way we live, work, and interact.</Text>
-                <Text style={styles.description}>Technology is a driving force behind modern innovation and progress, continually reshaping the way we live, work, and interact. From the dawn of the digital age to the present day, technology has revolutionized industries, transformed communication, and expanded the boundaries of what is possible. Advances in computing power, artificial intelligence, and connectivity have led to breakthroughs that enhance our daily lives, streamline complex processes, and open new frontiers for exploration and creativity. As technology continues to evolve at an unprecedented pace, it presents both opportunities and challenges, necessitating a balanced approach to harness its potential while addressing ethical considerations and ensuring equitable access. Embracing technology's potential can lead to remarkable advancements, fostering a future where innovation drives positive change and enhances the quality of life globally.</Text>
+                    <Text style={styles.textDesign}>
+                        {new Date(blogDetail.created_at).toLocaleDateString()} | {blogDetail.category}
+                    </Text>
+                    <Text style={styles.shortDescription}>{blogDetail.description}</Text>
+                    <HTMLView value={blogDetail.content} stylesheet={styles} />
                 </View>
             </View>
         );
     };
 
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <ScrollView>
+                    <components.Header title="Read Blog" goBack={true} />
+                    <View style={styles.blogContainer}>
+                        <skeletonLoader.ReadBlogSkeletonLoader width={'100%'} height={150} />
+                        <View style={styles.textContainer}>
+                            <skeletonLoader.ReadBlogSkeletonLoader width={'80%'} height={30} />
+                            <skeletonLoader.ReadBlogSkeletonLoader width={'60%'} height={20} />
+                            <skeletonLoader.ReadBlogSkeletonLoader width={'100%'} height={20} />
+                            <skeletonLoader.ReadBlogSkeletonLoader width={'100%'} height={200} />
+                        </View>
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView>
-            <ScrollView>
                 {renderHeader()}
+            <ScrollView>
                 {renderContent()}
             </ScrollView>
         </SafeAreaView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: theme.COLORS.white,
+    },
     blogContainer: {
         margin: 10,
     },
@@ -91,4 +146,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ReadBlog
+export default ReadBlog;

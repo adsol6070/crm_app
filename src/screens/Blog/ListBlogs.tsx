@@ -1,17 +1,76 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native-gesture-handler';
+import { RefreshControl, ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { components } from '../../components';
+import { blogService } from '../../api/blog';
+import { skeletonLoader } from '../../components/skeletonLoaders';
+import { usePermissions } from '../../common/context/PermissionContext';
+import { hasPermission } from '../../utils/HasPermission';
 
 type RootStackParamList = {
-  ReadBlog: undefined;
+  ReadBlog: { blogId: string };
+  EditBlog: { blogId: string };
 };
 
 const ListBlogs: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [refreshing, setRefreshing] = useState(false);
+  const { permissions, refreshPermissions } = usePermissions();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [blogData, setBlogData] = useState<any[]>([]);
+
+  const getBlogData = async () => {
+    try {
+      const response: any = await blogService.getAllBlogs();
+      setBlogData(response);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getBlogData();
+    refreshPermissions();
+  }, []);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    getBlogData();
+    refreshPermissions();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
+
+  const handleDelete = (blogId: string) => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this blog?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              await blogService.deleteBlogById(blogId);
+              getBlogData();
+              refreshPermissions();
+            } catch (error) {
+              console.error("Error deleting lead:", error);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const renderHeader = () => {
     return (
@@ -21,37 +80,62 @@ const ListBlogs: React.FC = () => {
       />
     );
   };
-
   const renderContent = () => {
-    return (
-      <View style={styles.cardContainer}>
-        <Image source={{ uri: "https://wallpaperaccess.com/full/266471.jpg" }} style={styles.image} />
+    if (loading) {
+      return (
+        <View>
+          {Array(5).fill(null).map((_, index) => (
+            <skeletonLoader.BlogListSkeletonLoader key={index} />
+          ))}
+        </View>
+      );
+    }
+
+    return blogData.map((blog) => (
+      <View key={blog.id} style={styles.cardContainer}>
+        <Image source={{ uri: blog.blogImageUrl || 'https://tse2.mm.bing.net/th?id=OIP.sWCvltMZF_s3mjA5sL-RdgHaE8&pid=Api&P=0&h=180' }} style={styles.image} />
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>Technology is the best tool</Text>
-          <Text style={styles.date}>Date Category</Text>
-          <Text style={styles.shortDescription}>Technology is a driving force behind modern innovation and progress, continually reshaping the way we live, work, and interact.</Text>
+          <Text style={styles.title}>{blog.title}</Text>
+          <Text style={styles.date}>{new Date(blog.created_at).toLocaleDateString()} - {blog.category}</Text>
+          <Text style={styles.shortDescription} numberOfLines={2}>{blog.description}</Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.readMoreButton} onPress={() => navigation.navigate("ReadBlog")}>
+            <TouchableOpacity
+              style={styles.readMoreButton}
+              onPress={() => navigation.navigate("ReadBlog", { blogId: blog.id })}
+            >
               <Text style={styles.readMoreText}>Read More</Text>
             </TouchableOpacity>
             <View style={styles.actionContainer}>
-              <TouchableOpacity style={styles.actionIcon} onPress={() => navigation.navigate("ReadBlog")}>
+            {hasPermission(permissions, 'Blogs', 'Update') &&
+              <TouchableOpacity
+                style={styles.actionIcon}
+                onPress={() => navigation.navigate("EditBlog", { blogId: blog.id })}
+              >
                 <Ionicons name="pencil" size={24} color="blue" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionIcon} onPress={() => navigation.navigate("ReadBlog")}>
+  }
+  {hasPermission(permissions, 'Blogs', 'Delete') &&
+              <TouchableOpacity
+                style={styles.actionIcon}
+                onPress={() => handleDelete(blog.id)}
+              >
                 <Ionicons name="trash" size={24} color="red" />
-              </TouchableOpacity>
+              </TouchableOpacity> }
             </View>
           </View>
         </View>
       </View>
-    );
+    ));
   };
 
   return (
     <SafeAreaView>
-      <ScrollView>
-        {renderHeader()}
+      {renderHeader()}
+      <ScrollView style={styles.containerStyle}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {renderContent()}
       </ScrollView>
     </SafeAreaView>
@@ -59,6 +143,9 @@ const ListBlogs: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  containerStyle: {
+    marginBottom: 50
+  },
   cardContainer: {
     backgroundColor: '#ffffff',
     borderRadius: 8,

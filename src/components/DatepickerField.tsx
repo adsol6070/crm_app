@@ -9,6 +9,7 @@ interface InputFieldProps extends TextInputProps {
     containerStyle?: ViewStyle,
     customBorderColor?: string;   
     customBackgroundColor?: string; 
+    error?: string; 
   }
 
 const DatepickerField: React.FC<InputFieldProps> = ({
@@ -17,6 +18,7 @@ const DatepickerField: React.FC<InputFieldProps> = ({
   containerStyle,
   customBorderColor,
   customBackgroundColor,
+  error,
 }) => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
@@ -59,6 +61,9 @@ const DatepickerField: React.FC<InputFieldProps> = ({
           onChange={onChange}
         />
       )}
+        {error && (
+        <Text style={styles.errorText}>{error}</Text>
+      )}
     </View>
   );
 };
@@ -99,6 +104,12 @@ const styles = StyleSheet.create({
     color: theme.COLORS.gray1,
     ...theme.FONTS.Mulish_400Regular,
     height: '100%',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    paddingHorizontal: 20,
+    marginTop: 5,
   },
 });
 

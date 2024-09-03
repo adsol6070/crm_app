@@ -7,5 +7,4 @@ export type RootStackParamList = {
   ForgotPasswordSentEmail: undefined;
   Profile: undefined;
   Main: undefined;
-  ReadBlog: undefined;
 };
