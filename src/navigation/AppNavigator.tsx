@@ -15,6 +15,13 @@ import RolesList from "../screens/Users/RolesList";
 import RoleDetail from "../screens/Users/RoleDetail";
 import EditRole from "../screens/Users/EditRole";
 import AddLead from "../screens/Lead/Add";
+import LeadDetail from "../screens/Lead/LeadDetail";
+import LeadHistory from "../screens/Lead/LeadHistory";
+import DocumentChecklist from "../screens/Lead/DocumentChecklist";
+import DocumentUpload from "../screens/Lead/DocumentUpload";
+import EditBlog from "../screens/Blog/EditBlog";
+import EditLead from "../screens/Lead/EditLead";
+import LeadActions from "../screens/Lead/LeadActions";
 
 const Stack = createStackNavigator();
 
@@ -34,8 +41,15 @@ const AppNavigator = () => {
       <Stack.Screen name="AddBlog" component={AddBlog} />
       <Stack.Screen name="ListBlogs" component={ListBlogs} />
       <Stack.Screen name="ReadBlog" component={ReadBlog} />
+      <Stack.Screen name="EditBlog" component={EditBlog} />
       <Stack.Screen name="AddLead" component={AddLead} />
+      <Stack.Screen name="EditLead" component={EditLead} />
       <Stack.Screen name="ListLeads" component={ListLeads} />
+      <Stack.Screen name="LeadActions" component={LeadActions} />
+      <Stack.Screen name="LeadDetail" component={LeadDetail} />
+      <Stack.Screen name="LeadHistory" component={LeadHistory} />
+      <Stack.Screen name="DocumentChecklist" component={DocumentChecklist} />
+      <Stack.Screen name="DocumentUpload" component={DocumentUpload} />
     </Stack.Navigator>
   );
 };

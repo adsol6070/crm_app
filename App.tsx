@@ -15,8 +15,8 @@ import { Text } from "react-native";
 import { AuthProvider, useAuth } from "./src/common/context/AuthContext";
 import { Provider as PaperProvider } from "react-native-paper";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import SocketManager from "./src/socket";
 import { SocketProvider, useSocket } from "./src/common/context/SocketContext";
+import { PermissionsProvider } from "./src/common/context/PermissionContext";
 
 const AppContent = () => {
   const { isAuthenticated, token } = useAuth();
@@ -65,7 +65,9 @@ export default function App() {
     <AuthProvider>
       <ActionSheetProvider>
         <SocketProvider>
-          <AppContent />
+          <PermissionsProvider>
+           <AppContent />
+          </PermissionsProvider>
         </SocketProvider>
       </ActionSheetProvider>
     </AuthProvider>

@@ -1,56 +1,93 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
+import { dashboardService } from '../../api/dashboard';
 
-const LeadMonthReport = () => {
-  const startOfMonth = moment().startOf('month').format('MMM D, YYYY');
-  const endOfMonth = moment().endOf('month').format('MMM D, YYYY');
+const LeadMonthReport = ({ refreshKey }: any) => {
+  const [monthlyReport, setMonthlyReport] = useState<any>([]);
 
-  const data = {
-    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'], 
-    datasets: [
-      {
-        data: [120, 150, 80, 60, 90], 
-      },
-    ],
+  const startOfMonth = moment().startOf('month');
+  const endOfMonth = moment().endOf('month');
+  
+  const getMonthlyReportData = async () => {
+    try {
+      const response: any = await dashboardService.getLeadReportBasedTime(startOfMonth, endOfMonth);
+      setMonthlyReport(response);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
+  useEffect(() => {
+    getMonthlyReportData();
+  }, [refreshKey]);
+
+  const generateChartData = () => {
+    const weeks: any = {
+      'Week 1': 0,
+      'Week 2': 0,
+      'Week 3': 0,
+      'Week 4': 0,
+      'Week 5': 0,
+    };
+
+    if (monthlyReport) {
+      monthlyReport.forEach((report: any) => {
+        const weekOfMonth = moment(report.date).week() - moment(report.date).startOf('month').week() + 1;
+        const weekLabel = `Week ${weekOfMonth}`;
+        if (weeks[weekLabel] !== undefined) {
+          weeks[weekLabel] += parseInt(report.lead_count);
+        }
+      });
+    }
+
+    return {
+      labels: Object.keys(weeks),
+      datasets: [
+        {
+          data: Object.values(weeks),
+        },
+      ],
+    };
+  };
+
+  const data = generateChartData();
+
   return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Monthly Lead Report</Text>
-        <Text style={styles.time}>({startOfMonth} - {endOfMonth})</Text>
-        <BarChart
-          data={data}
-          width={Dimensions.get('window').width * 0.9}
-          height={220}
-          fromZero={true}
-          showBarTops={true}
-          chartConfig={{
-            backgroundColor: '#2c3e50',
-            backgroundGradientFrom: '#2c3e50',
-            backgroundGradientTo: '#2c3e50',
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
-              borderRadius: 16,
-              marginVertical: 8,
-            },
-            propsForBackgroundLines: {
-              strokeWidth: 0,
-              stroke: "#e3e3e3",
-            },
-          }}
-          yAxisLabel=""
-          yAxisSuffix=""
-          style={{
-            marginVertical: 8,
+    <View style={styles.container}>
+      <Text style={styles.title}>Monthly Lead Report</Text>
+      <Text style={styles.time}>({moment(startOfMonth).format('MMM D, YYYY')} - {moment(endOfMonth).format('MMM D, YYYY')})</Text>
+      <BarChart
+        data={data}
+        width={Dimensions.get('window').width * 0.9}
+        height={220}
+        fromZero={true}
+        showBarTops={true}
+        chartConfig={{
+          backgroundColor: '#2c3e50',
+          backgroundGradientFrom: '#2c3e50',
+          backgroundGradientTo: '#2c3e50',
+          decimalPlaces: 0,
+          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          style: {
             borderRadius: 16,
-          }}
-        />
-      </View>
+            marginVertical: 8,
+          },
+          propsForBackgroundLines: {
+            strokeWidth: 0,
+            stroke: "#e3e3e3",
+          },
+        }}
+        yAxisLabel=""
+        yAxisSuffix=""
+        style={{
+          marginVertical: 8,
+          borderRadius: 16,
+        }}
+      />
+    </View>
   );
 };
 

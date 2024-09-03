@@ -1,28 +1,39 @@
-import { View, Text, TouchableOpacity, Platform } from "react-native";
-import React from "react";
+import { View, Platform } from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dashboard } from "./Dashboard/";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, RefreshControl } from "react-native-gesture-handler";
 import { components } from "../components";
-import { MaterialIcons } from "@expo/vector-icons";
 import { theme } from "../constants/theme";
 import { useNavigation } from "@react-navigation/native";
 import Header1 from "../components/Header1";
 
 const Home = () => {
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setRefreshing(false);
+  };
+
+  const renderHeader = () => {
+    return <components.Header title="Home" burger={true} />;
+  };
 
   const renderContent = () => {
     return (
       <View style={{ paddingBottom: Platform.OS === "ios" ? 90 : 60 }}>
-        <Dashboard.DetailCard />
-        <Dashboard.LeadStatusReport />
-        <Dashboard.LeadSourceReport />
-        <Dashboard.LeadWeekReport />
-        <Dashboard.LeadMonthReport />
-        <Dashboard.LeadHalfYearlyReport />
-        <Dashboard.LeadYearlyReport />
-        <Dashboard.LeadCustomTimeReport />
+        <Dashboard.DetailCard refreshKey={refreshKey} />
+        <Dashboard.LeadStatusReport refreshKey={refreshKey} />
+        <Dashboard.LeadSourceReport refreshKey={refreshKey} />
+        <Dashboard.LeadWeekReport refreshKey={refreshKey} />
+        <Dashboard.LeadMonthReport refreshKey={refreshKey} />
+        <Dashboard.LeadHalfYearlyReport refreshKey={refreshKey} />
+        <Dashboard.LeadYearlyReport refreshKey={refreshKey} />
+        <Dashboard.LeadCustomTimeReport refreshKey={refreshKey} />
       </View>
     );
   };
@@ -34,7 +45,13 @@ const Home = () => {
         showMenuButton={true}
         onMenuPress={() => navigation.toggleDrawer()}
       />
-      <ScrollView>{renderContent()}</ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {renderContent()}
+      </ScrollView>
     </SafeAreaView>
   );
 };

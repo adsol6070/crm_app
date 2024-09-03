@@ -14,17 +14,23 @@ import { userService } from "../api/user";
 import { useAuth } from "../common/context/AuthContext";
 import SkeletonLoader from "./ProfileSkeletonLoader";
 import { IUserProfile } from "../types";
+import { usePermissions } from "../common/context/PermissionContext";
+import { hasPermission } from "../utils/HasPermission";
 
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props: any) => {
   const { user } = useAuth();
+  const { permissions, refreshPermissions } = usePermissions();
   const [userProfile, setUserProfile] = useState<IUserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const isDrawerOpen = useDrawerStatus() === "open";
 
   useEffect(() => {
-    if (isDrawerOpen) fetchProfile();
+    if (isDrawerOpen) {
+      fetchProfile();
+      refreshPermissions();
+    }
   }, [isDrawerOpen]);
 
   const fetchProfile = async () => {

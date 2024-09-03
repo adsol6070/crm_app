@@ -4,20 +4,25 @@ import {
   TextInput,
   TouchableOpacity,
   ViewStyle,
+  ScrollView,
   TextInputProps,
   Image,
   StyleSheet,
   Modal,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import RNPickerSelect from "react-native-picker-select";
 import { theme } from "../constants/theme";
 import { svg } from "../svg";
 import * as ImagePicker from "expo-image-picker";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { CountryPicker } from "react-native-country-codes-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import {
+  RichEditor,
+  RichToolbar,
+  actions,
+} from "react-native-pell-rich-editor";
 
 interface InputFieldProps extends TextInputProps {
   date?: string | undefined;
@@ -44,11 +49,19 @@ interface InputFieldProps extends TextInputProps {
   countryCode?: string;
   setCountryCode?: any;
   datePicker?: boolean;
+  useRichTextEditor?: boolean;
+  richEditorPlaceholder?: string;
+  initialContent?: string;
+  richEditorStyle?: ViewStyle;
+  richEditorToolbarStyle?: ViewStyle;
+  onRichTextChange?: (content: string) => void;
+  clearContent?: boolean;
   onDateChange?: (date: Date) => void;
   disableFutureDates?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
+  date,
   title,
   placeholder,
   containerStyle,
@@ -72,7 +85,13 @@ const InputField: React.FC<InputFieldProps> = ({
   countryCode,
   setCountryCode,
   datePicker = false,
-  date,
+  useRichTextEditor = false,
+  richEditorPlaceholder,
+  richEditorStyle,
+  richEditorToolbarStyle,
+  onRichTextChange,
+  initialContent,
+  clearContent,
   onDateChange,
   disableFutureDates = false,
   ...rest
@@ -82,6 +101,7 @@ const InputField: React.FC<InputFieldProps> = ({
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [show, setShow] = useState(false);
+  const richText = useRef(null);
 
   const toggleSecureEntry = () => {
     setIsSecure(!isSecure);
@@ -140,148 +160,185 @@ const InputField: React.FC<InputFieldProps> = ({
 
   return (
     <View>
-      <View
-        style={[
-          styles.container,
-          {
-            height: dropdown || multiline || image ? "auto" : 50,
-            borderColor:
-              customBorderColor || (error ? "red" : theme.COLORS.lightBlue1),
-          },
-          containerStyle,
-        ]}
-      >
-        {dropdown ? (
-          <RNPickerSelect
-            placeholder={{ label: placeholder || "Select...", value: "" }}
-            items={items}
-            onValueChange={onValueChange as (value: any, index: number) => void}
-            value={selectedValue}
-            style={pickerSelectStyles}
-            useNativeAndroidPickerStyle={false}
+      {useRichTextEditor ? (
+        <ScrollView contentContainerStyle={pickerSelectStyles.scrollView}>
+          <Text style={{ marginBottom: 10 }}>{title}</Text>
+          <RichToolbar
+            editor={richText}
+            actions={[
+              actions.setBold,
+              actions.setItalic,
+              actions.setUnderline,
+              actions.heading1,
+              actions.insertBulletsList,
+              actions.insertOrderedList,
+              actions.insertLink,
+              actions.alignLeft,
+              actions.alignCenter,
+              actions.alignRight,
+            ]}
+            style={[pickerSelectStyles.toolbar]}
           />
-        ) : image ? (
-          <>
-            <TouchableOpacity
-              onPress={showImageActionSheet}
-              style={[styles.imageContainer, { height: imageContainerHeight }]}
-            >
-              {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.image} />
-              ) : (
-                <Text style={styles.imagePlaceholder}>
-                  {placeholder || "Select Image"}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </>
-        ) : datePicker ? (
-          <>
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(true)}
-              style={{ flex: 1 }}
-            >
-              <TextInput
-                editable={false}
-                style={{
-                  flex: 1,
-                  height: "100%",
-                  width: "100%",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  ...theme.FONTS.Mulish_400Regular,
-                  fontSize: 16,
-                  textAlignVertical: "center",
-                  paddingVertical: 0,
-                  color: theme.COLORS.gray1,
-                }}
-                value={date ? date : ""}
-                placeholder={placeholder}
-                placeholderTextColor={theme.COLORS.lightGray}
+          <RichEditor
+            ref={richText}
+            style={[pickerSelectStyles.editor]}
+            placeholder={placeholder}
+            onChange={onRichTextChange}
+            initialContentHTML={initialContent || ""}
+          />
+        </ScrollView>
+      ) : (
+        <>
+          <View
+            style={[
+              styles.container,
+              {
+                height: dropdown || multiline || image ? "auto" : 50,
+                borderColor:
+                  customBorderColor ||
+                  (error ? "red" : theme.COLORS.lightBlue1),
+              },
+              containerStyle,
+            ]}
+          >
+            {dropdown ? (
+              <RNPickerSelect
+                placeholder={{ label: placeholder || "Select...", value: "" }}
+                items={items}
+                onValueChange={
+                  onValueChange as (value: any, index: number) => void
+                }
+                value={selectedValue}
+                style={pickerSelectStyles}
+                useNativeAndroidPickerStyle={false}
               />
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={date || new Date()}
-                mode="date"
-                display="default"
-                onChange={handleDateChange}
-                maximumDate={disableFutureDates ? new Date() : undefined}
-              />
-            )}
-          </>
-        ) : (
-          <>
-            {title === "Phone" && (
-              <TouchableOpacity
-                style={styles.countryPickerContainer}
-                onPress={() => setShow(true)}
-              >
-                <CountryPicker
-                  lang="en"
-                  initialState={countryCode}
-                  show={show}
-                  inputPlaceholder="Select your country"
-                  pickerButtonOnPress={(item) => {
-                    setCountryCode(item?.dial_code);
-                    setShow(false);
-                  }}
-                  style={{
-                    modal: { ...styles.countryPicker },
-                    countryName: {
+            ) : image ? (
+              <>
+                <TouchableOpacity
+                  onPress={showImageActionSheet}
+                  style={[
+                    styles.imageContainer,
+                    { height: imageContainerHeight },
+                  ]}
+                >
+                  {imageUri ? (
+                    <Image source={{ uri: imageUri }} style={styles.image} />
+                  ) : (
+                    <Text style={styles.imagePlaceholder}>
+                      {placeholder || "Select Image"}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </>
+            ) : datePicker ? (
+              <>
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(true)}
+                  style={{ flex: 1 }}
+                >
+                  <TextInput
+                    editable={false}
+                    style={{
+                      flex: 1,
+                      height: "100%",
+                      width: "100%",
+                      flexDirection: "row",
+                      justifyContent: "center",
                       ...theme.FONTS.Mulish_400Regular,
+                      fontSize: 16,
+                      textAlignVertical: "center",
+                      paddingVertical: 0,
+                      color: theme.COLORS.gray1,
+                    }}
+                    value={date ? date : ""}
+                    placeholder={placeholder}
+                    placeholderTextColor={theme.COLORS.lightGray}
+                  />
+                </TouchableOpacity>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={date || new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={handleDateChange}
+                    maximumDate={disableFutureDates ? new Date() : undefined}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                {title === "Phone" && (
+                  <TouchableOpacity
+                    style={styles.countryPickerContainer}
+                    onPress={() => setShow(true)}
+                  >
+                    <CountryPicker
+                      lang="en"
+                      initialState={countryCode}
+                      show={show}
+                      inputPlaceholder="Select your country"
+                      pickerButtonOnPress={(item) => {
+                        setCountryCode(item?.dial_code);
+                        setShow(false);
+                      }}
+                      style={{
+                        modal: { ...styles.countryPicker },
+                        countryName: {
+                          ...theme.FONTS.Mulish_400Regular,
+                        },
+                        dialCode: {
+                          ...theme.FONTS.Mulish_400Regular,
+                        },
+                        searchMessageText: {
+                          ...theme.FONTS.Mulish_400Regular,
+                        },
+                      }}
+                    />
+                    <Text style={styles.countryCode}>{countryCode}</Text>
+                  </TouchableOpacity>
+                )}
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      height: multiline ? undefined : "100%",
+                      textAlignVertical: multiline ? "top" : "center",
+                      paddingVertical: multiline ? 10 : 0,
                     },
-                    dialCode: {
-                      ...theme.FONTS.Mulish_400Regular,
-                    },
-                    searchMessageText: {
-                      ...theme.FONTS.Mulish_400Regular,
-                    },
-                  }}
+                  ]}
+                  keyboardType={keyboardType}
+                  placeholder={placeholder}
+                  secureTextEntry={isSecure}
+                  placeholderTextColor={theme.COLORS.lightGray}
+                  multiline={multiline}
+                  numberOfLines={numberOfLines}
+                  {...rest}
                 />
-                <Text style={styles.countryCode}>{countryCode}</Text>
-              </TouchableOpacity>
+                {eyeOffSvg && (
+                  <TouchableOpacity
+                    onPress={toggleSecureEntry}
+                    style={styles.eyeIcon}
+                  >
+                    {isSecure ? <svg.EyeOffSvg /> : <svg.EyeSvg />}
+                  </TouchableOpacity>
+                )}
+              </>
             )}
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  height: multiline ? undefined : "100%",
-                  textAlignVertical: multiline ? "top" : "center",
-                  paddingVertical: multiline ? 10 : 0,
-                },
-              ]}
-              keyboardType={keyboardType}
-              placeholder={placeholder}
-              secureTextEntry={isSecure}
-              placeholderTextColor={theme.COLORS.lightGray}
-              multiline={multiline}
-              numberOfLines={numberOfLines}
-              {...rest}
-            />
-            {eyeOffSvg && (
-              <TouchableOpacity
-                onPress={toggleSecureEntry}
-                style={styles.eyeIcon}
-              >
-                {isSecure ? <svg.EyeOffSvg /> : <svg.EyeSvg />}
-              </TouchableOpacity>
-            )}
-          </>
-        )}
 
-        {title && (
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>{title}</Text>
+            {title && (
+              <View style={styles.titleContainer}>
+                <Text style={styles.titleText}>{title}</Text>
+              </View>
+            )}
+            {check && (
+              <View style={styles.checkIcon}>
+                <svg.CheckSvg />
+              </View>
+            )}
           </View>
-        )}
-        {check && (
-          <View style={styles.checkIcon}>
-            <svg.CheckSvg />
-          </View>
-        )}
-      </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && <Text style={styles.errorText}>{error}</Text>}
+        </>
+      )}
     </View>
   );
 };
@@ -418,6 +475,27 @@ const pickerSelectStyles = StyleSheet.create({
   placeholder: {
     color: theme.COLORS.lightGray,
     fontSize: 16,
+  },
+  scrollView: {
+    flexGrow: 1,
+    height: 280,
+  },
+  editor: {
+    borderColor: theme.COLORS.lightBlue1,
+    borderWidth: 1,
+    borderRadius: 8,
+    minHeight: 200,
+    backgroundColor: theme.COLORS.white,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    ...theme.FONTS.Mulish_400Regular,
+    fontSize: 16,
+  },
+  toolbar: {
+    borderBottomColor: theme.COLORS.lightBlue1,
+    borderBottomWidth: 1,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
 });
 

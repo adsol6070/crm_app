@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { dashboardService } from '../../api/dashboard';
+import moment from 'moment';
 
 const { width } = Dimensions.get('window');
 
-const LeadCustomTimeReport = () => {
+const LeadCustomTimeReport = ({ refreshKey }: any) => {
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [chartType, setChartType] = useState('line');
-  
+  const [customTimeReport, setCustomTimeReport] = useState<any>([]);
+
   const onDateChange = (event: any, selectedDate: any, isStartDate: boolean) => {
     if (selectedDate) {
       if (isStartDate) {
@@ -26,24 +29,59 @@ const LeadCustomTimeReport = () => {
     setShowEndDatePicker(false);
   };
 
+  const getCustomTimeReportData = async () => {
+    try {
+      const start = moment(startDate);
+      const end = moment(endDate);
+      const response: any = await dashboardService.getLeadReportBasedTime(start, end);
+      setCustomTimeReport(response);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getCustomTimeReportData();
+  }, [refreshKey, startDate, endDate]);
+
+  const aggregateData = () => {
+    const aggregatedData: { [key: string]: number } = {};
+
+    customTimeReport.forEach((report: any) => {
+      const dateKey = moment(report.date).format('MMM D');
+      if (aggregatedData[dateKey]) {
+        aggregatedData[dateKey] += parseInt(report.lead_count, 10);
+      } else {
+        aggregatedData[dateKey] = parseInt(report.lead_count, 10);
+      }
+    });
+
+    const labels = Object.keys(aggregatedData);
+    const data = Object.values(aggregatedData);
+
+    return { labels, data };
+  };
+
+  const { labels, data } = aggregateData();
+
   const chartData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    labels: labels.length > 0 ? labels : ['No Data'],
     datasets: [
       {
-        data: [20, 45, 28, 80, 99, 43]
-      }
-    ]
+        data: data.length > 0 ? data : [0],
+      },
+    ],
   };
 
   const chartConfig = {
     backgroundColor: '#ffffff',
     backgroundGradientFrom: '#ffffff',
     backgroundGradientTo: '#f5f5f5',
-    decimalPlaces: 2,
+    decimalPlaces: 0,
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     style: {
-      borderRadius: 16
-    }
+      borderRadius: 16,
+    },
   };
 
   return (
@@ -112,7 +150,7 @@ const LeadCustomTimeReport = () => {
               population: value,
               color: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`,
               legendFontColor: '#7F7F7F',
-              legendFontSize: 15
+              legendFontSize: 15,
             }))}
             width={width - 32}
             height={220}

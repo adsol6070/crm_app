@@ -1,37 +1,18 @@
 {
+  "cli": {
+    "version": ">= 11.0.2"
+  },
   "build": {
-    "preview": {
-      "android": {
-        "buildType": "apk",
-        "env": {
-          "API_URL": "http://192.168.1.21:8000"
-        }
-      }
-    },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease",
-        "env": {
-          "API_URL": "http://192.168.1.21:8000"
-        }
-      }
-    },
-    "preview3": {
+    "development": {
       "developmentClient": true,
-      "env": {
-        "API_URL": "http://192.168.1.21:8000"
-      }
+      "distribution": "internal"
     },
-    "preview4": {
-      "distribution": "internal",
-      "env": {
-        "API_URL": "http://192.168.1.21:8000"
-      }
+    "preview": {
+      "distribution": "internal"
     },
-    "production": {
-      "env": {
-        "API_URL": "https://your-production-backend.com"
-      }
-    }
+    "production": {}
+  },
+  "submit": {
+    "production": {}
   }
 }

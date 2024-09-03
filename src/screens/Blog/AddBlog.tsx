@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Text,
   Platform,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { components } from "../../components";
@@ -13,25 +14,44 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { RefreshControl } from "react-native-gesture-handler";
+import { blogService } from "../../api/blog";
+import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
+import { theme } from "../../constants/theme";
 import Header1 from "../../components/Header1";
+import { useNavigation } from "@react-navigation/native";
 
 const AddBlog = () => {
-  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [image, setImage] = useState<string | null>(null);
+  const [content, setContent] = useState<string>("");
+  const [clearStatus, setClearStatus] = useState<boolean>(false);
+
+  const getCategories = async () => {
+    try {
+      const response: any = await blogService.getBlogCategory();
+
+      const newCategories = response.map((category: any) =>
+        capitalizeFirstLetter(category.category)
+      );
+
+      setCategories(newCategories);
+    } catch (error) {
+      console.error("Error fetching blog categories", error);
+    }
+  };
+
+  useEffect(() => {
+    getCategories();
+  }, []);
 
   const schema = yup.object().shape({
     title: yup.string().required("Title is required"),
-    shortDescription: yup.string().required("Short description is required"),
+    description: yup.string().required("Short description is required"),
+    content: yup.string(),
     category: yup.string().required("Category is required"),
   });
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    reset();
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 500);
-  }, []);
 
   const {
     control,
@@ -42,23 +62,48 @@ const AddBlog = () => {
     resolver: yupResolver(schema),
   });
 
-  const handleSelect = (value: string) => {
-    setSelectedValue(value);
-  };
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    reset({ category: "" });
+    setImage(null);
+    setClearStatus(true);
+    setContent("");
+    setClearStatus(false);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
 
   const onSubmit = async (data: any) => {
-    console.log(data);
-    reset();
-  };
+    console.log("data ", data);
+    console.log("content ", content);
+    try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("content", content);
+      formData.append("category", data.category);
+      formData.append("uploadType", "Blog");
 
-  const renderHeader = () => {
-    return <components.Header title="Add Blog" goBack={true} />;
+      if (image) {
+        formData.append("blogImage", image);
+      }
+      await blogService.createBlog(formData);
+      reset({ category: "" });
+      setImage(null);
+      setClearStatus(true);
+      setContent("");
+      setClearStatus(false);
+      Alert.alert("Blog Created Successfully");
+    } catch (error) {
+      console.log("Error creating blog ", error);
+    }
   };
 
   const renderContent = () => {
     return (
       <View style={styles.fieldContainer}>
-        <View style={{ marginTop: 30, marginBottom: 30 }}>
+        <View>
           <Controller
             control={control}
             name="title"
@@ -67,7 +112,6 @@ const AddBlog = () => {
                 title="Title"
                 placeholder="Enter the title of the blog"
                 customBorderColor="#ddd"
-                customBackgroundColor="#f5f5f5"
                 onChangeText={onChange}
                 onBlur={onBlur}
                 value={value}
@@ -78,46 +122,66 @@ const AddBlog = () => {
         </View>
         <Controller
           control={control}
-          name="shortDescription"
+          name="description"
           render={({ field: { onChange, onBlur, value } }) => (
             <components.InputField
               title="Short Description"
               placeholder="Write the Short Description"
               customBorderColor="#ddd"
-              customBackgroundColor="#f5f5f5"
               multiline={true}
               numberOfLines={5}
               onChangeText={onChange}
               onBlur={onBlur}
               value={value}
-              error={errors.shortDescription?.message}
+              error={errors.description?.message}
             />
           )}
         />
         <Controller
           control={control}
           name="category"
-          render={({ field: { onChange } }) => (
+          render={({ field: { onChange, value } }) => (
             <components.Dropdown
-              options={["Option 1", "Option 2", "Option 3"]}
-              selectedValue={selectedValue}
+              options={categories}
+              selectedValue={capitalizeFirstLetter(value)}
               onSelect={(value: string) => {
-                handleSelect(value);
-                onChange(value);
+                const val = value.toLowerCase();
+                onChange(val);
               }}
-              error={errors.category?.message}
-              placeholder="Select an option"
+              placeholder="Select a category"
               label="Category"
+              error={errors.category?.message}
             />
           )}
         />
         <View>
-          <Text>Content</Text>
-          <components.TextEditor />
+          <Controller
+            control={control}
+            name="content"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <components.InputField
+                title="Content"
+                useRichTextEditor
+                richEditorPlaceholder="Write your content here..."
+                onRichTextChange={(text) => {
+                  setContent(text);
+                  onChange(text);
+                }}
+                error={errors.content?.message}
+                initialContent={content}
+                clearContent={clearStatus}
+              />
+            )}
+          />
         </View>
         <View>
           <Text>Upload Image</Text>
-          <components.ImagePickerComponent />
+          <components.FilePicker
+            file={image}
+            setFile={setImage}
+            allowCamera={true}
+            allowImagePick={true}
+          />
         </View>
         <components.Button title="Add Blog" onPress={handleSubmit(onSubmit)} />
       </View>
@@ -145,7 +209,7 @@ const AddBlog = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: theme.COLORS.white,
   },
   fieldContainer: {
     margin: 20,
