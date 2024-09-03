@@ -11,6 +11,7 @@ import { useAuth } from '../../common/context/AuthContext';
 import { genderOptions, maritalStatusOptions, nationalityOptions } from '../../utils/options';
 import { theme } from '../../constants/theme';
 import { skeletonLoader } from '../../components/skeletonLoaders';
+import { capitalizeFirstLetter } from '../../utils/CapitalizeFirstLetter';
 
 const EditLead = () => {
     const route = useRoute();
@@ -19,6 +20,9 @@ const EditLead = () => {
     const { user } = useAuth();
     const navigation = useNavigation();
     const [visaCategories, setVisaCategories] = useState<any[]>([]);
+    const [nationalityDropdownOptions, setNationalityDropdownOptions] = useState<any[]>([]);
+    const [maritalStatusDropdownOptions, setMaritalStatusDropdownOptions] = useState<any[]>([]);
+    const [genderDropdownOptions, setGenderDropdownOptions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [dob, setDob] = useState<Date | undefined>(undefined);
     const [followUpDate, setFollowUpDate] = useState<Date | undefined>(undefined);
@@ -139,21 +143,34 @@ const EditLead = () => {
     const getCategories = async () => {
         try {
             const response: any = await leadService.getVisaCategory();
-            const newCategories = response.map((category: any) => {
-                return {
-                    value: category.category,
-                    label: category.category,
-                }
-            })
+            const newCategories = response.map((category: any) => 
+                category.category,
+            )
             setVisaCategories(newCategories);
         } catch (error) {
             console.error("Error fetching visa categories", error);
         }
     }
 
+    const getAllOptions = ()=>{
+        const nationalityCategories = nationalityOptions.map((category: any) => 
+            category.value,
+        )
+        setNationalityDropdownOptions(nationalityCategories);
+        const genderCategories = genderOptions.map((category: any) => 
+            category.value,
+        )
+        setGenderDropdownOptions(genderCategories);
+        const maritalCategories = maritalStatusOptions.map((category: any) => 
+            category.value,
+        )
+        setMaritalStatusDropdownOptions(maritalCategories);
+    }
+
     useEffect(() => {
         getLeadDetails();
         getCategories();
+        getAllOptions();
     }, []);
 
     const onSubmit = async (data: any) => {
@@ -279,24 +296,22 @@ const EditLead = () => {
                 )}
             />
             <Controller
-                control={control}
-                name="gender"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <components.InputField
-                        title="Gender"
-                        placeholder="Select gender"
-                        containerStyle={{ marginBottom: 20 }}
-                        dropdown={true}
-                        items={genderOptions}
-                        selectedValue={value}
-                        onValueChange={(val) => onChange(val)}
-                        onBlur={onBlur}
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
-                        error={errors.gender?.message}
-                    />
-                )}
-            />
+                    control={control}
+                    name="gender"
+                    render={({ field: { onChange, value } }) => (
+                        <components.Dropdown
+                            options={genderDropdownOptions}
+                            selectedValue={capitalizeFirstLetter(value)}
+                            onSelect={(value: string) => {
+                                const val = value.toLowerCase();
+                                onChange(val);
+                            }}
+                            placeholder="Select a gender"
+                            label="Gender"
+                            error={errors.gender?.message}
+                        />
+                    )}
+                />
             <Controller
                 control={control}
                 name="dob"
@@ -403,27 +418,41 @@ const EditLead = () => {
                     />
                 )}
             />
-
             <Controller
-                control={control}
-                name="nationality"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <components.InputField
-                        title="Nationality"
-                        placeholder="Select nationality"
-                        containerStyle={{ marginBottom: 20 }}
-                        dropdown={true}
-                        items={nationalityOptions}
-                        selectedValue={value}
-                        onValueChange={(val) => onChange(val)}
-                        onBlur={onBlur}
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
-                        error={errors.nationality?.message}
-                    />
-                )}
-            />
-            <Controller
+                    control={control}
+                    name="nationality"
+                    render={({ field: { onChange, value } }) => (
+                        <components.Dropdown
+                            options={nationalityDropdownOptions}
+                            selectedValue={capitalizeFirstLetter(value)}
+                            onSelect={(value: string) => {
+                                const val = value.toLowerCase();
+                                onChange(val);
+                            }}
+                            placeholder="Select a Nationality"
+                            label="Nationality"
+                            error={errors.nationality?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name="maritalStatus"
+                    render={({ field: { onChange, value } }) => (
+                        <components.Dropdown
+                            options={maritalStatusDropdownOptions}
+                            selectedValue={capitalizeFirstLetter(value)}
+                            onSelect={(value: string) => {
+                                const val = value.toLowerCase();
+                                onChange(val);
+                            }}
+                            placeholder="Select a Marital Status"
+                            label="Marital Status"
+                            error={errors.maritalStatus?.message}
+                        />
+                    )}
+                />
+            {/* <Controller
                 control={control}
                 name="maritalStatus"
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -441,7 +470,7 @@ const EditLead = () => {
                         error={errors.maritalStatus?.message}
                     />
                 )}
-            />
+            /> */}
             <Controller
                 control={control}
                 name="passportNumber"
@@ -482,25 +511,23 @@ const EditLead = () => {
                     />
                 )}
             />
-            <Controller
-                control={control}
-                name="visaCategory"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <components.InputField
-                        title="Visa Category"
-                        placeholder="Select visa category"
-                        containerStyle={{ marginBottom: 20 }}
-                        dropdown={true}
-                        items={visaCategories}
-                        selectedValue={value}
-                        onValueChange={(val) => onChange(val)}
-                        onBlur={onBlur}
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
-                        error={errors.visaCategory?.message}
-                    />
-                )}
-            />
+             <Controller
+                    control={control}
+                    name="visaCategory"
+                    render={({ field: { onChange, value } }) => (
+                        <components.Dropdown
+                            options={visaCategories}
+                            selectedValue={capitalizeFirstLetter(value)}
+                            onSelect={(value: string) => {
+                                const val = value.toLowerCase();
+                                onChange(val);
+                            }}
+                            placeholder="Select a category"
+                            label="Visa Category"
+                            error={errors.visaCategory?.message}
+                        />
+                    )}
+                />
             <Controller
                 control={control}
                 name="highestQualification"
