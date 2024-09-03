@@ -5,51 +5,44 @@ import {
   TouchableOpacity,
   TextInput,
   FlatList,
-  Image,
-  ActivityIndicator,
-  Alert,
-  Linking,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../../constants/theme";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { userService } from "../../api/user";
 import SkeletonLoader from "./SkeletonLoader";
-import GetPlaceholderImage from "../../utils/GetPlaceholderImage ";
+import { rolesService } from "../../api/roles";
 import Header1 from "../../components/Header1";
+import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 
-const UserList = () => {
+const RoleList = () => {
   const navigation = useNavigation();
   const [search, setSearch] = useState<string>("");
-  const [refreshing, setRefreshing] = useState(false);
-  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [filteredRoles, setFilteredRoles] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleSearch = (text: string) => {
     setSearch(text);
-    const filteredData = filteredUsers.filter((user) =>
-      user.userName.toLowerCase().includes(text.toLowerCase())
+    const filteredData = filteredRoles.filter((role) =>
+      role.name.toLowerCase().includes(text.toLowerCase())
     );
-    setFilteredUsers(filteredData);
+    setFilteredRoles(filteredData);
   };
 
-  const fetchUsers = async () => {
+  const fetchRoles = async () => {
     setLoading(true);
     try {
-      const userList = await userService.getAllUsers();
-      const modifiedUsers = userList.users.map((user) => ({
-        id: user.id,
-        userImg: user.profileImageUrl,
-        userName: `${user.firstname} ${user.lastname}`,
-        role: user.role,
-        phoneNumber: user.phone,
+      const roles = await rolesService.getAllRoles();
+      const formattedRoles = roles.map((role: string, index: number) => ({
+        id: index + 1,
+        name: role,
       }));
-
-      setFilteredUsers(modifiedUsers);
+      setFilteredRoles(formattedRoles);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching roles:", error);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -57,32 +50,29 @@ const UserList = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchUsers().finally(() => setRefreshing(false));
+    fetchRoles().finally(() => setRefreshing(false));
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      fetchUsers();
+      fetchRoles();
     }, [])
   );
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
-    const handleCall = () => {
-      if (item.phoneNumber) {
-        Linking.openURL(`tel:${item.phoneNumber}`);
-      }
-    };
-
     return (
       <TouchableOpacity
         key={item.id}
-        onPress={() => navigation.navigate("UserDetail", { userId: item.id })}
+        onPress={() =>
+          navigation.navigate("RoleDetail", { roleName: item.name })
+        }
         style={[
           {
             width: "100%",
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 22,
+            paddingVertical: 15,
             borderBottomColor: theme.COLORS.secondaryWhite,
             borderBottomWidth: 1,
           },
@@ -95,73 +85,35 @@ const UserList = () => {
       >
         <View
           style={{
-            paddingVertical: 15,
-            marginRight: 22,
-          }}
-        >
-          {item.userImg && item.userImg !== "" ? (
-            <Image
-              source={{ uri: item.userImg }}
-              resizeMode="contain"
-              style={{
-                height: 50,
-                width: 50,
-                borderRadius: 25,
-              }}
-            />
-          ) : (
-            <GetPlaceholderImage name={item.userName.split(" ")[0]} />
-          )}
-        </View>
-        <View
-          style={{
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             flex: 1,
           }}
         >
-          <View style={{ flexDirection: "column" }}>
-            <Text style={{ ...theme.FONTS.H4, marginBottom: 4 }}>
-              {item.userName}
-            </Text>
-            <Text
-              style={{ ...theme.FONTS.Mulish_400Regular, color: "#808080" }}
-            >
-              {item.role}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+          <Text style={{ ...theme.FONTS.H4, marginBottom: 4 }}>
+            {capitalizeFirstLetter(item.name)}
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("RoleDetail", { roleId: item.id })
+            }
+            style={styles.iconButton}
           >
-            <TouchableOpacity onPress={handleCall} style={styles.iconButton}>
-              <MaterialIcons name="call" size={20} color={theme.COLORS.black} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("UserDetail", { userId: item.id })
-              }
-              style={styles.iconButton}
-            >
-              <AntDesign name="eye" size={20} color={theme.COLORS.black} />
-            </TouchableOpacity>
-          </View>
+            <AntDesign name="eye" size={20} color={theme.COLORS.black} />
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     );
   };
 
   const renderAddButton = () => {
-    if (filteredUsers.length === 0 && !loading) {
+    if (filteredRoles.length === 0 && !loading) {
       return (
         <>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => navigation.navigate("AddUsers")}
+            onPress={() => navigation.navigate("HandleAccess")}
           >
             <AntDesign
               name="pluscircleo"
@@ -170,7 +122,7 @@ const UserList = () => {
             />
           </TouchableOpacity>
           <Text style={styles.addButtonText}>
-            Click here to add the first user now.
+            Click here to add first role now.
           </Text>
         </>
       );
@@ -182,13 +134,13 @@ const UserList = () => {
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
         <Header1
-          title="Users"
+          title="Roles"
           showBackButton={true}
           onBackPress={() => navigation.goBack()}
-          {...(filteredUsers.length > 0
+          {...(filteredRoles.length > 0
             ? {
                 actionIcon: "plus",
-                onActionPress: () => navigation.navigate("AddUsers"),
+                onActionPress: () => navigation.navigate("HandleAccess"),
               }
             : {})}
         />
@@ -209,19 +161,18 @@ const UserList = () => {
             style={{ width: "100%", height: "100%", marginHorizontal: 12 }}
             value={search}
             onChangeText={handleSearch}
-            placeholder="Search user..."
+            placeholder="Search role..."
           />
         </View>
         <View style={styles.countContainer}>
           {loading ? (
-            <SkeletonLoader countOnly={true} />
+            <SkeletonLoader countOnly={true} withImage={false} />
           ) : (
             <Text style={styles.countText}>
-              {" "}
-              {filteredUsers.length === 0
-                ? "0 Users found"
-                : `${filteredUsers.length} ${
-                    filteredUsers.length === 1 ? "User" : "Users"
+              {filteredRoles.length === 0
+                ? "0 Roles found"
+                : `${filteredRoles.length} ${
+                    filteredRoles.length === 1 ? "Role" : "Roles"
                   }`}
             </Text>
           )}
@@ -229,13 +180,13 @@ const UserList = () => {
         <View style={{ flex: 1 }}>
           {loading ? (
             Array.from({ length: 8 }).map((_, index) => (
-              <SkeletonLoader key={index} withImage={true} />
+              <SkeletonLoader key={index} />
             ))
-          ) : filteredUsers.length === 0 ? (
+          ) : filteredRoles.length === 0 ? (
             <View style={styles.addButtonContainer}>{renderAddButton()}</View>
           ) : (
             <FlatList
-              data={filteredUsers}
+              data={filteredRoles}
               renderItem={renderItem}
               keyExtractor={(item) => item.id.toString()}
               refreshing={refreshing}
@@ -283,4 +234,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserList;
+export default RoleList;

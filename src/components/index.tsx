@@ -8,6 +8,7 @@ import Dropdown from "./Dropdown";
 import ImagePickerComponent from "./ImagePicker";
 import TextEditor from "./TextEditor";
 import DatepickerField from "./DatepickerField";
+import Header1 from "./Header1";
 
 const components = {
   InputField,
@@ -16,10 +17,11 @@ const components = {
   ProfileCategory,
   ColorfulCard,
   StartEndDatePicker,
-  Dropdown,
+  Dropdown, 
   ImagePickerComponent,
   TextEditor,
-  DatepickerField
+  DatepickerField,
+  Header1,
 };
 
 export { components };

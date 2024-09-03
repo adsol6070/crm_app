@@ -1,36 +1,20 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dashboard } from "./Dashboard/";
 import { ScrollView } from "react-native-gesture-handler";
 import { components } from "../components";
-
-/* <View
-        style={{ flex: 1, backgroundColor: theme.COLORS.white, padding: 16 }}
-      >
-        <TouchableOpacity
-          onPress={() => navigation.toggleDrawer()}
-          style={{
-            width: 45,
-            height: 45,
-            backgroundColor: theme.COLORS.secondaryWhite,
-            justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 999,
-          }}
-        >
-          <MaterialIcons name="menu" size={24} color={theme.COLORS.gray1} />
-        </TouchableOpacity>
-      </View> */
+import { MaterialIcons } from "@expo/vector-icons";
+import { theme } from "../constants/theme";
+import { useNavigation } from "@react-navigation/native";
+import Header1 from "../components/Header1";
 
 const Home = () => {
-  const renderHeader = () => {
-    return <components.Header title="Home" burger={true} />;
-  };
+  const navigation = useNavigation();
 
   const renderContent = () => {
     return (
-      <View>
+      <View style={{ paddingBottom: Platform.OS === "ios" ? 90 : 60 }}>
         <Dashboard.DetailCard />
         <Dashboard.LeadStatusReport />
         <Dashboard.LeadSourceReport />
@@ -44,8 +28,12 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView style={{ marginBottom: 50 }}>
-      {renderHeader()}
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.COLORS.white }}>
+      <Header1
+        title="Home"
+        showMenuButton={true}
+        onMenuPress={() => navigation.toggleDrawer()}
+      />
       <ScrollView>{renderContent()}</ScrollView>
     </SafeAreaView>
   );

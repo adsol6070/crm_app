@@ -1,63 +1,103 @@
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import React from "react";
+import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
 import {
   createDrawerNavigator,
   DrawerItemList,
-  DrawerItem,
+  useDrawerStatus,
 } from "@react-navigation/drawer";
-import Settings from "../screens/Settings";
 import BottomTabNavigation from "./BottomTabNavigation";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../constants/theme";
 import DrawerItemWithSubItems from "./DrawerItemWithSubItems";
+import { userService } from "../api/user";
+import { useAuth } from "../common/context/AuthContext";
+import SkeletonLoader from "./ProfileSkeletonLoader";
+import { IUserProfile } from "../types";
 
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props: any) => {
-  return (
-    <SafeAreaView style={styles.drawerContent}>
+  const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<IUserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const isDrawerOpen = useDrawerStatus() === "open";
+
+  useEffect(() => {
+    if (isDrawerOpen) fetchProfile();
+  }, [isDrawerOpen]);
+
+  const fetchProfile = async () => {
+    if (!user?.sub) return;
+    setLoading(true);
+    try {
+      const response = await userService.getProfile({ userId: user?.sub });
+      const { firstname, lastname, profileImageUrl, role } = response;
+      setUserProfile({ firstname, lastname, profileImageUrl, role });
+    } catch (error) {
+      console.log("Profile Fetching error ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderProfile = () => {
+    if (loading) return <SkeletonLoader />;
+    return (
       <View style={styles.profileSection}>
         <Image
-          source={{ uri: "https://avatar.iran.liara.run/public/boy" }}
+          source={{
+            uri:
+              userProfile?.profileImageUrl ||
+              "https://avatar.iran.liara.run/public/boy",
+          }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>John Doe</Text>
-        <Text style={styles.profileRole}>Software Developer</Text>
+        <Text style={styles.profileName}>
+          {userProfile?.firstname} {userProfile?.lastname}
+        </Text>
+        <Text style={styles.profileRole}>{userProfile?.role}</Text>
       </View>
+    );
+  };
+
+  const drawerItems = [
+    {
+      label: "Users",
+      icon: "people-outline",
+      subItems: [
+        { label: "Add Users", screen: "AddUsers" },
+        { label: "View Users", screen: "ViewUsers" },
+        { label: "Roles and Permissions", screen: "HandleAccess" },
+        { label: "View Roles", screen: "ViewRoles" },
+      ],
+    },
+    {
+      label: "Blogs",
+      icon: "book-outline",
+      subItems: [
+        { label: "Add Blog", screen: "AddBlog" },
+        { label: "List Blogs", screen: "ListBlogs" },
+      ],
+    },
+    {
+      label: "Leads",
+      icon: "people-outline",
+      subItems: [
+        { label: "Add Lead", screen: "AddLead" },
+        { label: "List Leads", screen: "ListLeads" },
+      ],
+    },
+  ];
+
+  return (
+    <SafeAreaView style={styles.drawerContent}>
+      {renderProfile()}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <DrawerItemList {...props} />
-        <DrawerItemWithSubItems
-          label="Users"
-          icon="people-outline"
-          subItems={[
-            { label: "Add Users", screen: "AddUsers" },
-            { label: "View Users", screen: "ViewUsers" },
-          ]}
-        />
-        <DrawerItemWithSubItems
-          label="Blogs"
-          icon="book-outline"
-          subItems={[
-            { label: "Add Blog", screen: "AddBlog" },
-            { label: "List Blogs", screen: "ListBlogs" },
-          ]}
-        />
-        <DrawerItemWithSubItems
-          label="Leads"
-          icon="people-outline"
-          subItems={[
-            { label: "Add Lead", screen: "AddLead" },
-            { label: "List Leads", screen: "ListLeads" },
-          ]}
-        />
+        {drawerItems.map((item, index) => (
+          <DrawerItemWithSubItems key={index} {...item} />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -95,20 +135,6 @@ const DrawerNavigation = () => {
           ),
         }}
         component={BottomTabNavigation}
-      />
-      <Drawer.Screen
-        name="Settings"
-        options={{
-          drawerLabel: "Settings",
-          drawerIcon: () => (
-            <Ionicons
-              name="settings-outline"
-              size={24}
-              color={theme.COLORS.black}
-            />
-          ),
-        }}
-        component={Settings}
       />
     </Drawer.Navigator>
   );
@@ -153,38 +179,6 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontFamily: "Mulish_400Regular",
     color: "#666",
-  },
-  menuSection: {
-    flex: 1,
-    paddingHorizontal: 15,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  menuText: {
-    marginLeft: 15,
-    fontFamily: "Mulish_400Regular",
-    fontSize: 16,
-    color: theme.COLORS.black,
-  },
-  submenuSection: {
-    marginTop: 20,
-  },
-  submenuTitle: {
-    fontSize: 16,
-    fontFamily: "Mulish_700Bold",
-    color: theme.COLORS.black,
-    marginBottom: 10,
-  },
-  submenuItem: {
-    paddingVertical: 8,
-  },
-  submenuText: {
-    fontFamily: "Mulish_400Regular",
-    fontSize: 14,
-    color: theme.COLORS.black,
   },
 });
 

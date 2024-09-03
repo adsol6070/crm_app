@@ -1,9 +1,22 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { httpClient } from "../client";
-import { IUser as IProfileResponse } from "../../types";
 
 interface UserPayload {
   userId: string | undefined;
+}
+
+interface ProfileResponse {
+  id: string;
+  tenantID?: string;
+  firstname: string;
+  lastname: string;
+  city: string;
+  email: string;
+  phone: string;
+  address: string;
+  profileImage?: string;
+  isEmailVerified?: string;
+  role: string;
 }
 
 const getAuthHeaders = async (isMultipart: boolean = false) => {
@@ -42,45 +55,28 @@ const makeRequest = async <T>(
   }
 };
 
-class UserService {
-  async getProfile(payload: UserPayload): Promise<IProfileResponse> {
-    return makeRequest("post", "/users/profile", payload);
+class RolesService {
+  async createRole(payload: any) {
+    return makeRequest<void>("post", "/permissions/", payload);
   }
 
-  async createUser(payload: FormData) {
-    return makeRequest<void>("post", "/users/", payload, true);
+  async getAllRoles() {
+    return makeRequest<any[]>("get", "/permissions/roles");
   }
 
-  async getAllUsers() {
-    return makeRequest<any[]>("get", "/users/");
+  async getRoleByName(payload: any): Promise<any> {
+    return makeRequest<any>("post", `/permissions/by-role`, payload);
   }
 
-  async getUser(userId: string): Promise<any> {
-    return makeRequest<any>("get", `/users/${userId}`);
+  async updateRole(payload: any, roleId: string): Promise<void> {
+    return makeRequest<void>("patch", `/permissions/${roleId}`, payload);
   }
 
-  async updateUser(payload: any, userId: string): Promise<void> {
-    return makeRequest<void>("patch", `/users/${userId}`, payload);
-  }
-
-  async deleteUser(userId: string): Promise<void> {
-    return makeRequest<void>("delete", `/users/${userId}`);
-  }
-
-  async updateProfileImage(userId: string, image: File): Promise<void> {
-    const formData = new FormData();
-    formData.append("uploadType", "User");
-    formData.append("profileImage", image);
-
-    return makeRequest<void>(
-      "patch",
-      `/users/${userId}/profile-image`,
-      formData,
-      true
-    );
+  async deleteRole(roleId: string): Promise<void> {
+    return makeRequest<void>("delete", `/permissions/${roleId}`);
   }
 }
 
-const userService = new UserService();
+const rolesService = new RolesService();
 
-export { userService };
+export { rolesService };
