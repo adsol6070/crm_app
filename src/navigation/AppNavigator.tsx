@@ -8,8 +8,13 @@ import UserDetail from "../screens/Users/UserDetail";
 import AddBlog from "../screens/Blog/AddBlog";
 import ListBlogs from "../screens/Blog/ListBlogs";
 import ReadBlog from "../screens/Blog/ReadBlog";
-import AddLead from "../screens/Lead/AddLead";
 import ListLeads from "../screens/Lead/ListLeads";
+import EditUser from "../screens/Users/EditUser";
+import HandleAccess from "../screens/Users/HandleAccess";
+import RolesList from "../screens/Users/RolesList";
+import RoleDetail from "../screens/Users/RoleDetail";
+import EditRole from "../screens/Users/EditRole";
+import AddLead from "../screens/Lead/Add";
 import LeadDetail from "../screens/Lead/LeadDetail";
 import LeadHistory from "../screens/Lead/LeadHistory";
 import DocumentChecklist from "../screens/Lead/DocumentChecklist";
@@ -22,12 +27,17 @@ const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName="Main" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Main" component={DrawerNavigation} />
       <Stack.Screen name="PersonalChat" component={PersonalChat} />
       <Stack.Screen name="AddUsers" component={AddUser} />
       <Stack.Screen name="ViewUsers" component={UserList} />
+      <Stack.Screen name="HandleAccess" component={HandleAccess} />
+      <Stack.Screen name="ViewRoles" component={RolesList} />
+      <Stack.Screen name="RoleDetail" component={RoleDetail} />
+      <Stack.Screen name="EditRole" component={EditRole} />
       <Stack.Screen name="UserDetail" component={UserDetail} />
+      <Stack.Screen name="EditUser" component={EditUser} />
       <Stack.Screen name="AddBlog" component={AddBlog} />
       <Stack.Screen name="ListBlogs" component={ListBlogs} />
       <Stack.Screen name="ReadBlog" component={ReadBlog} />

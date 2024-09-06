@@ -6,191 +6,192 @@ import {
   TextInput,
   FlatList,
   Image,
+  ActivityIndicator,
+  Alert,
+  Linking,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../../constants/theme";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-
-const userData: any[] = [
-  {
-    id: "1",
-    userImg: "https://avatar.iran.liara.run/public/boy",
-    userName: "John Doe",
-    role: "Admin",
-  },
-  {
-    id: "2",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Jane Smith",
-    role: "Super Admin",
-  },
-  {
-    id: "3",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Bob Johnson",
-    role: "Manager",
-  },
-  {
-    id: "4",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Alice Williams",
-    role: "Manager",
-  },
-  {
-    id: "5",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Charlie Brown",
-    role: "Manager",
-  },
-  {
-    id: "6",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Eve Adams",
-    role: "Admin",
-  },
-  {
-    id: "7",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Frank Miller",
-    role: "Admin",
-  },
-  {
-    id: "8",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Grace Lee",
-    role: "Manager",
-  },
-  {
-    id: "9",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Hannah Davis",
-    role: "Manager",
-  },
-  {
-    id: "10",
-    userId: "",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Ian Wilson",
-    role: "Admin",
-  },
-];
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { userService } from "../../api/user";
+import SkeletonLoader from "./SkeletonLoader";
+import GetPlaceholderImage from "../../utils/GetPlaceholderImage ";
+import Header1 from "../../components/Header1";
 
 const UserList = () => {
   const navigation = useNavigation();
   const [search, setSearch] = useState<string>("");
-  const [filteredUsers, setFilteredUsers] = useState(userData);
+  const [refreshing, setRefreshing] = useState(false);
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleSearch = (text: string) => {
     setSearch(text);
-    const filteredData = userData.filter((user) =>
+    const filteredData = filteredUsers.filter((user) =>
       user.userName.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredUsers(filteredData);
   };
 
-  const renderItem = ({ item, index }: any) => (
-    <TouchableOpacity
-      key={item.id}
-      onPress={() =>
-        navigation.navigate("UserDetail", { userName: item.userName })
-      }
-      style={[
-        {
-          width: "100%",
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 22,
-          borderBottomColor: theme.COLORS.secondaryWhite,
-          borderBottomWidth: 1,
-        },
-        index % 2 !== 0
-          ? {
-              backgroundColor: theme.COLORS.tertiaryWhite,
-            }
-          : null,
-      ]}
-    >
-      <View
-        style={{
-          paddingVertical: 15,
-          marginRight: 22,
-        }}
-      >
-        <Image
-          source={{ uri: item.userImg }}
-          resizeMode="contain"
-          style={{
-            height: 50,
-            width: 50,
-            borderRadius: 25,
-          }}
-        />
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flex: 1,
-        }}
-      >
-        <View style={{ flexDirection: "column" }}>
-          <Text style={{ ...theme.FONTS.H4, marginBottom: 4 }}>
-            {item.userName}
-          </Text>
-          <Text style={{ fontSize: 14, color: "#808080" }}>{item.role}</Text>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => console.log("Edit get called")}
-            style={styles.iconButton}
-          >
-            <AntDesign name="edit" size={20} color={theme.COLORS.black} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => console.log("Delete get called")}
-            style={styles.iconButton}
-          >
-            <MaterialIcons name="delete" size={20} color={theme.COLORS.black} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const userList = await userService.getAllUsers();
+      const modifiedUsers = userList.users.map((user) => ({
+        id: user.id,
+        userImg: user.profileImageUrl,
+        userName: `${user.firstname} ${user.lastname}`,
+        role: user.role,
+        phoneNumber: user.phone,
+      }));
+
+      setFilteredUsers(modifiedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchUsers().finally(() => setRefreshing(false));
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUsers();
+    }, [])
   );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={{ flex: 1 }}>
+  const renderItem = ({ item, index }: { item: any; index: number }) => {
+    const handleCall = () => {
+      if (item.phoneNumber) {
+        Linking.openURL(`tel:${item.phoneNumber}`);
+      }
+    };
+
+    return (
+      <TouchableOpacity
+        key={item.id}
+        onPress={() => navigation.navigate("UserDetail", { userId: item.id })}
+        style={[
+          {
+            width: "100%",
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 22,
+            borderBottomColor: theme.COLORS.secondaryWhite,
+            borderBottomWidth: 1,
+          },
+          index % 2 !== 0
+            ? {
+                backgroundColor: theme.COLORS.tertiaryWhite,
+              }
+            : null,
+        ]}
+      >
+        <View
+          style={{
+            paddingVertical: 15,
+            marginRight: 22,
+          }}
+        >
+          {item.userImg && item.userImg !== "" ? (
+            <Image
+              source={{ uri: item.userImg }}
+              resizeMode="contain"
+              style={{
+                height: 50,
+                width: 50,
+                borderRadius: 25,
+              }}
+            />
+          ) : (
+            <GetPlaceholderImage name={item.userName.split(" ")[0]} />
+          )}
+        </View>
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            marginHorizontal: 22,
-            marginTop: 22,
+            flex: 1,
           }}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialIcons
-              name="keyboard-arrow-left"
-              size={24}
+          <View style={{ flexDirection: "column" }}>
+            <Text style={{ ...theme.FONTS.H4, marginBottom: 4 }}>
+              {item.userName}
+            </Text>
+            <Text
+              style={{ ...theme.FONTS.Mulish_400Regular, color: "#808080" }}
+            >
+              {item.role}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity onPress={handleCall} style={styles.iconButton}>
+              <MaterialIcons name="call" size={20} color={theme.COLORS.black} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("UserDetail", { userId: item.id })
+              }
+              style={styles.iconButton}
+            >
+              <AntDesign name="eye" size={20} color={theme.COLORS.black} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderAddButton = () => {
+    if (filteredUsers.length === 0 && !loading) {
+      return (
+        <>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate("AddUsers")}
+          >
+            <AntDesign
+              name="pluscircleo"
+              size={50}
               color={theme.COLORS.black}
             />
           </TouchableOpacity>
-          <Text style={{ ...theme.FONTS.H4 }}>Users</Text>
+          <Text style={styles.addButtonText}>
+            Click here to add the first user now.
+          </Text>
+        </>
+      );
+    }
+    return null;
+  };
 
-          <TouchableOpacity onPress={() => navigation.navigate("AddUsers")}>
-            <AntDesign name="plus" size={20} color={theme.COLORS.black} />
-          </TouchableOpacity>
-        </View>
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={{ flex: 1 }}>
+        <Header1
+          title="Users"
+          showBackButton={true}
+          onBackPress={() => navigation.goBack()}
+          {...(filteredUsers.length > 0
+            ? {
+                actionIcon: "plus",
+                onActionPress: () => navigation.navigate("AddUsers"),
+              }
+            : {})}
+        />
         <View
           style={{
             marginHorizontal: 22,
@@ -211,12 +212,36 @@ const UserList = () => {
             placeholder="Search user..."
           />
         </View>
+        <View style={styles.countContainer}>
+          {loading ? (
+            <SkeletonLoader countOnly={true} />
+          ) : (
+            <Text style={styles.countText}>
+              {" "}
+              {filteredUsers.length === 0
+                ? "0 Users found"
+                : `${filteredUsers.length} ${
+                    filteredUsers.length === 1 ? "User" : "Users"
+                  }`}
+            </Text>
+          )}
+        </View>
         <View style={{ flex: 1 }}>
-          <FlatList
-            data={filteredUsers}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
+          {loading ? (
+            Array.from({ length: 8 }).map((_, index) => (
+              <SkeletonLoader key={index} withImage={true} />
+            ))
+          ) : filteredUsers.length === 0 ? (
+            <View style={styles.addButtonContainer}>{renderAddButton()}</View>
+          ) : (
+            <FlatList
+              data={filteredUsers}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -231,6 +256,30 @@ const styles = StyleSheet.create({
   iconButton: {
     padding: 8,
     marginHorizontal: 5,
+  },
+  countContainer: {
+    marginHorizontal: 22,
+    marginBottom: 5,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  countText: {
+    ...theme.FONTS.H4,
+    color: theme.COLORS.black,
+  },
+  addButtonContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 150,
+    backgroundColor: theme.COLORS.white,
+  },
+  addButton: {
+    marginBottom: 10,
+  },
+  addButtonText: {
+    ...theme.FONTS.H4,
+    color: theme.COLORS.black,
   },
 });
 

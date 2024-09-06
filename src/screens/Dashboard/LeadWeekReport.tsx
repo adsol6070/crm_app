@@ -4,6 +4,7 @@ import { BarChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
 import { dashboardService } from '../../api/dashboard';
+import { theme } from '../../constants/theme';
 
 const LeadWeekReport = ({ refreshKey }: any) => {
   const [weeklyReport, setWeeklyReport] = useState<any>(undefined);
@@ -101,9 +102,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'left',
+    ...theme.FONTS.Mulish_600SemiBold
   },
   time: {
     fontSize: 16,

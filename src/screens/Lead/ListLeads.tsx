@@ -182,6 +182,29 @@ const ListLeads = () => {
     setFilteredLeads(filteredData);
   };
 
+  const renderAddButton = () => {
+    if (filteredLeads.length === 0 && !loading) {
+      return (
+        <>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate("AddLead")}
+          >
+            <AntDesign
+              name="pluscircleo"
+              size={50}
+              color={theme.COLORS.black}
+            />
+          </TouchableOpacity>
+          <Text style={styles.addButtonText}>
+            Click here to add the first lead now.
+          </Text>
+        </>
+      );
+    }
+    return null;
+  };
+
   const renderVisaFilter = () => (
     <View style={styles.pickerContainer}>
       <Picker
@@ -254,7 +277,7 @@ const ListLeads = () => {
             <MaterialIcons name="phone" size={20} color="blue" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate("LeadActions", { leadId: item.id, visaType: item.visaCategory})}
+            onPress={() => navigation.navigate("LeadActions", { leadId: item.id, visaType: item.visaCategory })}
             style={styles.iconButton}
           >
             <MaterialIcons name="settings" size={20} color="black" />
@@ -325,9 +348,10 @@ const ListLeads = () => {
                   }
                 />
               ) : (
-                <View style={styles.noLeadsContainer}>
-                  <Text style={styles.noLeadsText}>No leads found</Text>
-                </View>
+                // <View style={styles.noLeadsContainer}>
+                //   <Text style={styles.noLeadsText}>No leads found</Text>
+                // </View>
+                <View style={styles.addButtonContainer}>{renderAddButton()}</View>
               )}
             </View>
           </View>)
@@ -374,7 +398,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   countText: {
-    ...theme.FONTS.H4,
+    ...theme.FONTS.Mulish_700Bold,
     color: theme.COLORS.black,
   },
   pickerContainer: {
@@ -426,15 +450,29 @@ const styles = StyleSheet.create({
     padding: 8,
     marginHorizontal: 5,
   },
-  noLeadsContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  // noLeadsContainer: {
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
+  // noLeadsText: {
+  //   ...theme.FONTS.H4,
+  //   color: theme.COLORS.black,
+  //   textAlign: 'center',
+  //   margin: 20,
+  // },
+  addButtonContainer: {
+    height: '85%',
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 150,
+    backgroundColor: theme.COLORS.white,
   },
-  noLeadsText: {
+  addButton: {
+    marginBottom: 10,
+  },
+  addButtonText: {
     ...theme.FONTS.H4,
     color: theme.COLORS.black,
-    textAlign: 'center',
-    margin: 20,
   },
 });
 

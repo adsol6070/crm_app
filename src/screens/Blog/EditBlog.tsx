@@ -8,11 +8,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { blogService } from '../../api/blog';
 import { capitalizeFirstLetter } from '../../utils/CapitalizeFirstLetter';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../../constants/theme';
+import Header1 from '../../components/Header1';
 
 const EditBlog = () => {
     const route = useRoute();
+    const navigation = useNavigation();
     const { blogId }: any = route.params;
     const [refreshing, setRefreshing] = useState(false);
     const [categories, setCategories] = useState<any[]>([]);
@@ -96,10 +98,11 @@ const EditBlog = () => {
 
     const renderHeader = () => {
         return (
-            <components.Header
-                title="Edit Blog"
-                goBack={true}
-            />
+            <Header1
+            title="Edit Blog"
+            showBackButton={true}
+            onBackPress={() => navigation.goBack()}
+        />
         );
     };
 

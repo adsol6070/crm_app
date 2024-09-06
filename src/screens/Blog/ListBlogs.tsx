@@ -9,6 +9,7 @@ import { blogService } from '../../api/blog';
 import { skeletonLoader } from '../../components/skeletonLoaders';
 import { usePermissions } from '../../common/context/PermissionContext';
 import { hasPermission } from '../../utils/HasPermission';
+import Header1 from '../../components/Header1';
 
 type RootStackParamList = {
   ReadBlog: { blogId: string };
@@ -74,10 +75,11 @@ const ListBlogs: React.FC = () => {
 
   const renderHeader = () => {
     return (
-      <components.Header
-        title="Blog Lists"
-        goBack={true}
-      />
+      <Header1
+            title="Blog Lists"
+            showBackButton={true}
+            onBackPress={() => navigation.goBack()}
+        />
     );
   };
   const renderContent = () => {

@@ -6,6 +6,7 @@ import { Dimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { dashboardService } from '../../api/dashboard';
 import moment from 'moment';
+import { theme } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -170,13 +171,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 16,
     color: '#333',
+    ...theme.FONTS.Mulish_600SemiBold
   },
   dateContainer: {
     marginBottom: 16,
@@ -186,8 +186,8 @@ const styles = StyleSheet.create({
   },
   chartTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 8,
+    ...theme.FONTS.Mulish_400Regular
   },
   picker: {
     height: 50,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../../constants/theme";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Keyboard } from "react-native";
+import { useSocket } from "../../common/context/SocketContext";
+import GetPlaceholderImage from "../../utils/GetPlaceholderImage ";
+import SkeletonLoader from "../Users/SkeletonLoader";
 
 interface ChatUser {
   id: string;
@@ -24,101 +27,98 @@ interface ChatUser {
   isOnline: boolean;
 }
 
-const chatData: ChatUser[] = [
-  {
-    id: "1",
-    userImg: "https://avatar.iran.liara.run/public/boy",
-    userName: "John Doe",
-    lastSeen: "Last seen 5 minutes ago",
-    isOnline: true,
-  },
-  {
-    id: "2",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Jane Smith",
-    lastSeen: "Last seen 10 minutes ago",
-    isOnline: false,
-  },
-  {
-    id: "3",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Bob Johnson",
-    lastSeen: "Last seen 2 hours ago",
-    isOnline: false,
-  },
-  {
-    id: "4",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Alice Williams",
-    lastSeen: "Last seen 1 day ago",
-    isOnline: true,
-  },
-  {
-    id: "5",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Charlie Brown",
-    lastSeen: "Last seen 3 days ago",
-    isOnline: false,
-  },
-  {
-    id: "6",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Eve Adams",
-    lastSeen: "Last seen 6 hours ago",
-    isOnline: true,
-  },
-  {
-    id: "7",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Frank Miller",
-    lastSeen: "Last seen 15 minutes ago",
-    isOnline: true,
-  },
-  {
-    id: "8",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Grace Lee",
-    lastSeen: "Last seen 20 minutes ago",
-    isOnline: false,
-  },
-  {
-    id: "9",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Hannah Davis",
-    lastSeen: "Last seen 3 hours ago",
-    isOnline: false,
-  },
-  {
-    id: "10",
-    userImg: "https://via.placeholder.com/100",
-    userName: "Ian Wilson",
-    lastSeen: "Last seen 2 days ago",
-    isOnline: true,
-  },
-];
+const mapUserData = (data): ChatUser[] => {
+  return data.map((user: any) => ({
+    id: user.id,
+    userImg: user.profileImageUrl,
+    userName: `${user.firstname} ${user.lastname}`,
+    lastSeen: user.online
+      ? "Online"
+      : user.last_active
+      ? `Last seen ${new Date(user.last_active).toLocaleTimeString()}`
+      : "Last seen recently",
+    isOnline: user.online || false,
+  }));
+};
 
 const Chat = () => {
   const navigation = useNavigation();
+  const socketManager = useSocket();
   const [search, setSearch] = useState<string>("");
-  const [filteredUsers, setFilteredUsers] = useState(chatData);
+  const [filteredUsers, setFilteredUsers] = useState<ChatUser[] | null>(null);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(
+    new Map()
+  );
+  const [loading, setLoading] = useState(true);
 
-  const activeUsers = () => chatData.filter((user) => user.isOnline);
+  const fetchInitialUsers = useCallback(() => {
+    setLoading(true);
+    socketManager?.emit("requestInitialUsers");
+    socketManager?.emit("getUnreadMessages");
+    socketManager.on("initialUsers", async (users: any[]) => {
+      const mappedUsers = mapUserData(users);
+      setFilteredUsers(mappedUsers);
+      setLoading(false);
+    });
+
+    socketManager?.on("unreadMessagesCount", ({ unreadMessagesMap }) => {
+      setUnreadMessages(new Map(Object.entries(unreadMessagesMap)));
+    });
+
+    socketManager?.on("messageRead", ({ fromUserId }) => {
+      setUnreadMessages((prev) => {
+        const updated = new Map(prev);
+        updated.delete(fromUserId);
+        return updated;
+      });
+    });
+
+    return () => {
+      socketManager.off("initialUsers");
+      socketManager.off("unreadMessagesCount");
+    };
+  }, [socketManager]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchInitialUsers();
+      return () => {
+        socketManager.off("initialUsers");
+      };
+    }, [fetchInitialUsers, socketManager])
+  );
+
+  const activeUsers = () =>
+    filteredUsers ? filteredUsers.filter((user) => user.isOnline) : [];
 
   const handleSearch = (text: string) => {
     setSearch(text);
-    const filteredData = chatData.filter((user) =>
-      user.userName.toLowerCase().includes(text.toLowerCase())
-    );
-    setFilteredUsers(filteredData);
+    if (filteredUsers) {
+      const filteredData = filteredUsers.filter((user) =>
+        user.userName.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredUsers(filteredData);
+    }
+  };
+
+  const userChatOpen = (user: ChatUser) => {
+    navigation.navigate("PersonalChat", {
+      userName: user.userName,
+      userId: user.id,
+    });
+    socketManager?.emit("messageRead", { fromUserId: user.id });
+    setUnreadMessages((prev) => {
+      const updated = new Map(prev);
+      updated.delete(user.id);
+      return updated;
+    });
   };
 
   const renderItem: ListRenderItem<ChatUser> = ({ item, index }) => (
     <TouchableOpacity
       key={index}
-      onPress={() =>
-        navigation.navigate("PersonalChat", { userName: item.userName })
-      }
+      onPress={() => userChatOpen(item)}
       style={[
         {
           width: "100%",
@@ -152,17 +152,21 @@ const Chat = () => {
             }}
           ></View>
         )}
-        <Image
-          source={{ uri: item.userImg }}
-          resizeMode="contain"
-          style={{
-            height: 50,
-            width: 50,
-            borderRadius: 25,
-          }}
-        />
+        {item.userImg ? (
+          <Image
+            source={{ uri: item.userImg }}
+            resizeMode="contain"
+            style={{
+              height: 50,
+              width: 50,
+              borderRadius: 25,
+            }}
+          />
+        ) : (
+          <GetPlaceholderImage name={item.userName.split(" ")[0]} />
+        )}
       </View>
-      <View style={{ flexDirection: "column" }}>
+      <View style={{ flexDirection: "column", flex: 1 }}>
         <Text style={{ ...theme.FONTS.H4, marginBottom: 4 }}>
           {item.userName}
         </Text>
@@ -174,6 +178,22 @@ const Chat = () => {
           {item.lastSeen}
         </Text>
       </View>
+      {unreadMessages.get(item.id) > 0 && (
+        <View
+          style={{
+            backgroundColor: "red",
+            borderRadius: 10,
+            height: 20,
+            width: 20,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 12 }}>
+            {unreadMessages.get(item.id)}
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 
@@ -187,7 +207,13 @@ const Chat = () => {
       () => setKeyboardVisible(false)
     );
 
+    socketManager?.on("receiveMessage", async (newMessage: any) => {
+      console.log("Called..........");
+      socketManager.emit("getUnreadMessages");
+    });
+
     return () => {
+      socketManager.emit("receiveMessage");
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
     };
@@ -244,15 +270,19 @@ const Chat = () => {
               <TouchableOpacity
                 style={{ paddingVertical: 15, marginRight: 22 }}
               >
-                <Image
-                  source={{ uri: item.userImg }}
-                  resizeMode="contain"
-                  style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 25,
-                  }}
-                />
+                {item.userImg ? (
+                  <Image
+                    source={{ uri: item.userImg }}
+                    resizeMode="contain"
+                    style={{
+                      height: 50,
+                      width: 50,
+                      borderRadius: 25,
+                    }}
+                  />
+                ) : (
+                  <GetPlaceholderImage name={item.userName.split(" ")[0]} />
+                )}
               </TouchableOpacity>
               <Text style={{ ...theme.FONTS.Mulish_400Regular }}>
                 {item.userName.substring(0, 5)}...
@@ -288,11 +318,17 @@ const Chat = () => {
           paddingBottom: keyboardVisible ? 0 : Platform.OS === "ios" ? 90 : 60,
         }}
       >
-        <FlatList
-          data={filteredUsers}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-        />
+        {loading || filteredUsers === null ? (
+          Array.from({ length: 8 }).map((_, index) => (
+            <SkeletonLoader key={index} withImage={true} />
+          ))
+        ) : (
+          <FlatList
+            data={filteredUsers}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        )}
       </View>
     </SafeAreaView>
   );

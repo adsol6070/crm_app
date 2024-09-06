@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { httpClient } from "../client";
-import { ResponseType } from 'axios';
+import { ResponseType } from "axios";
 
 const getAuthHeaders = async (isMultipart: boolean = false) => {
   const token = await AsyncStorage.getItem("accessToken");
@@ -54,9 +54,9 @@ class LeadService {
   }
   async getSpecificLeadByUserId(userId: string) {
     return makeRequest("get", `/lead/getSpecificLeads/${userId}`);
-  } 
+  }
   async createLead(payload: any) {
-    return makeRequest("post", `/lead/createLead`, payload);
+    return makeRequest("post", `/lead/`, payload);
   }
   async deleteAllLeads() {
     return makeRequest("delete", `/lead/`);
@@ -83,16 +83,37 @@ class LeadService {
     return makeRequest("get", `/lead/getDocument/${leadId}`);
   }
   async deleteSingleDocument(leadId?: string, filename?: string) {
-    return makeRequest("delete", `/lead/getSingleDocument/${leadId}/${filename}`);
+    return makeRequest(
+      "delete",
+      `/lead/getSingleDocument/${leadId}/${filename}`
+    );
   }
   async getSingleDocument(leadId?: string, filename?: string) {
-    return makeRequest("get", `/lead/getSingleDocument/${leadId}/${filename}`, undefined, false, "blob");
+    return makeRequest(
+      "get",
+      `/lead/getSingleDocument/${leadId}/${filename}`,
+      undefined,
+      false,
+      "blob"
+    );
   }
   async getSingleDocumentUrl(leadId?: string, filename?: string) {
-    return makeRequest("get", `/lead/getSingleDocumentUrl/${leadId}/${filename}`);
+    return makeRequest(
+      "get",
+      `/lead/getSingleDocumentUrl/${leadId}/${filename}`
+    );
   }
-  async updateSingleDocument(leadId?: string, filename?: string, payload?: FormData) {
-    return makeRequest("patch", `/lead/getSingleDocument/${leadId}/${filename}`, payload, true);
+  async updateSingleDocument(
+    leadId?: string,
+    filename?: string,
+    payload?: FormData
+  ) {
+    return makeRequest(
+      "patch",
+      `/lead/getSingleDocument/${leadId}/${filename}`,
+      payload,
+      true
+    );
   }
   async uploadSingleDocument(leadId?: string, payload?: FormData) {
     return makeRequest("post", `/lead/uploadSingleDocument`, payload, true);

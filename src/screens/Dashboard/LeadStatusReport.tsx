@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dashboardService } from '../../api/dashboard';
+import { theme } from '../../constants/theme';
 
 const LeadStatusReport = ({ refreshKey }: any) => {
     const [statusReport, setStatusReport] = useState<any>(undefined);
@@ -87,8 +88,8 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 'bold',
         marginBottom: 16,
+        ...theme.FONTS.Mulish_600SemiBold
     },
 });
 

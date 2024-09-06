@@ -19,14 +19,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jatin9070.CRM"
+      "package": "com.harman34688.CRM"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "a910638a-b224-49a0-abf3-079fd0de158a"
+        "projectId": "64fc7d5d-7249-43b9-9402-c613fc41f514"
       }
     }
   }

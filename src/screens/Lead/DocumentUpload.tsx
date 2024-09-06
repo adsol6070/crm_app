@@ -5,11 +5,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
 import { theme } from '../../constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { leadService } from '../../api/lead';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useAuth } from '../../common/context/AuthContext';
+import Header1 from '../../components/Header1';
 
 const iconMapping: any = {
     'Passport': 'badge',
@@ -23,6 +24,7 @@ const iconMapping: any = {
 const DocumentUpload = () => {
     const route = useRoute();
     const { user }: any = useAuth();
+    const navigation = useNavigation();
     const { leadId, documentName }: any = route.params;
     const [loading, setLoading] = useState(true);
     const [documentStatus, setDocumentStatus] = useState(false);
@@ -207,9 +209,10 @@ const DocumentUpload = () => {
 
     const renderHeader = () => {
         return (
-            <components.Header
+            <Header1
                 title="Upload"
-                goBack={true}
+                showBackButton={true}
+                onBackPress={() => navigation.goBack()}
             />
         );
     };
@@ -231,7 +234,7 @@ const DocumentUpload = () => {
                 <View style={styles.uploadHeader}>
                     <MaterialIcons name={iconName} style={styles.iconStyles} color={theme.COLORS.black} />
                     <Text style={styles.headerText}>{documentName}</Text>
-                    <Text style={styles.titleText}>Upload your documents in PDF, JPEG, or PNG formats</Text>
+                    <Text style={styles.titleText}>Upload your documents in PDF format only</Text>
                 </View>
                 <View style={styles.uploadedArea}>
                     {documentStatus ?
@@ -349,13 +352,15 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 20,
         color: 'white',
-        textAlign: 'center'
+        textAlign: 'center',
+        ...theme.FONTS.Mulish_400Regular
     },
     titleText: {
         fontSize: 16,
         margin: 10,
         color: 'white',
-        textAlign: 'center'
+        textAlign: 'center',
+        ...theme.FONTS.Mulish_400Regular
     },
     uploadedArea: {
         margin: 20,

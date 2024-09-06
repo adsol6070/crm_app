@@ -6,8 +6,8 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { components } from "../components";
 import { constants } from "../constants";
@@ -15,34 +15,39 @@ import { svg } from "../svg";
 import { useAuth } from "../common/context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { userService } from "../api/user";
+import DetailSkeletonLoader from "./Users/DetailSkeletonLoader";
 
 const Profile = () => {
   const navigation = useNavigation();
   const { logout, user } = useAuth();
   const { theme } = constants;
   const [showModal, setShowModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState<ProfileResponse | undefined>(undefined);
+  const [currentUser, setCurrentUser] = useState<undefined | any>(undefined);
   const [avatarLoading, setAvatarLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-    const fetchProfile = async ()=>{
-    try {
-      const userId = user?.sub;
-      const response = await userService.getProfile({userId})
-      setCurrentUser(response)
-    } catch (error) {
-      console.log("Profile Fetching error ", error)
-    }
-  }
-  fetchProfile();
-  },[])
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchProfile = async () => {
+        setLoading(true);
+        try {
+          const userId = user?.sub;
+          const response = await userService.getProfile({ userId });
+          console.log("Response ", response);
+          setCurrentUser(response);
+        } catch (error) {
+          console.log("Profile Fetching error ", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchProfile();
+    }, [user])
+  );
 
   const renderHeader = () => {
-    return (
-      <components.Header
-        title="Profile"
-      />
-    );
+    return <components.Header title="Profile" />;
   };
 
   const renderContent = () => {
@@ -59,7 +64,7 @@ const Profile = () => {
       >
         <TouchableOpacity
           style={{ width: 126, height: 126, marginBottom: 20 }}
-        // onPress={() => navigation.navigate("EditProfile")}
+          // onPress={() => navigation.navigate("EditProfile")}
         >
           {avatarLoading && (
             <ActivityIndicator
@@ -82,7 +87,11 @@ const Profile = () => {
           )}
           <Image
             source={{
-              uri: "https://avatar.iran.liara.run/public/boy",
+              uri: `${
+                currentUser.profileImageUrl === ""
+                  ? "https://avatar.iran.liara.run/public/boy"
+                  : currentUser.profileImageUrl
+              }`,
             }}
             style={{
               width: "100%",
@@ -115,27 +124,27 @@ const Profile = () => {
         </Text>
         <View style={{ width: "100%" }}>
           <components.ProfileCategory
-            title={currentUser.id === "null" ? "N/A": currentUser.id}
+            title={currentUser.id === "null" ? "N/A" : currentUser.id}
             icon={<svg.UserIdSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.role === "null" ? "N/A": currentUser.role}
+            title={currentUser.role === "null" ? "N/A" : currentUser.role}
             icon={<svg.RoleSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.phone === "null" ? "N/A": currentUser.phone}
+            title={currentUser.phone === "null" ? "N/A" : currentUser.phone}
             icon={<svg.PhoneSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.city === "null" ? "N/A": currentUser.city}
+            title={currentUser.city === "null" ? "N/A" : currentUser.city}
             icon={<svg.CitySvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.address === "null" ? "N/A": currentUser.address}
+            title={currentUser.address === "null" ? "N/A" : currentUser.address}
             icon={<svg.MapPinSvg />}
             categoryNavigation={false}
           />
@@ -150,15 +159,14 @@ const Profile = () => {
     );
   };
 
-
   const renderModal = () => {
     const hanldeLogout = async () => {
       try {
         await logout();
       } catch (error) {
-        console.error('Logout Error:', error);
+        console.error("Logout Error:", error);
       }
-    }
+    };
     return (
       <View style={{ alignSelf: "center" }}>
         <Modal
@@ -250,6 +258,10 @@ const Profile = () => {
       </View>
     );
   };
+
+  if (loading) {
+    return <DetailSkeletonLoader />;
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

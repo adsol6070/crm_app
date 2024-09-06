@@ -3,14 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { components } from '../../components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { blogService } from '../../api/blog';
 import HTMLView from 'react-native-htmlview';
 import { theme } from '../../constants/theme';
 import { skeletonLoader } from '../../components/skeletonLoaders';
+import Header1 from '../../components/Header1';
 
 const ReadBlog = () => {
     const route = useRoute();
+    const navigation = useNavigation();
     const { blogId }: any = route.params;
     const [loading, setLoading] = useState<boolean>(true);
     const [blogDetail, setBlogDetail] = useState<any>(null);
@@ -32,10 +34,11 @@ const ReadBlog = () => {
 
     const renderHeader = () => {
         return (
-            <components.Header
-                title="Read Blog"
-                goBack={true}
-            />
+            <Header1
+            title="Read Blog"
+            showBackButton={true}
+            onBackPress={() => navigation.goBack()}
+        />
         );
     };
 

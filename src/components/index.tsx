@@ -20,7 +20,7 @@ const components = {
   ProfileCategory,
   ColorfulCard,
   StartEndDatePicker,
-  Dropdown,
+  Dropdown, 
   ImagePickerComponent,
   TextEditor,
   DatepickerField,

@@ -13,6 +13,7 @@ import { userService } from '../../api/user1';
 import { skeletonLoader } from '../../components/skeletonLoaders';
 import { usePermissions } from '../../common/context/PermissionContext';
 import { hasPermission } from '../../utils/HasPermission';
+import Header1 from '../../components/Header1';
 
 type RootStackParamList = {
     LeadDetail: { leadId: string };
@@ -133,9 +134,12 @@ const LeadActions = () => {
             }
         });
     };
-
     const renderHeader = () => (
-        <components.Header title="Lead Actions" goBack={true} />
+        <Header1
+            title="Lead Actions"
+            showBackButton={true}
+            onBackPress={() => navigation.goBack()}
+        />
     );
 
     const renderStatusPicker = () => (
@@ -230,8 +234,8 @@ const LeadActions = () => {
         <SafeAreaView style={styles.container}>
             {renderHeader()}
             <ScrollView refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                } contentContainerStyle={styles.scrollView}>
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            } contentContainerStyle={styles.scrollView}>
                 {loading ? <skeletonLoader.ListSkeletonLoader
                     itemCount={7}
                     itemHeight={75}
@@ -318,22 +322,22 @@ const styles = StyleSheet.create({
     },
     leadIdText: {
         fontSize: 16,
-        fontWeight: 'bold',
         color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_700Bold
     },
     leadNameText: {
         fontSize: 18,
-        fontWeight: 'bold',
         color: theme.COLORS.primary,
+        ...theme.FONTS.Mulish_600SemiBold
     },
     statusUpdateContainer: {
         marginBottom: 20,
     },
     statusLabel: {
         fontSize: 16,
-        fontWeight: '600',
         color: theme.COLORS.black,
         marginBottom: 5,
+        ...theme.FONTS.Mulish_700Bold
     },
     pickerContainer: {
         borderRadius: 5,
@@ -365,8 +369,8 @@ const styles = StyleSheet.create({
     },
     actionButtonText: {
         fontSize: 14,
-        fontWeight: '600',
         color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_600SemiBold
     },
     modalContainer: {
         flex: 1,
@@ -382,9 +386,9 @@ const styles = StyleSheet.create({
     },
     modalTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
         marginBottom: 15,
         color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_700Bold
     },
     checkboxContainer: {
         flexDirection: 'row',
@@ -397,6 +401,7 @@ const styles = StyleSheet.create({
     checkboxLabel: {
         fontSize: 16,
         color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_400Regular
     },
     modalButtons: {
         flexDirection: 'row',

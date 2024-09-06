@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dashboardService } from '../../api/dashboard';
+import { theme } from '../../constants/theme';
 
 const LeadSourceReport = ({ refreshKey }: any) => {
   const [sourceReport, setSourceReport] = useState<any>([]);
@@ -65,8 +66,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 16,
+    ...theme.FONTS.Mulish_600SemiBold
   },
 });
 

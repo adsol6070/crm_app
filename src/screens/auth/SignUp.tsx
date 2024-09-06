@@ -48,6 +48,7 @@ const SignUp = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [image, setImage] = useState<ImageObject | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [countryCode, setCountryCode] = useState<string>("+91");
 
   const {
     control,
@@ -99,7 +100,7 @@ const SignUp = () => {
       formData.append("lastname", data.lastname);
       formData.append("email", data.email);
       formData.append("password", data.password);
-      formData.append("phone", data.phone);
+      formData.append("phone", `${countryCode}${data.phone}`);
       formData.append("role", "superAdmin");
       formData.append("uploadType", "User");
 
@@ -257,13 +258,15 @@ const SignUp = () => {
           name="phone"
           render={({ field: { onChange, onBlur, value } }) => (
             <components.InputField
-              title="Phone Number"
+              title="Phone"
               placeholder="Enter your phone number"
               containerStyle={{ marginBottom: 20 }}
               onChangeText={onChange}
               onBlur={onBlur}
               value={value}
               keyboardType="phone-pad"
+              countryCode={countryCode}
+              setCountryCode={setCountryCode}
               error={errors.phone?.message}
             />
           )}

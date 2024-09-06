@@ -1,6 +1,6 @@
 // App.tsx
 
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AuthNavigator from "./src/navigation/AuthNavigator";
@@ -14,10 +14,30 @@ import { useFonts } from "expo-font";
 import { Text } from "react-native";
 import { AuthProvider, useAuth } from "./src/common/context/AuthContext";
 import { Provider as PaperProvider } from "react-native-paper";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import { SocketProvider, useSocket } from "./src/common/context/SocketContext";
 import { PermissionsProvider } from "./src/common/context/PermissionContext";
 
 const AppContent = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, token } = useAuth();
+  const socketManager = useSocket();
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      socketManager.updateToken(token);
+      socketManager.connectSocket();
+
+      socketManager.on("welcome", (message) => {
+        console.log("Welcome message:", message);
+      });
+    } else {
+      socketManager.disconnectSocket();
+    }
+
+    return () => {
+      socketManager.disconnectSocket();
+    };
+  }, [isAuthenticated, token]);
 
   return (
     <NavigationContainer>
@@ -43,9 +63,13 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <PermissionsProvider>
-        <AppContent />
-      </PermissionsProvider>
+      <ActionSheetProvider>
+        <SocketProvider>
+          <PermissionsProvider>
+           <AppContent />
+          </PermissionsProvider>
+        </SocketProvider>
+      </ActionSheetProvider>
     </AuthProvider>
   );
 }
