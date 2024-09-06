@@ -28,14 +28,6 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
     [clearErrors, trigger]
   );
 
-  const formatDate = (date: Date) => {
-    const updatedDate = new Date(date);
-    const day = String(updatedDate.getDate()).padStart(2, "0");
-    const month = String(updatedDate.getMonth() + 1).padStart(2, "0");
-    const year = updatedDate.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
   return (
     <View>
       <Text style={styles.stepTitle}>Personal Information</Text>
@@ -62,9 +54,9 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
                 disableFutureDates
                 customBorderColor="#ddd"
                 customBackgroundColor="#f5f5f5"
-                date={value ? formatDate(value as Date) : undefined}
+                date={value ? value : undefined}
                 onDateChange={(date) => {
-                  onChange(date.toISOString());
+                  onChange(date);
                   handleFieldChange(field as keyof PersonalInfoData);
                 }}
                 error={errors[field as keyof PersonalInfoData]?.message}

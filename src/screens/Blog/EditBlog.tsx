@@ -74,8 +74,6 @@ const EditBlog = () => {
     });
 
     const onSubmit = async (data: any) => {
-        console.log("data ", data)
-        console.log("content ", content)
         try {
             const formData = new FormData()
             formData.append('title', data.title)

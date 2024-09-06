@@ -96,7 +96,7 @@ const RoleList = () => {
           </Text>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate("RoleDetail", { roleId: item.id })
+              navigation.navigate("RoleDetail", { roleName: item.name })
             }
             style={styles.iconButton}
           >

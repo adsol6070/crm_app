@@ -25,7 +25,7 @@ import {
 } from "react-native-pell-rich-editor";
 
 interface InputFieldProps extends TextInputProps {
-  date?: string | undefined;
+  date?: Date | undefined;
   title?: string;
   placeholder?: string;
   containerStyle?: ViewStyle;
@@ -156,13 +156,31 @@ const InputField: React.FC<InputFieldProps> = ({
     );
   };
 
+  const formatDate = (date: Date) => {
+    const updatedDate = new Date(date);
+    const day = String(updatedDate.getDate()).padStart(2, "0");
+    const month = String(updatedDate.getMonth() + 1).padStart(2, "0");
+    const year = updatedDate.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const imageContainerHeight = imageUri ? 200 : 50;
 
   return (
     <View>
       {useRichTextEditor ? (
         <ScrollView contentContainerStyle={pickerSelectStyles.scrollView}>
-          <Text style={{ marginBottom: 10 }}>{title}</Text>
+          <Text
+            style={{
+              marginBottom: 10,
+              ...theme.FONTS.Mulish_600SemiBold,
+              fontSize: 12,
+              textTransform: "capitalize",
+              color: theme.COLORS.gray1,
+            }}
+          >
+            {title}
+          </Text>
           <RichToolbar
             editor={richText}
             actions={[
@@ -250,7 +268,7 @@ const InputField: React.FC<InputFieldProps> = ({
                       paddingVertical: 0,
                       color: theme.COLORS.gray1,
                     }}
-                    value={date ? date : ""}
+                    value={date ? formatDate(date) : ""}
                     placeholder={placeholder}
                     placeholderTextColor={theme.COLORS.lightGray}
                   />

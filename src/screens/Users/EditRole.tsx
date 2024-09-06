@@ -81,7 +81,6 @@ const EditRole = () => {
   const [selectedModule, setSelectedModule] = useState(modules[0].id);
   const [loading, setLoading] = useState(true);
   const [roleID, setRoleID] = useState<string>("");
-  console.log("RoleID:", roleID);
   const [permissions, setPermissions] = useState({});
 
   const {
@@ -152,7 +151,6 @@ const EditRole = () => {
       permissions: formattedPermissions,
     };
 
-    console.log("FormData:", formData);
     try {
       await rolesService.updateRole(formData, roleID);
       Alert.alert("Success", "Role updated successfully.");

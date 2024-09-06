@@ -27,7 +27,10 @@ const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName="Main"
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen name="Main" component={DrawerNavigation} />
       <Stack.Screen name="PersonalChat" component={PersonalChat} />
       <Stack.Screen name="AddUsers" component={AddUser} />

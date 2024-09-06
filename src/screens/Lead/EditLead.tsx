@@ -20,9 +20,6 @@ const EditLead = () => {
     const navigation = useNavigation();
     const [visaCategories, setVisaCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [dob, setDob] = useState<Date | undefined>(undefined);
-    const [followUpDate, setFollowUpDate] = useState<Date | undefined>(undefined);
-    const [passportExpiryDate, setPassportExpiryDate] = useState<Date | undefined>(undefined);
 
     // Define validation schema
     const schema = yup.object().shape({
@@ -84,9 +81,6 @@ const EditLead = () => {
         setLoading(true)
         try {
             const response: any = await leadService.getLeadById(leadId);
-            setDob(response.dob);
-            setFollowUpDate(response.followUpDates)
-            setPassportExpiryDate(response.passportExpiry);
             reset({
                 firstname: response.firstname,
                 lastname: response.lastname,
@@ -94,7 +88,7 @@ const EditLead = () => {
                 phone: response.phone,
                 currentAddress: response.currentAddress,
                 permanentAddress: response.permanentAddress,
-                dob: response.dob,
+                dob: new Date(response.dob),
                 gender: response.gender,
                 country: response.country,
                 district: response.district,
@@ -104,7 +98,7 @@ const EditLead = () => {
                 nationality: response.nationality,
                 maritalStatus: response.maritalStatus,
                 passportNumber: response.passportNumber,
-                passportExpiry: response.passportExpiry,
+                passportExpiry: new Date(response.passportExpiry),
                 visaCategory: response.visaCategory,
                 highestQualification: response.highestQualification,
                 fieldOfStudy: response.fieldOfStudy,
@@ -126,7 +120,7 @@ const EditLead = () => {
                 preferredInstitutions: response.preferredInstitutions,
                 leadSource: response.leadSource,
                 referralContact: response.referralContact,
-                followUpDates: response.followUpDates,
+                followUpDates: new Date(response.followUpDates),
                 leadRating: response.leadRating,
             });
         } catch (error) {
@@ -161,7 +155,6 @@ const EditLead = () => {
             const updatedLeadData = {
                 ...data, tenantID: user?.tenantID, userID: user?.sub
             };
-            console.log("updatedData ", updatedLeadData)
             await leadService.updateLeadById(leadId, updatedLeadData);
             Alert.alert('Lead Updated Successfully');
         } catch (error) {
@@ -302,20 +295,15 @@ const EditLead = () => {
                 name="dob"
                 render={({ field: { onChange, onBlur, value } }) => (
                     <components.InputField
-                        date={dob}
                         title="DOB"
                         placeholder="Select Date of Birth"
                         customBorderColor="#ddd"
                         customBackgroundColor={theme.COLORS.white}
                         onDateChange={(date) => {
-                            if (date) {
-                                onChange(date.toDateString());
-                            } else {
-                                onChange('');
-                            }
-                        }}
+                            onChange(date);
+                          }}
                         onBlur={onBlur}
-                        value={value ? new Date(value).toDateString() : ''}
+                        date={value ? value : undefined}
                         error={errors.dob?.message}
                         datePicker={true}
                         disableFutureDates={true}
@@ -463,22 +451,17 @@ const EditLead = () => {
                 name="passportExpiry"
                 render={({ field: { onChange, onBlur, value } }) => (
                     <components.InputField
-                        date={passportExpiryDate}
-                        title="Passport Expiry"
-                        placeholder="Select passport expiry"
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
-                        onDateChange={(date) => {
-                            if (date) {
-                                onChange(date.toISOString());
-                            } else {
-                                onChange('');
-                            }
-                        }}
-                        onBlur={onBlur}
-                        value={value ? new Date(value).toDateString() : ''}
-                        error={errors.passportExpiry?.message}
-                        datePicker={true}
+                    title="Passport Expiry"
+                    placeholder="Select passport expiry"
+                    customBorderColor="#ddd"
+                    customBackgroundColor={theme.COLORS.white}
+                    onDateChange={(date) => {
+                        onChange(date);
+                    }}
+                    onBlur={onBlur}
+                    date={value ? value : undefined}
+                    error={errors.passportExpiry?.message}
+                    datePicker={true}
                     />
                 )}
             />
@@ -827,20 +810,15 @@ const EditLead = () => {
                 name="followUpDates"
                 render={({ field: { onChange, onBlur, value } }) => (
                     <components.InputField
-                        date={followUpDate}
                         title="Follow Up Dates"
                         placeholder="Select followUp dates"
                         customBorderColor="#ddd"
                         customBackgroundColor={theme.COLORS.white}
                         onDateChange={(date) => {
-                            if (date) {
-                                onChange(date.toISOString());
-                            } else {
-                                onChange('');
-                            }
+                            onChange(date);
                         }}
                         onBlur={onBlur}
-                        value={value ? new Date(value).toDateString() : ''}
+                        date={value ? value : undefined}
                         error={errors.followUpDates?.message}
                         datePicker={true}
                     />

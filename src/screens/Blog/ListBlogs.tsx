@@ -1,14 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { RefreshControl, ScrollView } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { components } from '../../components';
-import { blogService } from '../../api/blog';
-import { skeletonLoader } from '../../components/skeletonLoaders';
-import { usePermissions } from '../../common/context/PermissionContext';
-import { hasPermission } from '../../utils/HasPermission';
+import React, { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { RefreshControl, ScrollView } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { components } from "../../components";
+import { blogService } from "../../api/blog";
+import { skeletonLoader } from "../../components/skeletonLoaders";
+import { usePermissions } from "../../common/context/PermissionContext";
+import { hasPermission } from "../../utils/HasPermission";
+import Header1 from "../../components/Header1";
+import { theme } from "../../constants/theme";
 
 type RootStackParamList = {
   ReadBlog: { blogId: string };
@@ -72,55 +81,65 @@ const ListBlogs: React.FC = () => {
     );
   };
 
-  const renderHeader = () => {
-    return (
-      <components.Header
-        title="Blog Lists"
-        goBack={true}
-      />
-    );
-  };
   const renderContent = () => {
     if (loading) {
       return (
         <View>
-          {Array(5).fill(null).map((_, index) => (
-            <skeletonLoader.BlogListSkeletonLoader key={index} />
-          ))}
+          {Array(5)
+            .fill(null)
+            .map((_, index) => (
+              <skeletonLoader.BlogListSkeletonLoader key={index} />
+            ))}
         </View>
       );
     }
 
     return blogData.map((blog) => (
       <View key={blog.id} style={styles.cardContainer}>
-        <Image source={{ uri: blog.blogImageUrl || 'https://tse2.mm.bing.net/th?id=OIP.sWCvltMZF_s3mjA5sL-RdgHaE8&pid=Api&P=0&h=180' }} style={styles.image} />
+        <Image
+          source={{
+            uri:
+              blog.blogImageUrl ||
+              "https://tse2.mm.bing.net/th?id=OIP.sWCvltMZF_s3mjA5sL-RdgHaE8&pid=Api&P=0&h=180",
+          }}
+          style={styles.image}
+        />
         <View style={styles.contentContainer}>
           <Text style={styles.title}>{blog.title}</Text>
-          <Text style={styles.date}>{new Date(blog.created_at).toLocaleDateString()} - {blog.category}</Text>
-          <Text style={styles.shortDescription} numberOfLines={2}>{blog.description}</Text>
+          <Text style={styles.date}>
+            {new Date(blog.created_at).toLocaleDateString()} - {blog.category}
+          </Text>
+          <Text style={styles.shortDescription} numberOfLines={2}>
+            {blog.description}
+          </Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.readMoreButton}
-              onPress={() => navigation.navigate("ReadBlog", { blogId: blog.id })}
+              onPress={() =>
+                navigation.navigate("ReadBlog", { blogId: blog.id })
+              }
             >
               <Text style={styles.readMoreText}>Read More</Text>
             </TouchableOpacity>
             <View style={styles.actionContainer}>
-            {hasPermission(permissions, 'Blogs', 'Update') &&
-              <TouchableOpacity
-                style={styles.actionIcon}
-                onPress={() => navigation.navigate("EditBlog", { blogId: blog.id })}
-              >
-                <Ionicons name="pencil" size={24} color="blue" />
-              </TouchableOpacity>
-  }
-  {hasPermission(permissions, 'Blogs', 'Delete') &&
-              <TouchableOpacity
-                style={styles.actionIcon}
-                onPress={() => handleDelete(blog.id)}
-              >
-                <Ionicons name="trash" size={24} color="red" />
-              </TouchableOpacity> }
+              {hasPermission(permissions, "Blogs", "Update") && (
+                <TouchableOpacity
+                  style={styles.actionIcon}
+                  onPress={() =>
+                    navigation.navigate("EditBlog", { blogId: blog.id })
+                  }
+                >
+                  <Ionicons name="pencil" size={24} color="blue" />
+                </TouchableOpacity>
+              )}
+              {hasPermission(permissions, "Blogs", "Delete") && (
+                <TouchableOpacity
+                  style={styles.actionIcon}
+                  onPress={() => handleDelete(blog.id)}
+                >
+                  <Ionicons name="trash" size={24} color="red" />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -129,9 +148,13 @@ const ListBlogs: React.FC = () => {
   };
 
   return (
-    <SafeAreaView>
-      {renderHeader()}
-      <ScrollView style={styles.containerStyle}
+    <SafeAreaView style={styles.container}>
+      <Header1
+        title="Blog List"
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
+      <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -143,14 +166,15 @@ const ListBlogs: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  containerStyle: {
-    marginBottom: 50
+  container: {
+    flex: 1,
+    backgroundColor: theme.COLORS.white,
   },
   cardContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.COLORS.white,
     borderRadius: 8,
-    overflow: 'hidden',
-    shadowColor: '#000000',
+    overflow: "hidden",
+    shadowColor: theme.COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
@@ -158,54 +182,54 @@ const styles = StyleSheet.create({
     margin: 16,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   actionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 150,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   contentContainer: {
     padding: 16,
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
-    color: '#333333',
+    color: "#333333",
   },
   date: {
     fontSize: 14,
-    color: '#888888',
+    color: "#888888",
     marginBottom: 12,
   },
   shortDescription: {
     fontSize: 16,
-    color: '#444444',
+    color: "#444444",
     lineHeight: 22,
   },
   readMoreButton: {
     marginTop: 12,
-    backgroundColor: '#000',
+    backgroundColor: theme.COLORS.black,
     borderRadius: 4,
     paddingVertical: 10,
     paddingHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   readMoreText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
+    color: theme.COLORS.white,
+    fontSize: 12,
+    ...theme.FONTS.Mulish_600SemiBold,
   },
   actionIcon: {
-    marginLeft: 8, 
+    marginLeft: 8,
   },
 });
 

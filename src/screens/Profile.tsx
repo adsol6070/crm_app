@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Alert,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -16,11 +18,15 @@ import { useAuth } from "../common/context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { userService } from "../api/user";
 import DetailSkeletonLoader from "./Users/DetailSkeletonLoader";
+import * as ImagePicker from "expo-image-picker";
+import Header1 from "../components/Header1";
+import { useActionSheet } from "@expo/react-native-action-sheet";
 
 const Profile = () => {
   const navigation = useNavigation();
   const { logout, user } = useAuth();
   const { theme } = constants;
+  const { showActionSheetWithOptions } = useActionSheet();
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<undefined | any>(undefined);
   const [avatarLoading, setAvatarLoading] = useState(true);
@@ -33,7 +39,6 @@ const Profile = () => {
         try {
           const userId = user?.sub;
           const response = await userService.getProfile({ userId });
-          console.log("Response ", response);
           setCurrentUser(response);
         } catch (error) {
           console.log("Profile Fetching error ", error);
@@ -45,6 +50,78 @@ const Profile = () => {
       fetchProfile();
     }, [user])
   );
+
+  const handleEditProfileImage = async () => {
+    if (Platform.OS === "ios" || Platform.OS === "android") {
+      const { status: mediaStatus } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status: cameraStatus } =
+        await ImagePicker.requestCameraPermissionsAsync();
+
+      if (mediaStatus !== "granted" || cameraStatus !== "granted") {
+        Alert.alert(
+          "Permission required",
+          "Camera and photo library permissions are required to change profile picture."
+        );
+        return;
+      }
+
+      const options = ["Cancel", "Take Photo", "Choose from Library"];
+      const destructiveIndex = 1;
+
+      showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex: 0,
+          destructiveButtonIndex: destructiveIndex,
+        },
+        async (buttonIndex) => {
+          if (buttonIndex === 1) {
+            const result = await ImagePicker.launchCameraAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              aspect: [4, 4],
+              quality: 1,
+            });
+
+            if (!result.canceled) {
+              const image = result.assets[0];
+              const profileImage = {
+                uri: image.uri,
+                name: image.fileName || "unknown",
+                type: image.mimeType || "image/jpeg",
+                size: image.fileSize || 0,
+              };
+              // await uploadProfileImage(profileImage);
+            }
+          } else if (buttonIndex === 2) {
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ImagePicker.MediaTypeOptions.Images,
+              allowsEditing: true,
+              aspect: [4, 4],
+              quality: 1,
+            });
+
+            if (!result.canceled) {
+              const image = result.assets[0];
+              const profileImage = {
+                uri: image.uri,
+                name: image.fileName || "unknown",
+                type: image.mimeType || "image/jpeg",
+                size: image.fileSize || 0,
+              };
+              // await uploadProfileImage(profileImage);
+            }
+          }
+        }
+      );
+    } else {
+      Alert.alert(
+        "Feature Not Available",
+        "This feature is not available on this platform."
+      );
+    }
+  };
 
   const renderHeader = () => {
     return <components.Header title="Profile" />;
@@ -64,7 +141,7 @@ const Profile = () => {
       >
         <TouchableOpacity
           style={{ width: 126, height: 126, marginBottom: 20 }}
-          // onPress={() => navigation.navigate("EditProfile")}
+          onPress={handleEditProfileImage}
         >
           {avatarLoading && (
             <ActivityIndicator
@@ -124,27 +201,27 @@ const Profile = () => {
         </Text>
         <View style={{ width: "100%" }}>
           <components.ProfileCategory
-            title={currentUser.id === "null" ? "N/A" : currentUser.id}
+            title={currentUser.id ?? "N/A"}
             icon={<svg.UserIdSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.role === "null" ? "N/A" : currentUser.role}
+            title={currentUser.role ?? "N/A"}
             icon={<svg.RoleSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.phone === "null" ? "N/A" : currentUser.phone}
+            title={currentUser.phone ?? "N/A"}
             icon={<svg.PhoneSvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.city === "null" ? "N/A" : currentUser.city}
+            title={currentUser.city ?? "N/A"}
             icon={<svg.CitySvg />}
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.address === "null" ? "N/A" : currentUser.address}
+            title={currentUser.address ?? "N/A"}
             icon={<svg.MapPinSvg />}
             categoryNavigation={false}
           />
@@ -264,13 +341,11 @@ const Profile = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.COLORS.white }}>
+      <Header1 title="Profile" />
       <ScrollView>
-        <View style={{ flex: 1, marginBottom: 50 }}>
-          {renderHeader()}
-          {renderContent()}
-          {renderModal()}
-        </View>
+        {renderContent()}
+        {renderModal()}
       </ScrollView>
     </SafeAreaView>
   );

@@ -6,11 +6,9 @@ import {
   TextInput,
   FlatList,
   Image,
-  ActivityIndicator,
-  Alert,
   Linking,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme } from "../../constants/theme";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";

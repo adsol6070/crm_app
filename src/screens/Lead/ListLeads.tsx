@@ -18,16 +18,17 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { useAuth } from "../../common/context/AuthContext";
 import { leadService } from "../../api/lead";
 import { components } from "../../components";
-import { Picker } from '@react-native-picker/picker';
+import { Picker } from "@react-native-picker/picker";
 import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 import { skeletonLoader } from "../../components/skeletonLoaders";
 import { usePermissions } from "../../common/context/PermissionContext";
 import { hasPermission } from "../../utils/HasPermission";
+import Header1 from "../../components/Header1";
 
 type RootStackParamList = {
   AddLead: undefined;
   LeadDetail: { leadId: string };
-  LeadActions: { leadId: string, visaType: string };
+  LeadActions: { leadId: string; visaType: string };
 };
 
 const ListLeads = () => {
@@ -40,18 +41,20 @@ const ListLeads = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState(false);
   const [visaCategories, setVisaCategories] = useState<any[]>([]);
-  const [selectedVisaCategory, setSelectedVisaCategory] = useState<string>("All");
+  const [selectedVisaCategory, setSelectedVisaCategory] =
+    useState<string>("All");
 
   const getAllLeads = async () => {
     setLoading(true);
     try {
-      if (user.role === 'superAdmin') {
+      if (user.role === "superAdmin") {
         const response: any = await leadService.getAllLeads();
         setData(response);
         setFilteredLeads(response);
-      }
-      else {
-        const response: any = await leadService.getSpecificLeadByUserId(user?.sub);
+      } else {
+        const response: any = await leadService.getSpecificLeadByUserId(
+          user?.sub
+        );
         setData(response);
         setFilteredLeads(response);
       }
@@ -69,25 +72,28 @@ const ListLeads = () => {
         return {
           value: category.category,
           label: category.category,
-        }
-      })
-      setVisaCategories([{ value: "All Visa", label: "All Visa" }, ...newCategories]);
+        };
+      });
+      setVisaCategories([
+        { value: "All Visa", label: "All Visa" },
+        ...newCategories,
+      ]);
     } catch (error) {
       console.error("Error fetching visa categories", error);
     }
-  }
+  };
 
   useEffect(() => {
     getAllLeads();
     getVisaCategories();
     refreshPermissions();
-  }, [])
+  }, []);
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     getAllLeads();
     getVisaCategories();
-    refreshPermissions()
+    refreshPermissions();
     setTimeout(() => {
       setRefreshing(false);
     }, 500);
@@ -168,8 +174,9 @@ const ListLeads = () => {
     let filteredData = data;
 
     if (visaCategory !== "All Visa") {
-      filteredData = filteredData.filter((lead: any) =>
-        lead.visaCategory?.toLowerCase() === visaCategory.toLowerCase()
+      filteredData = filteredData.filter(
+        (lead: any) =>
+          lead.visaCategory?.toLowerCase() === visaCategory.toLowerCase()
       );
     }
 
@@ -190,14 +197,18 @@ const ListLeads = () => {
         style={[styles.picker]}
       >
         {visaCategories.map((option: any) => (
-          <Picker.Item key={option.value} label={capitalizeFirstLetter(option.label)} value={option.value} />
+          <Picker.Item
+            key={option.value}
+            label={capitalizeFirstLetter(option.label)}
+            value={option.value}
+          />
         ))}
       </Picker>
     </View>
   );
 
-  const renderItem = ({ item }: any) => (
-    hasPermission(permissions, 'Leads', 'View') ? (
+  const renderItem = ({ item }: any) =>
+    hasPermission(permissions, "Leads", "View") ? (
       <TouchableOpacity
         key={item.id}
         onPress={() => navigation.navigate("LeadDetail", { leadId: item.id })}
@@ -220,19 +231,26 @@ const ListLeads = () => {
             <MaterialIcons name="phone" size={20} color="blue" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate("LeadActions", { leadId: item.id, visaType: item.visaCategory })}
+            onPress={() =>
+              navigation.navigate("LeadActions", {
+                leadId: item.id,
+                visaType: item.visaCategory,
+              })
+            }
             style={styles.iconButton}
           >
             <MaterialIcons name="settings" size={20} color="black" />
           </TouchableOpacity>
-          {hasPermission(permissions, 'Leads', 'Delete') &&
+          {hasPermission(permissions, "Leads", "Delete") && (
             <TouchableOpacity
-              onPress={() => { handleDelete(item.id) }}
+              onPress={() => {
+                handleDelete(item.id);
+              }}
               style={styles.iconButton}
             >
               <MaterialIcons name="delete" size={20} color="red" />
             </TouchableOpacity>
-          }
+          )}
         </View>
       </TouchableOpacity>
     ) : (
@@ -254,40 +272,44 @@ const ListLeads = () => {
             <MaterialIcons name="phone" size={20} color="blue" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate("LeadActions", { leadId: item.id, visaType: item.visaCategory})}
+            onPress={() =>
+              navigation.navigate("LeadActions", {
+                leadId: item.id,
+                visaType: item.visaCategory,
+              })
+            }
             style={styles.iconButton}
           >
             <MaterialIcons name="settings" size={20} color="black" />
           </TouchableOpacity>
-          {hasPermission(permissions, 'Leads', 'Delete') &&
+          {hasPermission(permissions, "Leads", "Delete") && (
             <TouchableOpacity
-              onPress={() => { handleDelete(item.id) }}
+              onPress={() => {
+                handleDelete(item.id);
+              }}
               style={styles.iconButton}
             >
               <MaterialIcons name="delete" size={20} color="red" />
             </TouchableOpacity>
-          }
+          )}
         </View>
       </View>
-    )
-  );
+    );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialIcons
-              name="keyboard-arrow-left"
-              size={24}
-              color={theme.COLORS.black}
-            />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>Leads</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("AddLead")}>
-            <AntDesign name="plus" size={20} color={theme.COLORS.black} />
-          </TouchableOpacity>
-        </View>
+        <Header1
+          title="Leads"
+          showBackButton={true}
+          onBackPress={() => navigation.goBack()}
+          {...(filteredLeads.length > 0
+            ? {
+                actionIcon: "plus",
+                onActionPress: () => navigation.navigate("AddLead"),
+              }
+            : {})}
+        />
         <View style={styles.searchContainer}>
           <AntDesign name="search1" size={24} color={theme.COLORS.black} />
           <TextInput
@@ -297,11 +319,13 @@ const ListLeads = () => {
             placeholder="Search lead..."
           />
         </View>
-        {loading ? (<skeletonLoader.LeadListSkeletonLoader />) :
-          (<View>
+        {loading ? (
+          <skeletonLoader.LeadListSkeletonLoader />
+        ) : (
+          <View>
             <View style={styles.topBtnContainer}>
               {renderVisaFilter()}
-              {hasPermission(permissions, 'Leads', 'DeleteAll') &&
+              {hasPermission(permissions, "Leads", "DeleteAll") && (
                 <View>
                   <TouchableOpacity
                     onPress={handleDeleteAll}
@@ -309,7 +333,8 @@ const ListLeads = () => {
                   >
                     <Text style={styles.deleteAllBtn}>Delete All</Text>
                   </TouchableOpacity>
-                </View>}
+                </View>
+              )}
             </View>
             <View style={styles.countContainer}>
               <Text style={styles.countText}>{filteredLeads.length} leads</Text>
@@ -321,7 +346,10 @@ const ListLeads = () => {
                   renderItem={renderItem}
                   keyExtractor={(item) => item.id.toString()}
                   refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
                   }
                 />
               ) : (
@@ -330,10 +358,10 @@ const ListLeads = () => {
                 </View>
               )}
             </View>
-          </View>)
-        }
+          </View>
+        )}
       </View>
-    </SafeAreaView >
+    </SafeAreaView>
   );
 };
 
@@ -378,25 +406,25 @@ const styles = StyleSheet.create({
     color: theme.COLORS.black,
   },
   pickerContainer: {
-    width: '100%',
-    overflow: 'hidden',
+    width: "100%",
+    overflow: "hidden",
     marginLeft: 10,
     borderWidth: 1,
     borderRadius: 50,
-    borderColor: 'black',
+    borderColor: "black",
   },
   picker: {
     height: 30,
   },
   topBtnContainer: {
-    width: '65%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
+    width: "65%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   deleteAllBtn: {
-    backgroundColor: 'red',
-    color: 'white',
+    backgroundColor: "red",
+    color: "white",
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 50,
@@ -427,13 +455,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   noLeadsContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   noLeadsText: {
     ...theme.FONTS.H4,
     color: theme.COLORS.black,
-    textAlign: 'center',
+    textAlign: "center",
     margin: 20,
   },
 });

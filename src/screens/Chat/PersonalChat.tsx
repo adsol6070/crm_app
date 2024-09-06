@@ -86,6 +86,7 @@ const PersonalChat: React.FC<PersonalChatProps> = ({ navigation, route }) => {
   };
 
   const addMessage = (messages: IMessage[]) => {
+    console.log("Add Message get called:", messages);
     socketManager?.emit("sendMessage", {
       toUserId: userId,
       message: messages[0].text,
@@ -555,7 +556,7 @@ const PersonalChat: React.FC<PersonalChatProps> = ({ navigation, route }) => {
       <GiftedChat
         messages={messages}
         // showUserAvatar={true}
-        renderUsernameOnMessage={true}
+        // renderUsernameOnMessage={true}
         onSend={(messages) => addMessage(messages as IMessage[])}
         user={{
           _id: user?.sub as string,

@@ -142,8 +142,8 @@ const AddLead = () => {
   const onNext: SubmitHandler<LeadData> = async (data) => {
     if (currentStep < STEP_LABELS.length - 1) {
       handleStepChange(1);
+      setValidatedSteps((prev) => new Set(prev).add(currentStep));
     } else {
-      console.log("All Data:", data);
       try {
         await leadService.createLead(data);
         reset();

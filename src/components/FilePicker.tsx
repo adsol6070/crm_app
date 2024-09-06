@@ -1,8 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { theme } from "../constants/theme";
 
 interface FilePickerProps {
   file: any | null;
@@ -12,19 +20,24 @@ interface FilePickerProps {
   allowCamera?: boolean;
 }
 
-const FilePicker: React.FC<FilePickerProps> = ({ file, setFile, allowFilePick = false, allowImagePick = false, allowCamera = false }) => {
-
+const FilePicker: React.FC<FilePickerProps> = ({
+  file,
+  setFile,
+  allowFilePick = false,
+  allowImagePick = false,
+  allowCamera = false,
+}) => {
   const pickFile = async () => {
     try {
       const result: any = await DocumentPicker.getDocumentAsync({
-        type: '*/*',
+        type: "*/*",
       });
-  
-      if (result.type === 'cancel') {
-        Alert.alert('File selection cancelled.');
+
+      if (result.type === "cancel") {
+        Alert.alert("File selection cancelled.");
         return;
       }
-  
+
       if (result.assets && result.assets.length > 0) {
         const selectedFile = result.assets[0];
         const fileData = {
@@ -35,19 +48,23 @@ const FilePicker: React.FC<FilePickerProps> = ({ file, setFile, allowFilePick = 
         };
         setFile(fileData);
       } else {
-        Alert.alert('Failed to pick file.');
+        Alert.alert("Failed to pick file.");
       }
     } catch (error) {
-      console.error('Error picking file:', error);
-      Alert.alert('Failed to pick file.');
+      console.error("Error picking file:", error);
+      Alert.alert("Failed to pick file.");
     }
-  };  
+  };
 
   const pickImage = async () => {
-    const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status: libraryStatus } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (libraryStatus !== 'granted') {
-      Alert.alert('Permission required', 'Sorry, we need media library permissions to make this work!');
+    if (libraryStatus !== "granted") {
+      Alert.alert(
+        "Permission required",
+        "Sorry, we need media library permissions to make this work!"
+      );
       return;
     }
 
@@ -73,8 +90,11 @@ const FilePicker: React.FC<FilePickerProps> = ({ file, setFile, allowFilePick = 
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
-    if (status !== 'granted') {
-      Alert.alert('Permission required', 'Sorry, we need camera permissions to make this work!');
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission required",
+        "Sorry, we need camera permissions to make this work!"
+      );
       return;
     }
 
@@ -122,10 +142,12 @@ const FilePicker: React.FC<FilePickerProps> = ({ file, setFile, allowFilePick = 
       {file ? (
         <View style={styles.fileInfo}>
           <Text style={styles.fileName}>File Name: {file.name}</Text>
-          {file.type.startsWith('image/') ? (
+          {file.type.startsWith("image/") ? (
             <Image source={{ uri: file.uri }} style={styles.image} />
           ) : (
-            <Text style={styles.fileType}>File Type: {file.type.split('/').pop()}</Text>
+            <Text style={styles.fileType}>
+              File Type: {file.type.split("/").pop()}
+            </Text>
           )}
           <TouchableOpacity style={styles.removeButton} onPress={removeFile}>
             <MaterialIcons name="cancel" size={24} color="white" />
@@ -141,42 +163,41 @@ const FilePicker: React.FC<FilePickerProps> = ({ file, setFile, allowFilePick = 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: "#f8f8f8",
   },
   buttonContainer: {
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
     width: 240,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonCamera: {
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
     marginLeft: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
+    color: theme.COLORS.white,
+    ...theme.FONTS.Mulish_400Regular,
   },
   fileInfo: {
     marginTop: 20,
-    position: 'relative',
+    position: "relative",
   },
   fileName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   image: {
@@ -184,23 +205,23 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#007bff',
+    borderColor: "#007bff",
   },
   fileType: {
     fontSize: 14,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   removeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: '#ff4d4d',
+    backgroundColor: "#ff4d4d",
     borderRadius: 50,
     padding: 5,
   },
   text: {
-    fontSize: 16,
-    color: '#666',
+    color: "#666",
+    ...theme.FONTS.Mulish_400Regular,
   },
 });
 

@@ -6,12 +6,10 @@ import {
   Image,
   Alert,
   ScrollView,
-  Dimensions,
   Clipboard,
   Linking,
   Share,
   RefreshControl,
-  ActionSheetIOS,
   Platform,
 } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
@@ -26,16 +24,14 @@ import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import Header1 from "../../components/Header1";
 
-const { width } = Dimensions.get("window");
-
 const UserDetail = () => {
   const navigation = useNavigation();
-  const { showActionSheetWithOptions } = useActionSheet();
   const route = useRoute();
+  const { showActionSheetWithOptions } = useActionSheet();
   const { userId } = route.params;
   const [user, setUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchUser = async () => {
     setLoading(true);
@@ -149,7 +145,7 @@ const UserDetail = () => {
           destructiveButtonIndex: destructiveIndex,
         },
         async (buttonIndex) => {
-          if (buttonIndex === 1) {  
+          if (buttonIndex === 1) {
             const result = await ImagePicker.launchCameraAsync({
               mediaTypes: ImagePicker.MediaTypeOptions.Images,
               allowsEditing: true,
@@ -328,7 +324,7 @@ const UserDetail = () => {
           </View>
 
           {/* {user?.latitude && user?.longitude && ( */}
-          <View style={styles.mapContainer}>
+          {/* <View style={styles.mapContainer}>
             <MapView
               style={styles.map}
               initialRegion={{
@@ -347,7 +343,7 @@ const UserDetail = () => {
                 description="A popular city in California."
               />
             </MapView>
-          </View>
+          </View> */}
           {/* )} */}
         </View>
         <View style={styles.buttonContainer}>

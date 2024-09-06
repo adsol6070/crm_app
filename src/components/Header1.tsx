@@ -27,6 +27,8 @@ const Header1: React.FC<IHeaderProps> = ({
   actionIconSize = 20,
 }) => {
   const shouldApplyFlex1 = !actionIcon;
+  const isTitleCentered = !showMenuButton && !showBackButton && !onActionPress;
+
   return (
     <View
       style={{
@@ -37,7 +39,7 @@ const Header1: React.FC<IHeaderProps> = ({
         paddingTop: 22,
         paddingBottom: 10,
         backgroundColor: theme.COLORS.white,
-        marginBottom: 5,
+        // marginBottom: 5,
         elevation: 4,
       }}
     >
@@ -61,6 +63,7 @@ const Header1: React.FC<IHeaderProps> = ({
           />
         </TouchableOpacity>
       )}
+      {isTitleCentered && <View style={{ flex: 1 }}></View>}
       <Text style={{ ...theme?.FONTS?.H4 }}>{title}</Text>
       {onActionPress && actionIcon && (
         <TouchableOpacity onPress={onActionPress}>

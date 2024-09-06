@@ -20,11 +20,18 @@ import { theme } from "../../constants/theme";
 import Header1 from "../../components/Header1";
 import { useNavigation } from "@react-navigation/native";
 
+interface ImageObject {
+  uri: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
 const AddBlog = () => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<ImageObject | null>(null);
   const [content, setContent] = useState<string>("");
   const [clearStatus, setClearStatus] = useState<boolean>(false);
 
@@ -51,6 +58,7 @@ const AddBlog = () => {
     description: yup.string().required("Short description is required"),
     content: yup.string(),
     category: yup.string().required("Category is required"),
+    blogImage: yup.mixed(),
   });
 
   const {
@@ -73,6 +81,17 @@ const AddBlog = () => {
       setRefreshing(false);
     }, 500);
   }, []);
+
+  const handleImageSelect = (image: any) => {
+    const profileImage: ImageObject = {
+      uri: image.uri,
+      name: image.fileName || "unknown",
+      type: image.mimeType || "image/jpeg",
+      size: image.fileSize || 0,
+    };
+
+    setImage(profileImage);
+  };
 
   const onSubmit = async (data: any) => {
     console.log("data ", data);
@@ -154,35 +173,38 @@ const AddBlog = () => {
             />
           )}
         />
-        <View>
-          <Controller
-            control={control}
-            name="content"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <components.InputField
-                title="Content"
-                useRichTextEditor
-                richEditorPlaceholder="Write your content here..."
-                onRichTextChange={(text) => {
-                  setContent(text);
-                  onChange(text);
-                }}
-                error={errors.content?.message}
-                initialContent={content}
-                clearContent={clearStatus}
-              />
-            )}
-          />
-        </View>
-        <View>
-          <Text>Upload Image</Text>
-          <components.FilePicker
-            file={image}
-            setFile={setImage}
-            allowCamera={true}
-            allowImagePick={true}
-          />
-        </View>
+        <Controller
+          control={control}
+          name="content"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <components.InputField
+              title="Content"
+              useRichTextEditor
+              richEditorPlaceholder="Write your content here..."
+              onRichTextChange={(text) => {
+                setContent(text);
+                onChange(text);
+              }}
+              error={errors.content?.message}
+              initialContent={content}
+              clearContent={clearStatus}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="blogImage"
+          render={() => (
+            <components.InputField
+              title="Upload Image"
+              placeholder="Select an image"
+              image={true}
+              imageUri={image?.uri}
+              onImageSelect={handleImageSelect}
+              error={errors.blogImage?.message}
+            />
+          )}
+        />
         <components.Button title="Add Blog" onPress={handleSubmit(onSubmit)} />
       </View>
     );
@@ -190,16 +212,16 @@ const AddBlog = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header1
+        title="Add Blog"
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <Header1
-          title="Add Blog"
-          showBackButton={true}
-          onBackPress={() => navigation.goBack()}
-        />
         {renderContent()}
       </ScrollView>
     </SafeAreaView>
@@ -213,6 +235,14 @@ const styles = StyleSheet.create({
   },
   fieldContainer: {
     margin: 20,
+  },
+  label: {
+    ...theme.FONTS.H4,
+    color: theme.COLORS.black,
+  },
+  headerTitle: {
+    ...theme.FONTS.H1,
+    color: theme.COLORS.primary,
   },
 });
 

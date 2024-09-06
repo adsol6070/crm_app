@@ -18,6 +18,9 @@ import { components } from "../../components";
 import * as yup from "yup";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { userService } from "../../api/user";
+import Header1 from "../../components/Header1";
+import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
+import { rolesService } from "../../api/roles";
 
 const schema = yup.object().shape({
   firstname: yup.string().required("Firstname is required"),
@@ -29,10 +32,15 @@ const schema = yup.object().shape({
   role: yup.string().required("Role is required"),
 });
 
+const toTitleCase = (str: string) => {
+  return str.toLowerCase().replace(/\b(\w)/g, (s) => s.toUpperCase());
+};
+
 const EditUser = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { userId } = route.params;
+  const [roleOptions, setRoleOptions] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const {
@@ -62,7 +70,14 @@ const EditUser = () => {
     }
   };
 
+  const fetchRoles = async () => {
+    const roles = await rolesService.getAllRoles();
+    const transformedRoles = roles.map((role: string) => toTitleCase(role));
+    setRoleOptions([...transformedRoles] as any);
+  };
+
   useEffect(() => {
+    fetchRoles();
     fetchUser();
   }, [userId]);
 
@@ -91,22 +106,11 @@ const EditUser = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{ flex: 1 }}
-        >
-          <MaterialIcons
-            name="keyboard-arrow-left"
-            size={24}
-            color={theme.COLORS.black}
-          />
-        </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={{ ...theme.FONTS.H4 }}>Edit User</Text>
-        </View>
-        <View style={{ flex: 1 }} />
-      </View>
+      <Header1
+        title="Edit User"
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -229,19 +233,16 @@ const EditUser = () => {
             <Controller
               control={control}
               name="role"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <components.InputField
-                  title="Role"
-                  placeholder="Select role"
-                  containerStyle={{ marginBottom: 20 }}
-                  dropdown={true}
-                  items={[
-                    { label: "Admin", value: "admin" },
-                    { label: "User", value: "user" },
-                  ]}
-                  selectedValue={value}
-                  onValueChange={(val) => onChange(val)}
-                  onBlur={onBlur}
+              render={({ field: { onChange, value } }) => (
+                <components.Dropdown
+                  options={roleOptions}
+                  selectedValue={capitalizeFirstLetter(value)}
+                  onSelect={(value: string) => {
+                    const val = value.toLowerCase();
+                    onChange(val);
+                  }}
+                  placeholder="Select a role"
+                  label="Role"
                   error={errors.role?.message}
                 />
               )}

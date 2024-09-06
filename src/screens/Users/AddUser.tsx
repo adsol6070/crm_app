@@ -81,20 +81,19 @@ const AddUser = () => {
       phone: `${countryCode}${data.phone}`,
     };
 
-    console.log("ModifiedData:", modifiedData);
     try {
-      // const formData = new FormData();
-      // Object.keys(modifiedData).forEach((key) => {
-      //   formData.append(key, modifiedData[key]);
-      // });
-      // formData.append("uploadType", "User");
-      // if (image) {
-      //   formData.append("profileImage", image);
-      // }
-      // await userService.createUser(formData);
-      // navigation.navigate("ViewUsers");
-      // Alert.alert("Success", "User created successfully.");
-      // resetCreateUserForm();
+      const formData = new FormData();
+      Object.keys(modifiedData).forEach((key) => {
+        formData.append(key, modifiedData[key]);
+      });
+      formData.append("uploadType", "User");
+      if (image) {
+        formData.append("profileImage", image);
+      }
+      await userService.createUser(formData);
+      navigation.navigate("ViewUsers");
+      Alert.alert("Success", "User created successfully.");
+      resetCreateUserForm();
     } catch (error) {}
   };
 
