@@ -5,6 +5,7 @@ import { theme } from "../../../../constants/theme";
 
 interface LeadPreviewProps {
   data: LeadData;
+  countryCode: string;
 }
 
 const formatDate = (date: Date) => {
@@ -15,7 +16,7 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year}`;
 };
 
-const LeadPreview: React.FC<LeadPreviewProps> = ({ data }) => {
+const LeadPreview: React.FC<LeadPreviewProps> = ({ data, countryCode }) => {
   return (
     <View>
       <Text style={styles.stepTitle}>View Lead Details</Text>
@@ -28,7 +29,7 @@ const LeadPreview: React.FC<LeadPreviewProps> = ({ data }) => {
                 {capitalizeFirstLetter(key.replace(/([A-Z])/g, " $1"))}:
               </Text>
               <Text style={styles.tableValue}>
-                {key === "dob" ? formatDate(data[key]) : data[key] ?? "N/A"}
+                {(key === "dob" || key === "passportExpiry" || key === "followUpDates")? formatDate(data[key]): key === "phone" ? `${countryCode}${data[key]}` : data[key] ?? "N/A"}
               </Text>
             </View>
           ))}

@@ -5,9 +5,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { components } from '../../components';
 import { theme } from '../../constants/theme';
 import { leadService } from '../../api/lead';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { skeletonLoader } from '../../components/skeletonLoaders';
+import Header1 from '../../components/Header1';
 
 const getStatusColor = (status: any) => {
     switch (status) {
@@ -65,6 +66,7 @@ const LeadHistory = () => {
     const [leadHistory, setLeadHistory] = useState(undefined);
     const [loading, setLoading] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState(false);
+    const navigation = useNavigation();
     const route = useRoute();
     const { leadId }: any = route.params;
 
@@ -102,11 +104,11 @@ const LeadHistory = () => {
         }, 500);
     }, []);
 
-
     const renderHeader = () => (
-        <components.Header
+        <Header1
             title="Lead History"
-            goBack={true}
+            showBackButton={true}
+            onBackPress={() => navigation.goBack()}
         />
     );
 
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
     stepNumber: {
         color: theme.COLORS.white,
         fontSize: 16,
-        fontWeight: 'bold',
+        ...theme.FONTS.Mulish_400Regular
     },
     itemContent: {
         flex: 1,
@@ -241,8 +243,8 @@ const styles = StyleSheet.create({
     },
     action: {
         fontSize: 16,
-        fontWeight: 'bold',
         marginLeft: 10,
+        ...theme.FONTS.Mulish_700Bold
     },
     detailsContainer: {
         marginVertical: 8,
@@ -250,11 +252,13 @@ const styles = StyleSheet.create({
     details: {
         fontSize: 14,
         color: 'gray',
+        ...theme.FONTS.Mulish_400Regular
     },
     timestamp: {
         fontSize: 12,
-        color: theme.COLORS.lightGray,
+        color: theme.COLORS.gray1,
         marginTop: 4,
+        ...theme.FONTS.Mulish_400Regular
     },
     progressLineContainer: {
         flexDirection: 'row',

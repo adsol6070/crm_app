@@ -29,7 +29,7 @@ const CustomDrawerContent = (props: any) => {
   useEffect(() => {
     if (isDrawerOpen) {
       fetchProfile();
-      refreshPermissions();
+      // refreshPermissions();
     }
   }, [isDrawerOpen]);
 

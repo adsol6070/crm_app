@@ -208,7 +208,6 @@ const Chat = () => {
     );
 
     socketManager?.on("receiveMessage", async (newMessage: any) => {
-      console.log("Called..........");
       socketManager.emit("getUnreadMessages");
     });
 

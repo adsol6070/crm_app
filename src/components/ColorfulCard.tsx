@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { theme } from '../constants/theme';
 
 interface ColorfulCardProps {
   title?: string;
@@ -45,11 +46,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#fff',
+    ...theme.FONTS.Mulish_700Bold
   },
   description: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#fff',
+    ...theme.FONTS.Mulish_400Regular
   },
   icon: {
     marginLeft: 20,

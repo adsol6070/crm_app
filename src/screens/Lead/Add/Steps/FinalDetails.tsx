@@ -28,6 +28,14 @@ const FinalDetails: React.FC<FinalDetailsProps> = ({
     [clearErrors, trigger]
   );
 
+  const formatDate = (date: Date) => {
+    const updatedDate = new Date(date);
+    const day = String(updatedDate.getDate()).padStart(2, "0");
+    const month = String(updatedDate.getMonth() + 1).padStart(2, "0");
+    const year = updatedDate.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <View>
       <Text style={styles.stepTitle}>Final Details</Text>
@@ -36,13 +44,29 @@ const FinalDetails: React.FC<FinalDetailsProps> = ({
         "preferredContactTime",
         "leadSource",
         "referralContact",
+        "followUpDates",
         "leadRating",
       ].map((field, index) => (
         <Controller
           key={index}
           control={control}
           name={field as keyof FinalDetailsData}
-          render={({ field: { onChange, onBlur, value } }) => (
+          render={({ field: { onChange, onBlur, value } }) =>  
+            field === "followUpDates" ? (
+            <components.InputField
+              title="FollowUp Dates"
+              placeholder="DD/MM/YYYY"
+              datePicker
+              customBorderColor="#ddd"
+              customBackgroundColor="#f5f5f5"
+              date={value ? value : undefined}
+                onDateChange={(date) => {
+                  onChange(date);
+                  handleFieldChange(field as keyof FinalDetailsData);
+                }}
+              error={errors[field as keyof FinalDetailsData]?.message}
+            />
+          ) : (
             <components.InputField
               title={capitalizeFirstLetter(field.replace(/([A-Z])/g, " $1"))}
               placeholder={getPlaceholder(field)}
@@ -53,7 +77,7 @@ const FinalDetails: React.FC<FinalDetailsProps> = ({
                 handleFieldChange(field as keyof FinalDetailsData);
               }}
               onBlur={onBlur}
-              value={value}
+              value={typeof value === "string" ? value : ""}
               error={errors[field as keyof FinalDetailsData]?.message}
             />
           )}

@@ -33,7 +33,13 @@ const ReadBlog = () => {
   }, []);
 
   const renderHeader = () => {
-    return <components.Header title="Read Blog" goBack={true} />;
+    return (
+      <Header1
+        title="Read Blog"
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
+    );
   };
 
   const renderContent = () => {
@@ -100,11 +106,7 @@ const ReadBlog = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header1
-        title="Read Blog"
-        showBackButton={true}
-        onBackPress={() => navigation.goBack()}
-      />
+      {renderHeader()}
       <ScrollView>{renderContent()}</ScrollView>
     </SafeAreaView>
   );

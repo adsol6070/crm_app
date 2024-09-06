@@ -4,20 +4,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { components } from '../../components';
 import { ScrollView } from 'react-native-gesture-handler';
 import { theme } from '../../constants/theme';
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { leadService } from '../../api/lead';
 import useLeadData from './useLeadDetail';
 import { skeletonLoader } from '../../components/skeletonLoaders';
+import Header1 from '../../components/Header1';
 
 const LeadDetail = () => {
     const route = useRoute();
+    const navigation = useNavigation();
     const { leadId }: any = route.params;
     const { leadDetail, loading } = useLeadData(leadId);
-
     const renderHeader = () => (
-        <components.Header
+        <Header1
             title="Lead Detail"
-            goBack={true}
+            showBackButton={true}
+            onBackPress={() => navigation.goBack()}
         />
     );
 
@@ -182,24 +184,25 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
         marginBottom: 20,
         color: theme.COLORS.black,
         borderBottomWidth: 1,
         paddingBottom: 10,
+        ...theme.FONTS.Mulish_700Bold
     },
     infoRow: {
         flexDirection: 'row',
         marginBottom: 10,
     },
     infoLabel: {
-        fontWeight: 'bold',
         color: theme.COLORS.black,
         width: '40%',
+        ...theme.FONTS.Mulish_700Bold
     },
     infoValue: {
         color: theme.COLORS.black,
         width: '60%',
+        ...theme.FONTS.Mulish_400Regular
     },
     badge: {
         padding: 5,

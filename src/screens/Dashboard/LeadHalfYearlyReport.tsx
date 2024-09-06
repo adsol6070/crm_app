@@ -4,6 +4,7 @@ import { PieChart } from 'react-native-chart-kit';
 import moment from 'moment';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dashboardService } from '../../api/dashboard';
+import { theme } from '../../constants/theme';
 
 const LeadHalfYearlyReport = ({ refreshKey }: any) => {
   const [halfYearlyReport, setHalfYearlyReport] = useState<any>([]);
@@ -93,16 +94,17 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 8,
     textAlign: 'left',
     color: '#333',
+    ...theme.FONTS.Mulish_600SemiBold
   },
   time: {
     fontSize: 16,
     marginBottom: 16,
     textAlign: 'left',
     color: '#666', 
+    ...theme.FONTS.Mulish_400Regular
   },
   chart: {
     marginVertical: 8,

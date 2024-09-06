@@ -20,7 +20,7 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
   clearErrors,
   trigger,
 }) => {
-  const [visaCategories, setVisaCategories] = useState([]);
+  const [visaCategories, setVisaCategories] = useState<string[]>([]);
 
   const handleFieldChange = useCallback(
     async (field: keyof ImmigrationInfoData) => {
@@ -32,18 +32,27 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
     [clearErrors, trigger]
   );
 
+  const formatDate = (date: Date) => {
+    const updatedDate = new Date(date);
+    const day = String(updatedDate.getDate()).padStart(2, "0");
+    const month = String(updatedDate.getMonth() + 1).padStart(2, "0");
+    const year = updatedDate.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const fetchVisaCategories = async () => {
     try {
-      const response = await leadService.getVisaCategory();
-
-      console.log("Response:", response);
+      const response: any = await leadService.getVisaCategory();
+      const newCategories = response.map((category: any) =>
+        capitalizeFirstLetter(category.category)
+      );
+      setVisaCategories(newCategories)
     } catch (error) {
       console.error("Error fetching visa categories");
     }
   };
 
   useEffect(() => {
-    console.log("UseEffect get called>");
     fetchVisaCategories();
   }, []);
 
@@ -52,6 +61,7 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
       <Text style={styles.stepTitle}>Immigration Information</Text>
       {[
         "passportNumber",
+        "passportExpiry",
         "countryOfInterest",
         "desiredFieldOfStudy",
         "preferredInstitutions",
@@ -65,7 +75,22 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
           key={index}
           control={control}
           name={field as keyof ImmigrationInfoData}
-          render={({ field: { onChange, onBlur, value } }) => (
+          render={({ field: { onChange, onBlur, value } }) => 
+            field === "passportExpiry" ? (
+              <components.InputField
+                title="Passport Expiry"
+                placeholder="DD/MM/YYYY"
+                datePicker
+                customBorderColor="#ddd"
+                customBackgroundColor="#f5f5f5"
+                date={value ? value : undefined}
+                onDateChange={(date) => {
+                  onChange(date);
+                  handleFieldChange(field as keyof ImmigrationInfoData);
+                }}
+                error={errors[field as keyof ImmigrationInfoData]?.message}
+              />
+            ) : (
             <components.InputField
               title={capitalizeFirstLetter(field.replace(/([A-Z])/g, " $1"))}
               placeholder={getPlaceholder(field)}
@@ -76,7 +101,7 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
                 handleFieldChange(field as keyof ImmigrationInfoData);
               }}
               onBlur={onBlur}
-              value={value}
+              value={typeof value === "string" ? value : ""}
               error={errors[field as keyof ImmigrationInfoData]?.message}
             />
           )}
@@ -90,7 +115,7 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
           name={field as keyof ImmigrationInfoData}
           render={({ field: { onChange, value } }) => (
             <components.Dropdown
-              options={getDropdownOptions(field)}
+              options={getDropdownOptions(field, visaCategories)}
               selectedValue={capitalizeFirstLetter(value as string)}
               onSelect={(value: string) => {
                 const val = value.toLowerCase();
@@ -135,10 +160,10 @@ const getPlaceholder = (field: string) => {
   }
 };
 
-const getDropdownOptions = (field: string) => {
+const getDropdownOptions = (field: string, visaCategories: string[]) => {
   switch (field) {
     case "visaCategory":
-      return ["Option 1", "Option 2", "Option 3"];
+      return visaCategories;
     default:
       return [];
   }

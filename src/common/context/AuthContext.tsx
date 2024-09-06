@@ -67,7 +67,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (data: any): Promise<string | null> => {
     try {
       const response = await authService.login(data);
-      console.log("Response after login:", response);
       const token = response.tokens.accessToken;
       if (token) {
         const decodedToken = jwtDecode<DecodedToken>(token);

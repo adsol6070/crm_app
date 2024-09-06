@@ -20,7 +20,7 @@ import { PermissionsProvider } from "./src/common/context/PermissionContext";
 
 const AppContent = () => {
   const { isAuthenticated, token } = useAuth();
-  const socketManager = useSocket(); // Use socket instance
+  const socketManager = useSocket();
 
   useEffect(() => {
     if (isAuthenticated && token) {

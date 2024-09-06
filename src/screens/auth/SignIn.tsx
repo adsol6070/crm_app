@@ -65,6 +65,9 @@ const SignIn = () => {
         setErrorMessage("Invalid email or password");
         setVisible(true);
       }
+      else{
+        navigation.navigate("Main")
+      }
     } catch (error) {
       console.error("Login Error:", error);
       setErrorMessage("An error occurred. Please try again.");

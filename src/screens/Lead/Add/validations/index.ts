@@ -13,9 +13,9 @@ export const VALIDATION_SCHEMAS = {
     gender: Yup.string().required("Please select your Gender"),
     nationality: Yup.string().required("Please enter your Nationality"),
     maritalStatus: Yup.string().required("Please select your Marital Status"),
-    country: Yup.string().required("Please enter your Country"),
-    state: Yup.string().required("Please enter your State"),
-    district: Yup.string().required("Please enter your District"),
+    // country: Yup.string().required("Please enter your Country"),
+    // state: Yup.string().required("Please enter your State"),
+    // district: Yup.string().required("Please enter your District"),
     pincode: Yup.string()
       .required("Please enter your Pincode")
       .matches(/^[0-9]{6}$/, "Pincode must be exactly 6 digits")
@@ -46,6 +46,7 @@ export const VALIDATION_SCHEMAS = {
         "Passport number must be exactly 8 characters"
       )
       .trim(),
+    passportExpiry: Yup.date(),
     visaCategory: Yup.string().required("Please select your Visa Category"),
     courseOfInterest: Yup.string().nullable(),
     desiredFieldOfStudy: Yup.string().nullable(),
@@ -61,6 +62,7 @@ export const VALIDATION_SCHEMAS = {
     preferredContactTime: Yup.string().nullable(),
     leadSource: Yup.string().required("Please enter source of lead"),
     referralContact: Yup.string().nullable(),
+    followUpDates: Yup.date(),
     leadRating: Yup.string().nullable(),
   }),
 };

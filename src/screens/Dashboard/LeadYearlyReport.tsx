@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import moment from 'moment';
 import { dashboardService } from '../../api/dashboard';
+import { theme } from '../../constants/theme';
 
 const LeadYearlyReport = ({ refreshKey }: any) => {
   const [yearlyReport, setYearlyReport] = useState<any>([]);
@@ -87,14 +88,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 8,
     textAlign: 'left',
+    ...theme.FONTS.Mulish_600SemiBold
   },
   time: {
     fontSize: 16,
     marginBottom: 16,
     textAlign: 'left',
+    ...theme.FONTS.Mulish_400Regular
   },
   chart: {
     marginVertical: 8,

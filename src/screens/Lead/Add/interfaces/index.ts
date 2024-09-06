@@ -30,6 +30,7 @@ export interface AcademicInfoData {
 // Interface for Immigration Info Step
 export interface ImmigrationInfoData {
   passportNumber?: string;
+  passportExpiry?: Date;
   visaCategory: string;
   courseOfInterest?: string;
   desiredFieldOfStudy?: string;
@@ -47,6 +48,7 @@ export interface FinalDetailsData {
   preferredContactTime?: string;
   leadSource: string;
   referralContact?: string;
+  followUpDates?: Date;
   leadRating?: string;
 }
 

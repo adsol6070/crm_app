@@ -11,6 +11,7 @@ import { useAuth } from '../../common/context/AuthContext';
 import { genderOptions, maritalStatusOptions, nationalityOptions } from '../../utils/options';
 import { theme } from '../../constants/theme';
 import { skeletonLoader } from '../../components/skeletonLoaders';
+import { capitalizeFirstLetter } from '../../utils/CapitalizeFirstLetter';
 
 const EditLead = () => {
     const route = useRoute();
@@ -20,6 +21,7 @@ const EditLead = () => {
     const navigation = useNavigation();
     const [visaCategories, setVisaCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [countryCode, setCountryCode] = useState<string>("+91");
 
     // Define validation schema
     const schema = yup.object().shape({
@@ -32,37 +34,37 @@ const EditLead = () => {
         gender: yup.string().required("Gender is required"),
         dob: yup.date().required("Date of birth is required"),
         visaCategory: yup.string().required("Visa category is required"),
-        country: yup.string().required("Country is required"),
-        state: yup.string().required("State is required"),
-        district: yup.string().required("District is required"),
-        city: yup.string().required("City is required"),
+        country: yup.string().nullable(),
+        state: yup.string().nullable(),
+        district: yup.string().nullable(),
+        city: yup.string().nullable(),
         pincode: yup.string().required("Pincode is required"),
         nationality: yup.string().required("Nationality is required"),
         maritalStatus: yup.string().required("Marital Status is required"),
         highestQualification: yup.string().required('Please enter your Highest Qualification').trim(),
-        fieldOfStudy: yup.string(),
-        institutionName: yup.string(),
-        graduationYear: yup.string(),
-        grade: yup.string(),
-        testType: yup.string(),
-        testScore: yup.string(),
+        fieldOfStudy: yup.string().nullable(),
+        institutionName: yup.string().nullable(),
+        graduationYear: yup.string().nullable(),
+        grade: yup.string().nullable(),
+        testType: yup.string().nullable(),
+        testScore: yup.string().nullable(),
         passportNumber: yup.string().nullable().matches(/(^$)|(^[A-PR-WYa-pr-wy][0-9]\d\s?\d{4}[0-9]$)/, 'Passport number must be exactly 8 characters').trim(),
-        passportExpiry: yup.date(),
-        courseOfInterest: yup.string(),
-        countryOfInterest: yup.string(),
-        desiredFieldOfStudy: yup.string(),
-        preferredInstitutions: yup.string(),
-        intakeSession: yup.string(),
-        reasonForImmigration: yup.string(),
-        financialSupport: yup.string(),
-        sponsorDetails: yup.string(),
-        scholarships: yup.string(),
-        communicationMode: yup.string(),
-        preferredContactTime: yup.string(),
-        leadSource: yup.string(),
-        referralContact: yup.string(),
-        followUpDates: yup.date(),
-        leadRating: yup.string(),
+        passportExpiry: yup.date().nullable(),
+        courseOfInterest: yup.string().nullable(),
+        countryOfInterest: yup.string().nullable(),
+        desiredFieldOfStudy: yup.string().nullable(),
+        preferredInstitutions: yup.string().nullable(),
+        intakeSession: yup.string().nullable(),
+        reasonForImmigration: yup.string().nullable(),
+        financialSupport: yup.string().nullable(),
+        sponsorDetails: yup.string().nullable(),
+        scholarships: yup.string().nullable(),
+        communicationMode: yup.string().nullable(),
+        preferredContactTime: yup.string().nullable(),
+        leadSource: yup.string().nullable(),
+        referralContact: yup.string().nullable(),
+        followUpDates: yup.date().nullable(),
+        leadRating: yup.string().nullable(),
     });
 
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
@@ -77,15 +79,25 @@ const EditLead = () => {
         }, 500);
     }, []);
 
+    const splitCountryCode = (inputString: string) => {
+        const [countryCode, number] = inputString.split(' ');
+        return {
+            countryCode: number ? countryCode : '+91',
+            number: number || countryCode
+        };
+    };
+
     const getLeadDetails = async () => {
         setLoading(true)
         try {
             const response: any = await leadService.getLeadById(leadId);
+            const phone = splitCountryCode(response.phone)
+            setCountryCode(phone.countryCode)
             reset({
                 firstname: response.firstname,
                 lastname: response.lastname,
                 email: response.email,
-                phone: response.phone,
+                phone: phone.number,
                 currentAddress: response.currentAddress,
                 permanentAddress: response.permanentAddress,
                 dob: new Date(response.dob),
@@ -133,12 +145,9 @@ const EditLead = () => {
     const getCategories = async () => {
         try {
             const response: any = await leadService.getVisaCategory();
-            const newCategories = response.map((category: any) => {
-                return {
-                    value: category.category,
-                    label: category.category,
-                }
-            })
+            const newCategories = response.map((category: any) =>
+                category.category,
+            )
             setVisaCategories(newCategories);
         } catch (error) {
             console.error("Error fetching visa categories", error);
@@ -153,7 +162,8 @@ const EditLead = () => {
     const onSubmit = async (data: any) => {
         try {
             const updatedLeadData = {
-                ...data, tenantID: user?.tenantID, userID: user?.sub
+                ...data, tenantID: user?.tenantID, userID: user?.sub,
+                phone: `${countryCode} ${data.phone}`
             };
             await leadService.updateLeadById(leadId, updatedLeadData);
             Alert.alert('Lead Updated Successfully');
@@ -235,6 +245,9 @@ const EditLead = () => {
                         onChangeText={onChange}
                         onBlur={onBlur}
                         value={value}
+                        keyboardType="phone-pad"
+                        countryCode={countryCode}
+                        setCountryCode={setCountryCode}
                         error={errors.phone?.message}
                     />
                 )}
@@ -274,18 +287,16 @@ const EditLead = () => {
             <Controller
                 control={control}
                 name="gender"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <components.InputField
-                        title="Gender"
-                        placeholder="Select gender"
-                        containerStyle={{ marginBottom: 20 }}
-                        dropdown={true}
-                        items={genderOptions}
-                        selectedValue={value}
-                        onValueChange={(val) => onChange(val)}
-                        onBlur={onBlur}
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
+                render={({ field: { onChange, value } }) => (
+                    <components.Dropdown
+                        options={genderOptions}
+                        selectedValue={capitalizeFirstLetter(value)}
+                        onSelect={(value: string) => {
+                            const val = value.toLowerCase();
+                            onChange(val);
+                        }}
+                        placeholder="Select a gender"
+                        label="Gender"
                         error={errors.gender?.message}
                     />
                 )}
@@ -295,18 +306,15 @@ const EditLead = () => {
                 name="dob"
                 render={({ field: { onChange, onBlur, value } }) => (
                     <components.InputField
-                        title="DOB"
-                        placeholder="Select Date of Birth"
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
+                        title="Date of Birth"
+                        placeholder="DD/MM/YYYY"
+                        datePicker
+                        disableFutureDates
+                        date={value ? value : undefined}
                         onDateChange={(date) => {
                             onChange(date);
-                          }}
-                        onBlur={onBlur}
-                        date={value ? value : undefined}
+                        }}
                         error={errors.dob?.message}
-                        datePicker={true}
-                        disableFutureDates={true}
                     />
                 )}
             />
@@ -391,22 +399,19 @@ const EditLead = () => {
                     />
                 )}
             />
-
             <Controller
                 control={control}
                 name="nationality"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <components.InputField
-                        title="Nationality"
-                        placeholder="Select nationality"
-                        containerStyle={{ marginBottom: 20 }}
-                        dropdown={true}
-                        items={nationalityOptions}
-                        selectedValue={value}
-                        onValueChange={(val) => onChange(val)}
-                        onBlur={onBlur}
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
+                render={({ field: { onChange, value } }) => (
+                    <components.Dropdown
+                        options={nationalityOptions}
+                        selectedValue={capitalizeFirstLetter(value)}
+                        onSelect={(value: string) => {
+                            const val = value.toLowerCase();
+                            onChange(val);
+                        }}
+                        placeholder="Select a Nationality"
+                        label="Nationality"
                         error={errors.nationality?.message}
                     />
                 )}
@@ -414,18 +419,16 @@ const EditLead = () => {
             <Controller
                 control={control}
                 name="maritalStatus"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <components.InputField
-                        title="Marital Status"
-                        placeholder="Select Marital Status"
-                        containerStyle={{ marginBottom: 20 }}
-                        dropdown={true}
-                        items={maritalStatusOptions}
-                        selectedValue={value}
-                        onValueChange={(val) => onChange(val)}
-                        onBlur={onBlur}
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
+                render={({ field: { onChange, value } }) => (
+                    <components.Dropdown
+                        options={maritalStatusOptions}
+                        selectedValue={capitalizeFirstLetter(value)}
+                        onSelect={(value: string) => {
+                            const val = value.toLowerCase();
+                            onChange(val);
+                        }}
+                        placeholder="Select a Marital Status"
+                        label="Marital Status"
                         error={errors.maritalStatus?.message}
                     />
                 )}
@@ -451,35 +454,30 @@ const EditLead = () => {
                 name="passportExpiry"
                 render={({ field: { onChange, onBlur, value } }) => (
                     <components.InputField
-                    title="Passport Expiry"
-                    placeholder="Select passport expiry"
-                    customBorderColor="#ddd"
-                    customBackgroundColor={theme.COLORS.white}
-                    onDateChange={(date) => {
-                        onChange(date);
-                    }}
-                    onBlur={onBlur}
-                    date={value ? value : undefined}
-                    error={errors.passportExpiry?.message}
-                    datePicker={true}
+                        title="Passport Expiry"
+                        placeholder="DD/MM/YYYY"
+                        datePicker
+                        date={value ? value : undefined}
+                        onDateChange={(date) => {
+                            onChange(date);
+                        }}
+                        error={errors.passportExpiry?.message}
                     />
                 )}
             />
             <Controller
                 control={control}
                 name="visaCategory"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <components.InputField
-                        title="Visa Category"
-                        placeholder="Select visa category"
-                        containerStyle={{ marginBottom: 20 }}
-                        dropdown={true}
-                        items={visaCategories}
-                        selectedValue={value}
-                        onValueChange={(val) => onChange(val)}
-                        onBlur={onBlur}
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
+                render={({ field: { onChange, value } }) => (
+                    <components.Dropdown
+                        options={visaCategories}
+                        selectedValue={capitalizeFirstLetter(value)}
+                        onSelect={(value: string) => {
+                            const val = value.toLowerCase();
+                            onChange(val);
+                        }}
+                        placeholder="Select a category"
+                        label="Visa Category"
                         error={errors.visaCategory?.message}
                     />
                 )}
@@ -804,23 +802,19 @@ const EditLead = () => {
                     />
                 )}
             />
-
             <Controller
                 control={control}
                 name="followUpDates"
                 render={({ field: { onChange, onBlur, value } }) => (
                     <components.InputField
-                        title="Follow Up Dates"
-                        placeholder="Select followUp dates"
-                        customBorderColor="#ddd"
-                        customBackgroundColor={theme.COLORS.white}
+                        title="FollowUp Dates"
+                        placeholder="DD/MM/YYYY"
+                        datePicker
+                        date={value ? value : undefined}
                         onDateChange={(date) => {
                             onChange(date);
                         }}
-                        onBlur={onBlur}
-                        date={value ? value : undefined}
                         error={errors.followUpDates?.message}
-                        datePicker={true}
                     />
                 )}
             />
@@ -853,9 +847,9 @@ const EditLead = () => {
             >
                 {loading ? (<View style={styles.loadingContainer}>
                     <skeletonLoader.ListSkeletonLoader
-                    itemCount={10}
-                    itemHeight={50}
-                />
+                        itemCount={10}
+                        itemHeight={50}
+                    />
                 </View>) : renderContent()}
             </ScrollView>
             {/* <View style={styles.btnContainerStyles}>

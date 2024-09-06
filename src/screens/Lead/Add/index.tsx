@@ -12,7 +12,7 @@ import { components } from "../../../components";
 import PersonalInfo from "./Steps/PersonalInfo";
 import AcademicInfo from "./Steps/AcademicInfo";
 import ImmigrationInfo from "./Steps/ImmigrationInfo";
-import FinalDetails from "./Steps/FinalDetails";
+import FinalDetails from "./Steps/FinalDetails"; 
 import LeadPreview from "./Steps/LeadPreview";
 
 import {
@@ -94,6 +94,7 @@ const AddLead = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [validatedSteps, setValidatedSteps] = useState<Set<number>>(new Set());
+  const [countryCode, setCountryCode] = useState<string>("+91");
 
   const {
     control,
@@ -144,8 +145,12 @@ const AddLead = () => {
       handleStepChange(1);
       setValidatedSteps((prev) => new Set(prev).add(currentStep));
     } else {
+      const updatedData = {
+        ...data,
+        phone: `${countryCode} ${data.phone}`
+      }
       try {
-        await leadService.createLead(data);
+        await leadService.createLead(updatedData);
         reset();
         setCurrentStep(0);
       } catch (error) {
@@ -163,6 +168,8 @@ const AddLead = () => {
             errors={errors}
             clearErrors={clearErrors}
             trigger={trigger}
+            countryCode={countryCode}
+            setCountryCode={setCountryCode}
           />
         );
       case 1:
@@ -193,7 +200,7 @@ const AddLead = () => {
           />
         );
       case 4:
-        return <LeadPreview data={getValues()} />;
+        return <LeadPreview data={getValues()} countryCode={countryCode} />;
       default:
         return null;
     }

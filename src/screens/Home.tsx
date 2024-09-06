@@ -25,7 +25,7 @@ const Home = () => {
 
   const renderContent = () => {
     return (
-      <View style={{ paddingBottom: Platform.OS === "ios" ? 90 : 60 }}>
+      <View>
         <Dashboard.DetailCard refreshKey={refreshKey} />
         <Dashboard.LeadStatusReport refreshKey={refreshKey} />
         <Dashboard.LeadSourceReport refreshKey={refreshKey} />

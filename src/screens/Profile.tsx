@@ -136,6 +136,7 @@ const Profile = () => {
         contentContainerStyle={{
           alignItems: "center",
           paddingBottom: 20,
+          marginTop: 10,
         }}
         showsVerticalScrollIndicator={false}
       >

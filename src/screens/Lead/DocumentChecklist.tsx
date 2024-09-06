@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native";
 import { leadService } from '../../api/lead';
 import { skeletonLoader } from '../../components/skeletonLoaders';
+import Header1 from '../../components/Header1';
 
 type RootStackParamList = {
     DocumentUpload: { leadId: string, documentName: string };
@@ -60,9 +61,10 @@ const DocumentChecklist = () => {
 
     const renderHeader = () => {
         return (
-            <components.Header
+            <Header1
                 title="Document Checklist"
-                goBack={true}
+                showBackButton={true}
+                onBackPress={() => navigation.goBack()}
             />
         );
     };
@@ -138,6 +140,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
+        ...theme.FONTS.Mulish_600SemiBold
     },
     listContainer: {
         margin: 20,
@@ -157,6 +160,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 10,
         marginBottom: 10,
+        ...theme.FONTS.Mulish_400Regular
     },
     iconContainer: {
         flexDirection: 'row',

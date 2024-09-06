@@ -81,6 +81,16 @@ const ListBlogs: React.FC = () => {
     );
   };
 
+  const renderHeader = () => {
+    return (
+      <Header1
+            title="Blog Lists"
+            showBackButton={true}
+            onBackPress={() => navigation.goBack()}
+        />
+    );
+  };
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -149,11 +159,7 @@ const ListBlogs: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header1
-        title="Blog List"
-        showBackButton={true}
-        onBackPress={() => navigation.goBack()}
-      />
+      {renderHeader()}
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

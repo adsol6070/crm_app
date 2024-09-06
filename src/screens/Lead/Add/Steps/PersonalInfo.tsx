@@ -1,15 +1,18 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Control, Controller, FieldErrors } from "react-hook-form";
 import { components } from "../../../../components";
 import { PersonalInfoData } from "../interfaces";
 import { theme } from "../../../../constants/theme";
+import { genderOptions, maritalStatusOptions, nationalityOptions } from "../../../../utils/options";
 
 interface PersonalInfoProps {
   control: Control<PersonalInfoData>;
   errors: FieldErrors<PersonalInfoData>;
   clearErrors: (name?: keyof PersonalInfoData) => void;
   trigger: any;
+  countryCode: string;
+  setCountryCode: React.SetStateAction<React.Dispatch<string>>;
 }
 
 const PersonalInfo: React.FC<PersonalInfoProps> = ({
@@ -17,7 +20,10 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
   errors,
   clearErrors,
   trigger,
+  countryCode,
+  setCountryCode
 }) => {
+
   const handleFieldChange = useCallback(
     async (field: keyof PersonalInfoData) => {
       const result = await trigger(field);
@@ -73,6 +79,9 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
                 }}
                 onBlur={onBlur}
                 value={typeof value === "string" ? value : ""}
+                {...(field === "phone" && { keyboardType: "phone-pad" })}
+                countryCode={countryCode}
+                setCountryCode={setCountryCode}
                 error={errors[field as keyof PersonalInfoData]?.message}
               />
             )
@@ -84,9 +93,9 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
         "gender",
         "nationality",
         "maritalStatus",
-        "country",
-        "state",
-        "district",
+        // "country",
+        // "state",
+        // "district",
       ].map((field, index) => (
         <Controller
           key={index}
@@ -94,7 +103,7 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
           name={field as keyof PersonalInfoData}
           render={({ field: { onChange, value } }) => (
             <components.Dropdown
-              options={getDropdownOptions(field)}
+              options={getDropdownOptions(field, genderOptions, nationalityOptions, maritalStatusOptions)}
               selectedValue={value}
               onSelect={(value: string) => {
                 onChange(value);
@@ -130,12 +139,12 @@ const getPlaceholder = (field: string) => {
       return "Select an option";
     case "maritalStatus":
       return "Select an option";
-    case "country":
-      return "Select an option";
-    case "state":
-      return "Select an option";
-    case "district":
-      return "Select an option";
+    // case "country":
+    //   return "Select an option";
+    // case "state":
+    //   return "Select an option";
+    // case "district":
+    //   return "Select an option";
     case "pincode":
       return "000000";
     case "currentAddress":
@@ -147,18 +156,18 @@ const getPlaceholder = (field: string) => {
   }
 };
 
-const getDropdownOptions = (field: string) => {
+const getDropdownOptions = (field: string, genderOptions: string[], nationalityOptions: string[], maritalStatusOptions: string[]) => {
   switch (field) {
     case "gender":
-      return ["Male", "Female", "Other"];
+      return genderOptions;
     case "nationality":
-      return ["Indian", "Other"];
+      return nationalityOptions;
     case "maritalStatus":
-      return ["Single", "Married", "Divorced", "Widowed", "Separated"];
-    case "country":
-    case "state":
-    case "district":
-      return ["Option 1", "Option 2", "Option 3"];
+      return maritalStatusOptions;
+    // case "country":
+    // case "state":
+    // case "district":
+    //   return ["Option 1", "Option 2", "Option 3"];
     default:
       return [];
   }

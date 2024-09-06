@@ -56,7 +56,7 @@ class LeadService {
     return makeRequest("get", `/lead/getSpecificLeads/${userId}`);
   }
   async createLead(payload: any) {
-    return makeRequest("post", `/lead/createLead`, payload);
+    return makeRequest("post", `/lead/`, payload);
   }
   async deleteAllLeads() {
     return makeRequest("delete", `/lead/`);
