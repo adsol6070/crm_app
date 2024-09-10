@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
     textAlign: 'left',
+    ...theme.FONTS.Mulish_400Regular
   },
 });
 

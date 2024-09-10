@@ -79,19 +79,31 @@ const CustomDrawerContent = (props: any) => {
       ],
     },
     {
-      label: "Blogs",
-      icon: "book-outline",
-      subItems: [
-        { label: "Add Blog", screen: "AddBlog" },
-        { label: "List Blogs", screen: "ListBlogs" },
-      ],
-    },
-    {
       label: "Leads",
       icon: "people-outline",
       subItems: [
         { label: "Add Lead", screen: "AddLead" },
+        { label: "FormQR", screen: "Formqr" },
         { label: "List Leads", screen: "ListLeads" },
+        { label: "Add Category", screen: "AddVisaCategory" },
+        { label: "Add Checklists", screen: "AddChecklist" },
+        { label: "View Checklists", screen: "ViewChecklist" },
+      ],
+    },
+    {
+      label: "Blogs",
+      icon: "book-outline",
+      subItems: [
+        { label: "Add Blog", screen: "AddBlog" },
+        { label: "Add Category", screen: "AddBlogCategory" },
+        { label: "List Blogs", screen: "ListBlogs" },
+      ],
+    },
+    {
+      label: "Scores",
+      icon: "calculator",
+      subItems: [
+        { label: "View Results", screen: "ScoreList" },
       ],
     },
   ];

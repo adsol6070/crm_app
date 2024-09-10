@@ -25,14 +25,19 @@ const UserList = () => {
   const [search, setSearch] = useState<string>("");
   const [refreshing, setRefreshing] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const handleSearch = (text: string) => {
     setSearch(text);
+    if (text === "") {
+			setFilteredUsers(allUsers);
+		} else {
     const filteredData = filteredUsers.filter((user) =>
       user.userName.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredUsers(filteredData);
+  }
   };
 
   const fetchUsers = async () => {
@@ -46,7 +51,7 @@ const UserList = () => {
         role: user.role,
         phoneNumber: user.phone,
       }));
-
+      setAllUsers(modifiedUsers)
       setFilteredUsers(modifiedUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -231,7 +236,7 @@ const UserList = () => {
             Array.from({ length: 8 }).map((_, index) => (
               <SkeletonLoader key={index} withImage={true} />
             ))
-          ) : filteredUsers.length === 0 ? (
+          ) : allUsers.length === 0 ? (
             <View style={styles.addButtonContainer}>{renderAddButton()}</View>
           ) : (
             <FlatList

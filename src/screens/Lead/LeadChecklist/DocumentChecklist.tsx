@@ -1,14 +1,13 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { theme } from '../../constants/theme'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView, RefreshControl } from 'react-native-gesture-handler';
-import { components } from '../../components';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native";
-import { leadService } from '../../api/lead';
-import { skeletonLoader } from '../../components/skeletonLoaders';
-import Header1 from '../../components/Header1';
+import { theme } from '../../../constants/theme';
+import { leadService } from '../../../api/lead';
+import { skeletonLoader } from '../../../components/skeletonLoaders';
+import Header1 from '../../../components/Header1';
 
 type RootStackParamList = {
     DocumentUpload: { leadId: string, documentName: string };
@@ -17,7 +16,7 @@ type RootStackParamList = {
 const DocumentChecklist = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const route = useRoute();
-    const { leadId, visaType }: any = route.params;
+    const { leadId }: any = route.params;
     const [checklist, setChecklist] = useState<any[]>([]);
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);

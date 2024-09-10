@@ -79,6 +79,15 @@ class LeadService {
   async getVisaCategory() {
     return makeRequest("get", "/lead/visaCategory");
   }
+  async createVisaCategory(payload: any) {
+    return makeRequest("post", "/lead/visaCategory", payload);
+  }
+  async updateVisaCategory(categoryId: string, payload: any) {
+    return makeRequest("patch", `/lead/visaCategory/${categoryId}`, payload);
+  }
+  async deleteVisaCategory(categoryId: string) {
+    return makeRequest("delete", `/lead/visaCategory/${categoryId}`);
+  }  
   async getUploadedDocuments(leadId?: string) {
     return makeRequest("get", `/lead/getDocument/${leadId}`);
   }

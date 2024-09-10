@@ -1,16 +1,16 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, Linking } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { components } from '../../components';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
-import { theme } from '../../constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { leadService } from '../../api/lead';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { useAuth } from '../../common/context/AuthContext';
-import Header1 from '../../components/Header1';
+import { components } from '../../../components';
+import { useAuth } from '../../../common/context/AuthContext';
+import { theme } from '../../../constants/theme';
+import { leadService } from '../../../api/lead';
+import Header1 from '../../../components/Header1';
 
 const iconMapping: any = {
     'Passport': 'badge',

@@ -37,36 +37,18 @@ const makeRequest = async <T>(
   }
 };
 
-class BlogService {
-  async getAllBlogs() {
-    return makeRequest("get", "/blog/");
+class CRSService {
+  async getAllScores() {
+    return makeRequest("get", "/CRSScore/");
   }
-  async createBlog(payload: FormData) {
-    return makeRequest("post", "/blog/", payload, true);
-  }
-  async updateBlogById(blogId: string, payload: FormData) {
-    return makeRequest("patch", `/blog/${blogId}`, payload, true);
-  }
-  async getBlogById(blogId: string) {
-    return makeRequest("get", `/blog/${blogId}`);
-  } 
-  async deleteBlogById(blogId: string) {
-    return makeRequest("delete", `/blog/${blogId}`);
-  } 
-  async getBlogCategory() {
-    return makeRequest("get", "/blog/blogCategory");
-  }
-  async createBlogCategory(payload: any) {
-    return makeRequest("post", "/blog/blogCategory", payload);
-  }
-  async updateBlogCategory(categoryId: string, payload: any) {
-    return makeRequest("patch", `/blog/blogCategory/${categoryId}`, payload);
-  }
-  async deleteBlogCategory(categoryId: string) {
-    return makeRequest("delete", `/blog/blogCategory/${categoryId}`);
+  async deleteScoreById(scoreId: string) {
+    return makeRequest("delete", `/CRSScore/${scoreId}`);
   }  
+  async deleteAllScores(userId: string) {
+    return makeRequest("delete", `/deleteAll/${userId}`);
+  } 
 }
 
-const blogService = new BlogService();
+const crsService = new CRSService();
 
-export { blogService };
+export { crsService };

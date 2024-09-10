@@ -1,14 +1,12 @@
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { components } from '../../components';
 import { ScrollView } from 'react-native-gesture-handler';
-import { theme } from '../../constants/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { leadService } from '../../api/lead';
-import useLeadData from './useLeadDetail';
-import { skeletonLoader } from '../../components/skeletonLoaders';
-import Header1 from '../../components/Header1';
+import { theme } from '../../../constants/theme';
+import { skeletonLoader } from '../../../components/skeletonLoaders';
+import useLeadData from '../useLeadDetail';
+import Header1 from '../../../components/Header1';
 
 const LeadDetail = () => {
     const route = useRoute();

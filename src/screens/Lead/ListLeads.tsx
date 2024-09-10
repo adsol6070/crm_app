@@ -219,81 +219,44 @@ const ListLeads = () => {
     </View>
   );
 
-  const renderItem = ({ item }: any) => (
-    hasPermission(permissions, 'Leads', 'View') ? (
-      <TouchableOpacity
-        key={item.id}
-        onPress={() => navigation.navigate("LeadDetail", { leadId: item.id })}
-        style={styles.listItem}
-      >
+  const renderItem = ({ item }: any) => {
+    const hasViewPermission = hasPermission(permissions, 'Leads', 'View');
+    const hasDeletePermission = hasPermission(permissions, 'Leads', 'Delete');
+  
+    const LeadItemContent = () => (
+      <>
         <View style={styles.leadNameContainer}>
           <Text style={styles.leadName}>{item.firstname}</Text>
         </View>
         <View style={styles.iconContainer}>
-          <TouchableOpacity
-            onPress={() => openMailer(item.email)}
-            style={styles.iconButton}
-          >
+          <TouchableOpacity onPress={() => openMailer(item.email)} style={styles.iconButton}>
             <MaterialIcons name="email" size={20} color="blue" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => openDialer(item.phone)}
-            style={styles.iconButton}
-          >
+          <TouchableOpacity onPress={() => openDialer(item.phone)} style={styles.iconButton}>
             <MaterialIcons name="phone" size={20} color="blue" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("LeadActions", { leadId: item.id, visaType: item.visaCategory })}
-            style={styles.iconButton}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("LeadActions", { leadId: item.id, visaType: item.visaCategory })} style={styles.iconButton}>
             <MaterialIcons name="settings" size={20} color="black" />
           </TouchableOpacity>
-          {hasPermission(permissions, 'Leads', 'Delete') &&
-            <TouchableOpacity
-              onPress={() => { handleDelete(item.id) }}
-              style={styles.iconButton}
-            >
+          {hasDeletePermission && (
+            <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.iconButton}>
               <MaterialIcons name="delete" size={20} color="red" />
             </TouchableOpacity>
-          }
+          )}
         </View>
+      </>
+    );
+  
+    return hasViewPermission ? (
+      <TouchableOpacity key={item.id} onPress={() => navigation.navigate("LeadDetail", { leadId: item.id })} style={styles.listItem}>
+        <LeadItemContent />
       </TouchableOpacity>
     ) : (
       <View style={styles.listItem}>
-        <View style={styles.leadNameContainer}>
-          <Text style={styles.leadName}>{item.firstname}</Text>
-        </View>
-        <View style={styles.iconContainer}>
-          <TouchableOpacity
-            onPress={() => openMailer(item.email)}
-            style={styles.iconButton}
-          >
-            <MaterialIcons name="email" size={20} color="blue" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => openDialer(item.phone)}
-            style={styles.iconButton}
-          >
-            <MaterialIcons name="phone" size={20} color="blue" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("LeadActions", { leadId: item.id, visaType: item.visaCategory })}
-            style={styles.iconButton}
-          >
-            <MaterialIcons name="settings" size={20} color="black" />
-          </TouchableOpacity>
-          {hasPermission(permissions, 'Leads', 'Delete') &&
-            <TouchableOpacity
-              onPress={() => { handleDelete(item.id) }}
-              style={styles.iconButton}
-            >
-              <MaterialIcons name="delete" size={20} color="red" />
-            </TouchableOpacity>
-          }
-        </View>
+        <LeadItemContent />
       </View>
-    )
-  );
+    );
+  };  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -348,10 +311,8 @@ const ListLeads = () => {
                   }
                 />
               ) : (
-                // <View style={styles.noLeadsContainer}>
-                //   <Text style={styles.noLeadsText}>No leads found</Text>
-                // </View>
-                <View style={styles.addButtonContainer}>{renderAddButton()}</View>
+                data.length === 0 ? <View style={styles.addButtonContainer}>{renderAddButton()}</View>
+                : <View style={styles.addButtonContainer}><Text>No leads found for this category</Text></View>
               )}
             </View>
           </View>)
