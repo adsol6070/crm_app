@@ -17,7 +17,7 @@ import { svg } from "../svg";
 import { useAuth } from "../common/context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { userService } from "../api/user";
-import DetailSkeletonLoader from "./Users/DetailSkeletonLoader";
+import DetailSkeletonLoader from "./Users/Detail/SkeletonLoader";
 import * as ImagePicker from "expo-image-picker";
 import Header1 from "../components/Header1";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -32,24 +32,35 @@ const Profile = () => {
   const [avatarLoading, setAvatarLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const userId = user?.sub;
+      const response = await userService.getProfile({ userId });
+      setCurrentUser(response);
+    } catch (error) {
+      console.log("Profile Fetching error ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      const fetchProfile = async () => {
-        setLoading(true);
-        try {
-          const userId = user?.sub;
-          const response = await userService.getProfile({ userId });
-          setCurrentUser(response);
-        } catch (error) {
-          console.log("Profile Fetching error ", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchProfile();
     }, [user])
   );
+
+  const uploadProfileImage = async (image: any) => {
+    try {
+      await userService.updateProfileImage(user?.sub, image);
+      Alert.alert("Success", "Profile image updated successfully");
+      await fetchProfile();
+    } catch (error) {
+      Alert.alert("Error", "Failed to update profile image");
+      console.error("Error updating profile image:", error);
+    }
+  };
 
   const handleEditProfileImage = async () => {
     if (Platform.OS === "ios" || Platform.OS === "android") {
@@ -92,7 +103,7 @@ const Profile = () => {
                 type: image.mimeType || "image/jpeg",
                 size: image.fileSize || 0,
               };
-              // await uploadProfileImage(profileImage);
+              await uploadProfileImage(profileImage);
             }
           } else if (buttonIndex === 2) {
             const result = await ImagePicker.launchImageLibraryAsync({
@@ -110,7 +121,7 @@ const Profile = () => {
                 type: image.mimeType || "image/jpeg",
                 size: image.fileSize || 0,
               };
-              // await uploadProfileImage(profileImage);
+              await uploadProfileImage(profileImage);
             }
           }
         }

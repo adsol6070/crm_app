@@ -16,21 +16,21 @@ import React, { useState, useEffect, useCallback } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons, Ionicons, AntDesign } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { userService } from "../../api/user";
-import { theme } from "../../constants/theme";
-import MapView, { Marker } from "react-native-maps";
-import DetailSkeletonLoader from "./DetailSkeletonLoader";
+import { userService } from "../../../api/user";
+import { theme } from "../../../constants/theme";
+import DetailSkeletonLoader from "./SkeletonLoader";
 import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import Header1 from "../../components/Header1";
+import Header1 from "../../../components/Header1";
+import { PartialUser } from "../../../types";
 
 const UserDetail = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { showActionSheetWithOptions } = useActionSheet();
-  const { userId } = route.params;
-  const [user, setUser] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
+  const { userId } = route.params as { userId: string };
+  const [user, setUser] = useState<PartialUser | null>(null);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchUser = async () => {
@@ -56,7 +56,7 @@ const UserDetail = () => {
   }, [userId]);
 
   const handleEdit = () => {
-    navigation.navigate("EditUser", { userId: user?.id });
+    navigation.navigate("UserManager", { userId: user?.id });
   };
 
   const handleDelete = async () => {
@@ -72,7 +72,7 @@ const UserDetail = () => {
           text: "Delete",
           onPress: async () => {
             try {
-              await userService.deleteUser(user?.id);
+              await userService.deleteUser(user?.id as string);
               navigation.goBack();
               Alert.alert("Success", "User deleted successfully");
             } catch (error) {
@@ -101,16 +101,18 @@ const UserDetail = () => {
   const handleShare = async () => {
     try {
       const message = `
-        User Details:
-        Name: ${user?.firstname || "John"} ${user?.lastname || "Doe"}
-        Email: ${user?.email || "example@example.com"}
-        Phone: ${user?.phone || "+00 0000000000"}
-        City: ${user?.city || "City"}
-        Address: ${user?.address || "Address"}
-        Created At: ${
-          user?.created_at ? new Date(user.created_at).toLocaleString() : "N/A"
-        }
-      `;
+          User Details:
+          Name: ${user?.firstname || "John"} ${user?.lastname || "Doe"}
+          Email: ${user?.email || "example@example.com"}
+          Phone: ${user?.phone || "+00 0000000000"}
+          City: ${user?.city || "City"}
+          Address: ${user?.address || "Address"}
+          Created At: ${
+            user?.created_at
+              ? new Date(user.created_at).toLocaleString()
+              : "N/A"
+          }
+        `;
 
       await Share.share({
         message,
@@ -250,101 +252,31 @@ const UserDetail = () => {
         </View>
 
         <View style={styles.detailsContainer}>
-          <View style={styles.detailItem}>
-            <Text style={styles.detailTitle}>Tenant ID</Text>
-            <Text style={styles.detailText}>{user?.tenantID || "N/A"}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.detailTitle}>User ID</Text>
-            <Text style={styles.detailText}>{user?.id || "N/A"}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.detailTitle}>Email</Text>
-            <View style={styles.detailTextContainer}>
-              <Text style={styles.detailText}>
-                {user?.email || "example@example.com"}
-              </Text>
-              <TouchableOpacity
-                onPress={() =>
-                  copyToClipboard(user?.email || "example@example.com")
-                }
-                style={styles.iconContainer}
-              >
-                <MaterialIcons
-                  name="content-copy"
-                  size={20}
-                  color={theme.COLORS.primary}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  handleEmail(user?.email || "example@example.com")
-                }
-                style={styles.iconContainer}
-              >
-                <Ionicons name="mail" size={20} color={theme.COLORS.primary} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.detailTitle}>Phone Number</Text>
-            <View style={styles.detailTextContainer}>
-              <Text style={styles.detailText}>
-                {user?.phone || "+00 0000000000"}
-              </Text>
-              <TouchableOpacity
-                onPress={() => initiateCall(user?.phone || "+00 0000000000")}
-                style={styles.iconContainer}
-              >
-                <Ionicons name="call" size={20} color={theme.COLORS.primary} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.detailTitle}>City</Text>
-            <Text style={styles.detailText}>{user?.city || "City"}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.detailTitle}>Address</Text>
-            <Text style={styles.detailText}>{user?.address || "Address"}</Text>
-          </View>
-
-          <View style={styles.detailItem}>
-            <Text style={styles.detailTitle}>Created At</Text>
-            <Text style={styles.detailText}>
-              {user?.created_at
+          <DetailItem title="Tenant ID" value={user?.tenantID} />
+          <DetailItem title="User ID" value={user?.id} />
+          <DetailItem
+            title="Email"
+            value={user?.email}
+            onCopy={copyToClipboard}
+            onEmail={handleEmail}
+            email={user?.email}
+          />
+          <DetailItem
+            title="Phone Number"
+            value={user?.phone}
+            onCall={initiateCall}
+            phone={user?.phone}
+          />
+          <DetailItem title="City" value={user?.city} />
+          <DetailItem title="Address" value={user?.address} />
+          <DetailItem
+            title="Created At"
+            value={
+              user?.created_at
                 ? new Date(user.created_at).toLocaleString()
-                : "N/A"}
-            </Text>
-          </View>
-
-          {/* {user?.latitude && user?.longitude && ( */}
-          {/* <View style={styles.mapContainer}>
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: 37.7749, // Dummy latitude
-                longitude: -122.4194, // Dummy longitude
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              }}
-            >
-              <Marker
-                coordinate={{
-                  latitude: 37.7749, // Dummy latitude
-                  longitude: -122.4194, // Dummy longitude
-                }}
-                title="San Francisco"
-                description="A popular city in California."
-              />
-            </MapView>
-          </View> */}
-          {/* )} */}
+                : "N/A"
+            }
+          />
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.iconButton} onPress={handleEdit}>
@@ -369,6 +301,64 @@ const UserDetail = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+};
+
+// Define the type for DetailItem props
+interface DetailItemProps {
+  title: string;
+  value: string | undefined;
+  onCopy?: (text: string) => void;
+  onEmail?: (email: string) => void;
+  email?: string;
+  onCall?: (phoneNumber: string) => void;
+  phone?: string;
+}
+
+const DetailItem: React.FC<DetailItemProps> = ({
+  title,
+  value,
+  onCopy,
+  onEmail,
+  onCall,
+  email,
+  phone,
+}) => {
+  return (
+    <View style={styles.detailItem}>
+      <Text style={styles.detailTitle}>{title}</Text>
+      <View style={styles.detailTextContainer}>
+        <Text style={styles.detailText}>{value || "N/A"}</Text>
+        {onCopy && value && (
+          <TouchableOpacity
+            onPress={() => onCopy(value)}
+            style={styles.iconContainer}
+          >
+            <MaterialIcons
+              name="content-copy"
+              size={20}
+              color={theme.COLORS.primary}
+            />
+          </TouchableOpacity>
+        )}
+        {onEmail && email && (
+          <TouchableOpacity
+            onPress={() => onEmail(email)}
+            style={styles.iconContainer}
+          >
+            <Ionicons name="mail" size={20} color={theme.COLORS.primary} />
+          </TouchableOpacity>
+        )}
+        {onCall && phone && (
+          <TouchableOpacity
+            onPress={() => onCall(phone)}
+            style={styles.iconContainer}
+          >
+            <Ionicons name="call" size={20} color={theme.COLORS.primary} />
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
   );
 };
 

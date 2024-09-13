@@ -1,12 +1,12 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
 class HttpClient {
   private _httpClient: AxiosInstance;
 
   constructor() {
     this._httpClient = axios.create({
-      baseURL: "http://192.168.1.17:8000/api/v1",
+      baseURL: "http://192.168.1.25:8000/api/v1",
       timeout: 6000,
       headers: {
         "Content-Type": "application/json",

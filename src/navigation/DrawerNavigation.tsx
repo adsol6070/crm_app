@@ -72,9 +72,9 @@ const CustomDrawerContent = (props: any) => {
       label: "Users",
       icon: "people-outline",
       subItems: [
-        { label: "Add Users", screen: "AddUsers" },
+        { label: "Add Users", screen: "UserManager" },
         { label: "View Users", screen: "ViewUsers" },
-        { label: "Roles and Permissions", screen: "HandleAccess" },
+        { label: "Roles and Permissions", screen: "RoleManager" },
         { label: "View Roles", screen: "ViewRoles" },
       ],
     },

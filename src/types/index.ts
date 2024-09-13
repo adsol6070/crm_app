@@ -21,9 +21,12 @@ export interface IUser {
   profileImageUrl: string;
   role: string;
   tenantID: string;
-  address?: string | null;
-  city?: string | null;
+  address?: string;
+  city?: string;
+  created_at?: string;
 }
+
+export type PartialUser = Partial<IUser>;
 
 export interface IUserProfile
   extends Pick<IUser, "firstname" | "lastname" | "profileImageUrl" | "role"> {}

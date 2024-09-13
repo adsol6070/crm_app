@@ -12,11 +12,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { Checkbox } from "react-native-paper";
-import { theme } from "../../constants/theme";
-import RoleDetailSkeletonLoader from "./RoleDetailSkeletonLoader";
-import Header1 from "../../components/Header1";
-import { rolesService } from "../../api/roles";
-import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
+import { theme } from "../../../../constants/theme";
+import RoleDetailSkeletonLoader from "./SkeletonLoader";
+import Header1 from "../../../../components/Header1";
+import { rolesService } from "../../../../api/roles";
+import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
 
 const RoleDetail = () => {
   const navigation = useNavigation();
@@ -129,7 +129,7 @@ const RoleDetail = () => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.iconButton}
-                onPress={() => navigation.navigate("EditRole", { roleName })}
+                onPress={() => navigation.navigate("RoleManager", { roleName })}
               >
                 <AntDesign name="edit" size={24} color={theme.COLORS.white} />
               </TouchableOpacity>

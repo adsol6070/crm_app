@@ -20,7 +20,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from "expo-image-picker";
 import { authService } from "../../api/auth";
 import Toast from "react-native-toast-message";
-import AwesomeAlert from "react-native-awesome-alerts";
 
 const schema = yup.object().shape({
   tenantId: yup.string().required("Tenant ID is required"),

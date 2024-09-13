@@ -1,23 +1,23 @@
-import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   RefreshControl,
+  TouchableOpacity,
   Alert,
 } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { RadioButton, Checkbox } from "react-native-paper";
-import Header1 from "../../components/Header1";
-import { rolesService } from "../../api/roles";
-import { components } from "../../components";
-import { theme } from "../../constants/theme";
+import Header1 from "../../../../../components/Header1";
+import { useNavigation } from "@react-navigation/native";
+import { theme } from "../../../../../constants/theme";
+import { components } from "../../../../../components";
+import { Checkbox, RadioButton } from "react-native-paper";
+import { rolesService } from "../../../../../api/roles";
 
 const schema = yup.object().shape({
   role: yup.string().required("Role Name is required"),
@@ -73,13 +73,10 @@ const modules = [
   },
 ];
 
-const EditRole = () => {
+const RoleForm = ({ isEditMode, roleName }: any) => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const { roleName } = route.params;
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedModule, setSelectedModule] = useState(modules[0].id);
-  const [loading, setLoading] = useState(true);
   const [roleID, setRoleID] = useState<string>("");
   const [permissions, setPermissions] = useState({});
 
@@ -91,8 +88,8 @@ const EditRole = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
   const fetchRoleDetails = async () => {
-    setLoading(true);
     try {
       const roleDetail = await rolesService.getRoleByName({ role: roleName });
       setRoleID(roleDetail.id);
@@ -100,7 +97,6 @@ const EditRole = () => {
       if (roleDetail) {
         reset({ role: roleDetail.role });
 
-        // Map API permissions to the state structure
         const formattedPermissions = {};
         modules.forEach((module) => {
           formattedPermissions[module.id] = module.permissions.reduce(
@@ -118,22 +114,34 @@ const EditRole = () => {
       }
     } catch (error) {
       console.error("Error fetching role details:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRoleDetails();
-  }, [roleName]);
+    if (isEditMode) {
+      fetchRoleDetails();
+    }
+  }, [isEditMode, roleName]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchRoleDetails();
+    if (isEditMode) {
+      fetchRoleDetails();
+    }
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   }, []);
+
+  const handlePermissionChange = (moduleId: string, permission) => {
+    setPermissions((prevPermissions) => ({
+      ...prevPermissions,
+      [moduleId]: {
+        ...prevPermissions[moduleId],
+        [permission]: !prevPermissions[moduleId]?.[permission],
+      },
+    }));
+  };
 
   const onSubmit = async (data) => {
     const formattedPermissions = {};
@@ -146,35 +154,37 @@ const EditRole = () => {
         {}
       );
     });
+
     const formData = {
       ...data,
       permissions: formattedPermissions,
     };
 
     try {
-      await rolesService.updateRole(formData, roleID);
-      Alert.alert("Success", "Role updated successfully.");
+      await rolesService[isEditMode ? "updateRole" : "createRole"](
+        formData,
+        isEditMode ? roleID : undefined
+      );
+
+      Alert.alert(
+        "Success",
+        `Role ${isEditMode ? "updated" : "created"} successfully.`
+      );
       navigation.navigate("ViewRoles");
     } catch (error) {
-      console.error("Error updating role:", error);
-      Alert.alert("Error", "Failed to update the role.");
+      Alert.alert(
+        "Error",
+        `An error occurred while ${
+          isEditMode ? "updating" : "creating"
+        } the role.`
+      );
     }
-  };
-
-  const handlePermissionChange = (moduleId, permission) => {
-    setPermissions((prevPermissions) => ({
-      ...prevPermissions,
-      [moduleId]: {
-        ...prevPermissions[moduleId],
-        [permission]: !prevPermissions[moduleId]?.[permission],
-      },
-    }));
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Header1
-        title="Edit Role"
+        title={isEditMode ? "Edit Role" : "Add Role"}
         showBackButton={true}
         onBackPress={() => navigation.goBack()}
       />
@@ -254,12 +264,13 @@ const EditRole = () => {
               </ScrollView>
             ))}
         </View>
-
         <TouchableOpacity
           style={styles.submitButton}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text style={styles.submitButtonText}>Edit</Text>
+          <Text style={styles.submitButtonText}>
+            {isEditMode ? "Edit" : "Submit"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -344,4 +355,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditRole;
+export default RoleForm;

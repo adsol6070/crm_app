@@ -44,7 +44,7 @@ class LeadService {
     return makeRequest("get", `/lead/leadHistory/${leadId}`);
   }
   async getAllLeads() {
-    return makeRequest("get", "/lead/");
+    return makeRequest<any[]>("get", "/lead/");
   }
   async getChecklistByVisaType(visaType: string) {
     return makeRequest("get", `/checklists/${visaType}`);
