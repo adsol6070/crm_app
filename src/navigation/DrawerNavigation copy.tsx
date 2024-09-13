@@ -29,7 +29,7 @@ const CustomDrawerContent = (props: any) => {
   useEffect(() => {
     if (isDrawerOpen) {
       fetchProfile();
-      refreshPermissions();
+      // refreshPermissions();
     }
   }, [isDrawerOpen]);
 
@@ -71,80 +71,55 @@ const CustomDrawerContent = (props: any) => {
     {
       label: "Users",
       icon: "people-outline",
-      requiredPermission: { section: "Users", action: "Read" },
       subItems: [
-        { label: "Add Users", screen: "AddUsers", requiredPermission: { section: "Users", action: "Create" } },
-        { label: "View Users", screen: "ViewUsers", requiredPermission: { section: "Users", action: "Read" } },
-        { label: "Roles and Permissions", screen: "HandleAccess", requiredPermission: { section: "Roles", action: "Update" } },
-        { label: "View Roles", screen: "ViewRoles", requiredPermission: { section: "Roles", action: "Read" } },
+        { label: "Add Users", screen: "AddUsers" },
+        { label: "View Users", screen: "ViewUsers" },
+        { label: "Roles and Permissions", screen: "HandleAccess" },
+        { label: "View Roles", screen: "ViewRoles" },
       ],
     },
     {
       label: "Leads",
       icon: "people-outline",
-      requiredPermission: { section: "Leads", action: "View" },
       subItems: [
-        { label: "Add Lead", screen: "AddLead", requiredPermission: { section: "Leads", action: "Create" } },
-        { label: "FormQR", screen: "Formqr", requiredPermission: { section: "Leads", action: "ReadQR" } },
-        { label: "List Leads", screen: "ListLeads", requiredPermission: { section: "Leads", action: "View" } },
-        { label: "Add Category", screen: "AddVisaCategory", requiredPermission: { section: "VisaCategory", action: "Create" } },
-        { label: "Add Checklists", screen: "AddChecklist", requiredPermission: { section: "Checklists", action: "Create" } },
-        { label: "View Checklists", screen: "ViewChecklist", requiredPermission: { section: "Checklists", action: "Read" } },
+        { label: "Add Lead", screen: "AddLead" },
+        { label: "FormQR", screen: "Formqr" },
+        { label: "List Leads", screen: "ListLeads" },
+        { label: "Add Category", screen: "AddVisaCategory" },
+        { label: "Add Checklists", screen: "AddChecklist" },
+        { label: "View Checklists", screen: "ViewChecklist" },
       ],
     },
     {
       label: "Blogs",
       icon: "book-outline",
-      requiredPermission: { section: "Blogs", action: "Read" },
       subItems: [
-        { label: "Add Blog", screen: "AddBlog", requiredPermission: { section: "Blogs", action: "Create" } },
-        { label: "Add Category", screen: "AddBlogCategory", requiredPermission: { section: "BlogCategory", action: "Create" } },
-        { label: "List Blogs", screen: "ListBlogs", requiredPermission: { section: "Blogs", action: "Read" } },
+        { label: "Add Blog", screen: "AddBlog" },
+        { label: "Add Category", screen: "AddBlogCategory" },
+        { label: "List Blogs", screen: "ListBlogs" },
       ],
     },
     {
       label: "Scores",
       icon: "calculator",
-      requiredPermission: { section: "Scores", action: "Read" },
-      subItems: [{ label: "View Results", screen: "ScoreList", requiredPermission: { section: "Scores", action: "Read" } }],
+      subItems: [
+        { label: "View Results", screen: "ScoreList" },
+      ],
     },
   ];
-
-  const renderDrawerItems = () => {
-    return drawerItems.map((item, index) => {
-      if (["Roles and Permissions", "View Roles"].includes(item.label)) {
-        if (user?.role !== "superAdmin") {
-          return null;
-        }
-      }
-  
-      if (!hasPermission(permissions, item.requiredPermission.section, item.requiredPermission.action)) {
-        return null;
-      }
-      return (
-        <DrawerItemWithSubItems
-          key={index}
-          label={item.label}
-          icon={item.icon}
-          subItems={item.subItems.filter(subItem =>
-            hasPermission(permissions, subItem.requiredPermission.section, subItem.requiredPermission.action)
-          )}
-        />
-      );
-    });
-  };
 
   return (
     <SafeAreaView style={styles.drawerContent}>
       {renderProfile()}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <DrawerItemList {...props} />
-        {renderDrawerItems()}
+        {drawerItems.map((item, index) => (
+          <DrawerItemWithSubItems key={index} {...item} />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
 };
-
 
 const DrawerNavigation = () => {
   return (
