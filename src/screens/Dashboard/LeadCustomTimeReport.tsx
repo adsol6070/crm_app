@@ -7,6 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 import { dashboardService } from '../../api/dashboard';
 import moment from 'moment';
 import { theme } from '../../constants/theme';
+import { components } from '../../components';
 
 const { width } = Dimensions.get('window');
 
@@ -89,7 +90,7 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
     <View style={styles.container}>
       <Text style={styles.title}>Lead Custom Range Time Report</Text>
       <View style={styles.dateContainer}>
-        <Button title={`Start Date: ${startDate.toDateString()}`} onPress={() => setShowStartDatePicker(true)} />
+        <components.Button title={`Start Date: ${startDate.toDateString()}`} onPress={() => setShowStartDatePicker(true)} />
         {showStartDatePicker && (
           <DateTimePicker
             testID="startDatePicker"
@@ -101,7 +102,7 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
         )}
       </View>
       <View style={styles.dateContainer}>
-        <Button title={`End Date: ${endDate.toDateString()}`} onPress={() => setShowEndDatePicker(true)} />
+        <components.Button title={`End Date: ${endDate.toDateString()}`} onPress={() => setShowEndDatePicker(true)} />
         {showEndDatePicker && (
           <DateTimePicker
             testID="endDatePicker"

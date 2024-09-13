@@ -37,36 +37,24 @@ const makeRequest = async <T>(
   }
 };
 
-class BlogService {
-  async getAllBlogs() {
-    return makeRequest("get", "/blog/");
+class ChecklistService {
+  async getAllChecklist() {
+    return makeRequest("get", "/checklists/");
   }
-  async createBlog(payload: FormData) {
-    return makeRequest("post", "/blog/", payload, true);
+  async createChecklist(payload: any) {
+    return makeRequest("post", "/checklists/", payload);
   }
-  async updateBlogById(blogId: string, payload: FormData) {
-    return makeRequest("patch", `/blog/${blogId}`, payload, true);
+  async updateChecklistById(checklistId: string, payload: any) {
+    return makeRequest("patch", `/checklists/${checklistId}`, payload);
   }
-  async getBlogById(blogId: string) {
-    return makeRequest("get", `/blog/${blogId}`);
-  } 
-  async deleteBlogById(blogId: string) {
-    return makeRequest("delete", `/blog/${blogId}`);
-  } 
-  async getBlogCategory() {
-    return makeRequest("get", "/blog/blogCategory");
+  async deleteChecklistById(checklistId: string) {
+    return makeRequest("delete", `/checklists/${checklistId}`);
   }
-  async createBlogCategory(payload: any) {
-    return makeRequest("post", "/blog/blogCategory", payload);
+  async getChecklistByVisaType(visaType: string) {
+    return makeRequest("get", `/checklists/${visaType}`);
   }
-  async updateBlogCategory(categoryId: string, payload: any) {
-    return makeRequest("patch", `/blog/blogCategory/${categoryId}`, payload);
-  }
-  async deleteBlogCategory(categoryId: string) {
-    return makeRequest("delete", `/blog/blogCategory/${categoryId}`);
-  }  
 }
 
-const blogService = new BlogService();
+const checklistService = new ChecklistService();
 
-export { blogService };
+export { checklistService };

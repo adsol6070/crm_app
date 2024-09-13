@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, Alert, RefreshControl } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { components } from '../../components';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { leadService } from '../../api/lead';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useAuth } from '../../common/context/AuthContext';
-import { genderOptions, maritalStatusOptions, nationalityOptions } from '../../utils/options';
-import { theme } from '../../constants/theme';
-import { skeletonLoader } from '../../components/skeletonLoaders';
-import { capitalizeFirstLetter } from '../../utils/CapitalizeFirstLetter';
+import { components } from '../../../components';
+import { leadService } from '../../../api/lead';
+import { useAuth } from '../../../common/context/AuthContext';
+import { genderOptions, maritalStatusOptions, nationalityOptions } from '../../../utils/options';
+import { theme } from '../../../constants/theme';
+import { skeletonLoader } from '../../../components/skeletonLoaders';
+import { capitalizeFirstLetter } from '../../../utils/CapitalizeFirstLetter';
 
 const EditLead = () => {
     const route = useRoute();
@@ -23,7 +23,6 @@ const EditLead = () => {
     const [loading, setLoading] = useState(true);
     const [countryCode, setCountryCode] = useState<string>("+91");
 
-    // Define validation schema
     const schema = yup.object().shape({
         firstname: yup.string().required("First name is required"),
         lastname: yup.string().required("Last name is required"),

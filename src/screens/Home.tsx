@@ -19,10 +19,6 @@ const Home = () => {
     setRefreshing(false);
   };
 
-  const renderHeader = () => {
-    return <components.Header title="Home" burger={true} />;
-  };
-
   const renderContent = () => {
     return (
       <View style={{ paddingBottom: 50 }}>

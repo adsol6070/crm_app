@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { components } from '../../components';
-import { theme } from '../../constants/theme';
-import { leadService } from '../../api/lead';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { skeletonLoader } from '../../components/skeletonLoaders';
-import Header1 from '../../components/Header1';
+import { theme } from '../../../constants/theme';
+import { leadService } from '../../../api/lead';
+import { skeletonLoader } from '../../../components/skeletonLoaders';
+import Header1 from '../../../components/Header1';
 
 const getStatusColor = (status: any) => {
     switch (status) {
