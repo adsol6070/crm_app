@@ -224,24 +224,66 @@ const ScoreList = () => {
 				>
 					<View style={styles.modalContainer}>
 						<View style={styles.modalContent}>
-							<Text style={styles.modalTitle}>Score Card</Text>
-							<Text style={{ textAlign: "center", color: getScoreColor(selectedItem.score), fontSize: 24, fontWeight: 'bold' }}>
+							<Text style={{ textAlign: "center", color: getScoreColor(selectedItem.score), fontSize: 24, ...theme.FONTS.Mulish_700Bold }}>
 								Score: {selectedItem.score}
 							</Text>
-							<Text>Name: {selectedItem.name}</Text>
-							<Text>Age: {selectedItem.age}</Text>
-							<Text>Canadian Degree: {selectedItem.canadian_degree}</Text>
-							<Text>Canadian Experience: {selectedItem.canadian_experience}</Text>
-							<Text>Education: {selectedItem.education}</Text>
-							<Text>Email: {selectedItem.email}</Text>
-							<Text>First Language: {selectedItem.first_language}</Text>
-							<Text>Foreign Experience: {selectedItem.foreign_experience}</Text>
-							<Text>Job Offer: {selectedItem.job_offer}</Text>
-							<Text>Provincial Nomination: {selectedItem.provincial_nomination}</Text>
-							<Text>Spouse: {selectedItem.spouse}</Text>
-							<Text>Spouse Education: {selectedItem.spouse_education}</Text>
-							<Text>Spouse Experience: {selectedItem.spouse_experience}</Text>
-							<Text>Spouse Language: {selectedItem.spouse_language}</Text>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Name: </Text>
+								<Text style={styles.modalText}>{selectedItem.name}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Age: </Text>
+								<Text style={styles.modalText}>{selectedItem.age}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Canadian Degree: </Text>
+								<Text style={styles.modalText}>{selectedItem.canadian_degree}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Canadian Experience: </Text>
+								<Text style={styles.modalText}>{selectedItem.canadian_experience}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Education: </Text>
+								<Text style={styles.modalText}>{selectedItem.education}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Email: </Text>
+								<Text style={styles.modalText}>{selectedItem.email}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>First Language: </Text>
+								<Text style={styles.modalText}>{selectedItem.first_language}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Foreign Experience: </Text>
+								<Text style={styles.modalText}>{selectedItem.foreign_experience}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Job Offer: </Text>
+								<Text style={styles.modalText}>{selectedItem.job_offer}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Provincial Nomination: </Text>
+								<Text style={styles.modalText}>{selectedItem.provincial_nomination}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Spouse: </Text>
+								<Text style={styles.modalText}>{selectedItem.spouse}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Spouse Education: </Text>
+								<Text style={styles.modalText}>{selectedItem.spouse_education}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Spouse Experience: </Text>
+								<Text style={styles.modalText}>{selectedItem.spouse_experience}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Spouse Language: </Text>
+								<Text style={styles.modalText}>{selectedItem.spouse_language}</Text>
+							</View>
+
 							<TouchableOpacity
 								onPress={() => setModalVisible(false)}
 								style={styles.closeButton}
@@ -321,11 +363,24 @@ const styles = StyleSheet.create({
 		padding: 20,
 		borderRadius: 10,
 	},
+	modalRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginVertical: 4,
+	},
+	modalHeading: {
+		fontSize: 16,
+		...theme.FONTS.Mulish_700Bold
+	},
 	modalTitle: {
 		fontSize: 20,
-		fontWeight: "bold",
 		marginBottom: 10,
-		color: "#333",
+		...theme.FONTS.Mulish_400Regular
+	},
+	modalText: {
+		fontSize: 16,
+		...theme.FONTS.Mulish_600SemiBold
 	},
 	closeButton: {
 		marginTop: 20,
