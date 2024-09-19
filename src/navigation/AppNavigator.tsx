@@ -27,6 +27,7 @@ import ChecklistDetail from "../screens/Lead/Checklist/ChecklistDetail";
 import DocumentChecklist from "../screens/Lead/LeadChecklist/DocumentChecklist";
 import DocumentUpload from "../screens/Lead/LeadChecklist/DocumentUpload";
 import ScoreList from "../screens/CRSCalculator/Scorelist";
+import Calculatecrs from "../screens/CRSCalculator/Calculatecrs";
 
 const Stack = createStackNavigator();
 
@@ -62,6 +63,7 @@ const AppNavigator = () => {
       <Stack.Screen name="LeadHistory" component={LeadHistory} />
       <Stack.Screen name="DocumentChecklist" component={DocumentChecklist} />
       <Stack.Screen name="DocumentUpload" component={DocumentUpload} />
+      <Stack.Screen name="Calculatecrs" component={Calculatecrs} />
       <Stack.Screen name="ScoreList" component={ScoreList} />
     </Stack.Navigator>
   );

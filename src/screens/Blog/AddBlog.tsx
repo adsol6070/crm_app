@@ -122,7 +122,6 @@ const AddBlog = () => {
   const renderContent = () => {
     return (
       <View style={styles.fieldContainer}>
-        <View>
           <Controller
             control={control}
             name="title"
@@ -138,7 +137,6 @@ const AddBlog = () => {
               />
             )}
           />
-        </View>
         <Controller
           control={control}
           name="description"

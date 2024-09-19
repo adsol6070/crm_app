@@ -7,7 +7,7 @@ const utils = {
     nationalityOptions,
     genderOptions,
     maritalStatusOptions,
-    hasPermission
+    hasPermission,
 }
 
 export default { utils }

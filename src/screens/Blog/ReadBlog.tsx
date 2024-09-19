@@ -61,10 +61,10 @@ const ReadBlog = () => {
           </View>
           <Text style={styles.textDesign}>
             {new Date(blogDetail.created_at).toLocaleDateString()} |{" "}
-            {blogDetail.category}
+            {blogDetail.category == "Null"? "N/A": blogDetail.category}
           </Text>
           <Text style={styles.shortDescription}>{blogDetail.description}</Text>
-          <HTMLView value={blogDetail.content} stylesheet={styles} />
+          <HTMLView value={blogDetail.content} stylesheet={htmlStyles}  />
         </View>
       </View>
     );
@@ -139,7 +139,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
     color: theme.COLORS.white,
     backgroundColor: "black",
     paddingTop: 5,
@@ -147,23 +146,49 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     borderRadius: 10,
+    ...theme.FONTS.Mulish_700Bold
   },
   textDesign: {
     fontSize: 14,
     color: "#888888",
     marginBottom: 12,
+    ...theme.FONTS.Mulish_400Regular
   },
   shortDescription: {
     fontSize: 14,
     color: "#444444",
     lineHeight: 20,
     margin: 10,
+    ...theme.FONTS.Mulish_600SemiBold
   },
   description: {
     fontSize: 16,
     color: "#444444",
     lineHeight: 22,
     margin: 10,
+    ...theme.FONTS.Mulish_600SemiBold
+  }
+});
+
+const htmlStyles = StyleSheet.create({
+  "*": {  
+    fontFamily: theme.FONTS.Mulish_400Regular.fontFamily,
+  },
+  p: {
+    fontSize: 14,
+    color: "#444444",
+    fontFamily: theme.FONTS.Mulish_400Regular.fontFamily,
+    lineHeight: 22,
+  },
+  h1: {
+    fontSize: 24,
+    fontWeight: "bold",
+    fontFamily: theme.FONTS.Mulish_700Bold.fontFamily,
+  },
+  h2: {
+    fontSize: 20,
+    fontWeight: "bold",
+    fontFamily: theme.FONTS.Mulish_700Bold.fontFamily,
   },
 });
 

@@ -41,6 +41,9 @@ class CRSService {
   async getAllScores() {
     return makeRequest("get", "/CRSScore/");
   }
+  async saveScore(payload: any) {
+    return makeRequest("post", "/CRSScore/", payload);
+  }
   async deleteScoreById(scoreId: string) {
     return makeRequest("delete", `/CRSScore/${scoreId}`);
   }  

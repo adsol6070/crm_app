@@ -160,6 +160,11 @@ const CustomDrawerContent = (props: any) => {
       requiredPermission: { section: "Scores", action: "Read" },
       subItems: [
         {
+          label: "Calculate CRS",
+          screen: "Calculatecrs",
+          requiredPermission: { section: "Scores", action: "Read" },
+        },
+        {
           label: "View Results",
           screen: "ScoreList",
           requiredPermission: { section: "Scores", action: "Read" },

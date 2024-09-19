@@ -223,29 +223,11 @@ const Chat = () => {
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
           marginHorizontal: 22,
           marginTop: 22,
         }}
       >
         <Text style={{ ...theme.FONTS.H4 }}>Chats</Text>
-        <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity onPress={() => console.log("Add contacts")}>
-            <MaterialCommunityIcons
-              name="message-badge-outline"
-              size={20}
-              color={theme.COLORS.black}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={{ marginLeft: 12 }}>
-            <MaterialCommunityIcons
-              name="playlist-check"
-              size={20}
-              color={theme.COLORS.black}
-            />
-          </TouchableOpacity>
-        </View>
       </View>
       <View
         style={{
