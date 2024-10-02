@@ -54,7 +54,7 @@ class BlogService {
     return makeRequest("delete", `/blog/${blogId}`);
   } 
   async getBlogCategory() {
-    return makeRequest("get", "/blog/blogCategory");
+    return makeRequest<any[]>("get", "/blog/blogCategory");
   }
   async createBlogCategory(payload: any) {
     return makeRequest("post", "/blog/blogCategory", payload);

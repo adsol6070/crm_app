@@ -1,8 +1,9 @@
+import { Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { rolesService } from "../../../../api/roles";
-import ListScreen from "../../components/ListScreen";
-import { Text, View } from "react-native";
 import { theme } from "../../../../constants/theme";
+import { formatRoleDisplayName } from "../../../../utils/FormatRoleDisplayName";
+import ListScreen from "../../components/ListScreen";
 
 const RoleList = () => {
   const navigation = useNavigation();
@@ -21,12 +22,11 @@ const RoleList = () => {
         }))
       }
       placeholder="Search Role..."
-      noDataMessage="0 Roles found"
       addButtonDestination="RoleManager"
       skeletonWithImage={false}
       onItemPress={(item) => handleItemPress(item.name)}
       centerComponent={(item) => (
-        <Text style={theme.FONTS.H4}>{item.name}</Text>
+        <Text style={theme.FONTS.H4}>{formatRoleDisplayName(item.name)}</Text>
       )}
       actionConfigs={[
         {

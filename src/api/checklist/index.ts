@@ -39,7 +39,7 @@ const makeRequest = async <T>(
 
 class ChecklistService {
   async getAllChecklist() {
-    return makeRequest("get", "/checklists/");
+    return makeRequest<any[]>("get", "/checklists/");
   }
   async createChecklist(payload: any) {
     return makeRequest("post", "/checklists/", payload);

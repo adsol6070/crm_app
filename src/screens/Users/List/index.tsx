@@ -26,7 +26,6 @@ const UserList = () => {
         }))
       }
       placeholder="Search User..."
-      noDataMessage="0 Users found"
       addButtonDestination="UserManager"
       onItemPress={(item) => handleItemPress(item.id)}
       leadingComponent={(item) => (

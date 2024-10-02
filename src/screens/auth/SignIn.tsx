@@ -38,6 +38,7 @@ const SignIn = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -59,6 +60,7 @@ const SignIn = () => {
   const { login } = useAuth();
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     try {
       const response = await login(data);
       if (response == "Invalid email or password") {
@@ -71,6 +73,8 @@ const SignIn = () => {
       console.error("Login Error:", error);
       setErrorMessage("An error occurred. Please try again.");
       setVisible(true);
+    } finally {
+      setLoading(false);
     }
   };
 

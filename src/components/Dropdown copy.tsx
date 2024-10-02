@@ -11,25 +11,20 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../constants/theme";
 
-interface Option {
-  label: string;
-  value: string;
-}
-
 interface DropdownProps {
-  options: Option[];
-  selectedValue: string | null;
+  options: string[];
+  selectedValue: any;
   onSelect: (value: string) => void;
   placeholder?: string;
   label?: string;
-  error?: string;
+  error?: any;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
   options,
   selectedValue,
   onSelect,
-  placeholder = "Select an option",
+  placeholder,
   label,
   error,
 }) => {
@@ -44,11 +39,8 @@ const Dropdown: React.FC<DropdownProps> = ({
     setIsVisible(false);
   };
 
-  const selectedLabel = options.find(
-    (option) => option.value === selectedValue
-  )?.label;
-
-  const buttonTextColor = selectedLabel
+  // Determine the color based on whether selectedValue exists
+  const buttonTextColor = selectedValue
     ? theme.COLORS.black
     : theme.COLORS.lightGray;
 
@@ -58,7 +50,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       <TouchableOpacity style={styles.dropdownButton} onPress={toggleDropdown}>
         <View style={styles.inputStyle}>
           <Text style={[styles.buttonText, { color: buttonTextColor }]}>
-            {selectedLabel || placeholder}
+            {selectedValue || placeholder}
           </Text>
           <Ionicons name="chevron-down" size={20} color="#bbb" />
         </View>
@@ -71,18 +63,18 @@ const Dropdown: React.FC<DropdownProps> = ({
         onRequestClose={() => setIsVisible(false)}
       >
         <TouchableWithoutFeedback onPress={() => setIsVisible(false)}>
-          <View style={styles.modalOverlay}>
+          <View style={[styles.modalOverlay]}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContainer}>
                 <FlatList
                   data={options}
-                  keyExtractor={(item) => item.value}
+                  keyExtractor={(item) => item}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.option}
-                      onPress={() => handleSelect(item.value)}
+                      onPress={() => handleSelect(item)}
                     >
-                      <Text style={styles.optionText}>{item.label}</Text>
+                      <Text style={styles.optionText}>{item}</Text>
                     </TouchableOpacity>
                   )}
                 />
@@ -138,7 +130,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "rgba(0, 0, 0, 0.8)", // Decrease transparency here (0.2 instead of 0.5)
   },
   modalContainer: {
     width: "80%",

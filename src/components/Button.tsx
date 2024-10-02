@@ -6,9 +6,15 @@ interface ButtonProps {
   title: string;
   onPress: () => void;
   containerStyle?: ViewStyle;
+  loading?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ title, onPress, containerStyle }) => {
+const Button: React.FC<ButtonProps> = ({
+  title,
+  onPress,
+  containerStyle,
+  loading,
+}) => {
   return (
     <View style={{ ...containerStyle, width: "100%" }}>
       <TouchableOpacity
@@ -20,7 +26,8 @@ const Button: React.FC<ButtonProps> = ({ title, onPress, containerStyle }) => {
           alignItems: "center",
           backgroundColor: theme.COLORS.black,
         }}
-        onPress={onPress}
+        onPress={loading ? undefined : onPress}
+        disabled={loading}
       >
         <Text
           style={{

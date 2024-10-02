@@ -37,7 +37,9 @@ const LeadDetailSkeletonLoader = () => {
       {/* Skeleton items for the leads */}
       {[...Array(4)].map((_, index) => (
         <View key={index} style={styles.skeletonItem}>
-          <Animated.View style={[styles.skeletonDetailBox, { backgroundColor }]} />
+          <Animated.View
+            style={[styles.skeletonDetailBox, { backgroundColor }]}
+          />
         </View>
       ))}
     </View>
@@ -69,7 +71,6 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 10,
   },
-  
 });
 
 export default LeadDetailSkeletonLoader;

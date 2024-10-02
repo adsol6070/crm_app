@@ -63,7 +63,6 @@ const ListLeads = () => {
       title="Leads"
       fetchData={leadService.getAllLeads}
       placeholder="Search Lead..."
-      noDataMessage="0 Leads found"
       addButtonDestination="AddLead"
       onItemPress={(item) => handleItemPress(item.id)}
       centerComponent={(item) => {

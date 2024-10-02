@@ -1,41 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { dashboardService } from '../../api/dashboard';
-import moment from 'moment';
-import { theme } from '../../constants/theme';
-import { components } from '../../components';
+import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, Platform } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { LineChart, BarChart, PieChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import { dashboardService } from "../../api/dashboard";
+import moment from "moment";
+import { theme } from "../../constants/theme";
+import { components } from "../../components";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const LeadCustomTimeReport = ({ refreshKey }: any) => {
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [chartType, setChartType] = useState('line');
+  const [chartType, setChartType] = useState("line");
   const [customTimeReport, setCustomTimeReport] = useState<any>([]);
 
-  const onDateChange = (event: any, selectedDate: any, isStartDate: boolean) => {
-    if (selectedDate) {
+  const onDateChange = (
+    event: any,
+    selectedDate: any,
+    isStartDate: boolean
+  ) => {
+    if (event.type === "dismissed") {
+      setShowStartDatePicker(false);
+      setShowEndDatePicker(false);
+      return;
+    }
+
+    if (event.type === "set" && selectedDate) {
       if (isStartDate) {
         setStartDate(selectedDate);
       } else {
         setEndDate(selectedDate);
       }
+      setShowStartDatePicker(false);
+      setShowEndDatePicker(false);
     }
-    setShowStartDatePicker(false);
-    setShowEndDatePicker(false);
   };
 
   const getCustomTimeReportData = async () => {
     try {
       const start = moment(startDate);
       const end = moment(endDate);
-      const response: any = await dashboardService.getLeadReportBasedTime(start, end);
+      const response: any = await dashboardService.getLeadReportBasedTime(
+        start,
+        end
+      );
       setCustomTimeReport(response);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -50,7 +63,7 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
     const aggregatedData: { [key: string]: number } = {};
 
     customTimeReport.forEach((report: any) => {
-      const dateKey = moment(report.date).format('MMM D');
+      const dateKey = moment(report.date).format("MMM D");
       if (aggregatedData[dateKey]) {
         aggregatedData[dateKey] += parseInt(report.lead_count, 10);
       } else {
@@ -67,7 +80,7 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
   const { labels, data } = aggregateData();
 
   const chartData = {
-    labels: labels.length > 0 ? labels : ['No Data'],
+    labels: labels.length > 0 ? labels : ["No Data"],
     datasets: [
       {
         data: data.length > 0 ? data : [0],
@@ -76,9 +89,9 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
   };
 
   const chartConfig = {
-    backgroundColor: '#ffffff',
-    backgroundGradientFrom: '#ffffff',
-    backgroundGradientTo: '#f5f5f5',
+    backgroundColor: "#ffffff",
+    backgroundGradientFrom: "#ffffff",
+    backgroundGradientTo: "#f5f5f5",
     decimalPlaces: 0,
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     style: {
@@ -90,25 +103,31 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
     <View style={styles.container}>
       <Text style={styles.title}>Lead Custom Range Time Report</Text>
       <View style={styles.dateContainer}>
-        <components.Button title={`Start Date: ${startDate.toDateString()}`} onPress={() => setShowStartDatePicker(true)} />
+        <components.Button
+          title={`Start Date: ${startDate.toDateString()}`}
+          onPress={() => setShowStartDatePicker(true)}
+        />
         {showStartDatePicker && (
           <DateTimePicker
             testID="startDatePicker"
             value={startDate}
             mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={(event, date) => onDateChange(event, date, true)}
           />
         )}
       </View>
       <View style={styles.dateContainer}>
-        <components.Button title={`End Date: ${endDate.toDateString()}`} onPress={() => setShowEndDatePicker(true)} />
+        <components.Button
+          title={`End Date: ${endDate.toDateString()}`}
+          onPress={() => setShowEndDatePicker(true)}
+        />
         {showEndDatePicker && (
           <DateTimePicker
             testID="endDatePicker"
             value={endDate}
             mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={(event, date) => onDateChange(event, date, false)}
           />
         )}
@@ -124,7 +143,7 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
           <Picker.Item label="Bar Chart" value="bar" />
           <Picker.Item label="Pie Chart" value="pie" />
         </Picker>
-        {chartType === 'line' && (
+        {chartType === "line" && (
           <LineChart
             data={chartData}
             width={width - 32}
@@ -134,7 +153,7 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
             style={styles.chart}
           />
         )}
-        {chartType === 'bar' && (
+        {chartType === "bar" && (
           <BarChart
             data={chartData}
             width={width - 32}
@@ -145,13 +164,15 @@ const LeadCustomTimeReport = ({ refreshKey }: any) => {
             style={styles.chart}
           />
         )}
-        {chartType === 'pie' && (
+        {chartType === "pie" && (
           <PieChart
             data={chartData.datasets[0].data.map((value, index) => ({
               name: chartData.labels[index],
               population: value,
-              color: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.5)`,
-              legendFontColor: '#7F7F7F',
+              color: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
+                Math.random() * 255
+              )}, ${Math.floor(Math.random() * 255)}, 0.5)`,
+              legendFontColor: "#7F7F7F",
               legendFontSize: 15,
             }))}
             width={width - 32}
@@ -176,8 +197,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 16,
-    color: '#333',
-    ...theme.FONTS.Mulish_600SemiBold
+    color: "#333",
+    ...theme.FONTS.Mulish_600SemiBold,
   },
   dateContainer: {
     marginBottom: 16,
@@ -188,11 +209,11 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 18,
     marginBottom: 8,
-    ...theme.FONTS.Mulish_400Regular
+    ...theme.FONTS.Mulish_400Regular,
   },
   picker: {
     height: 50,
-    width: '100%',
+    width: "100%",
   },
   chart: {
     marginVertical: 8,

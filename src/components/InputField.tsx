@@ -24,6 +24,7 @@ import {
   actions,
 } from "react-native-pell-rich-editor";
 import { formatDate } from "../utils/FormatDate";
+import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 interface InputFieldProps extends TextInputProps {
   date?: Date | undefined;
@@ -34,7 +35,7 @@ interface InputFieldProps extends TextInputProps {
   keyboardType?: TextInputProps["keyboardType"];
   check?: boolean;
   eyeOffSvg?: boolean;
-  error?: string;
+  error?: string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
   image?: boolean;
   dropdown?: boolean;
   items?: Array<{ label: string; value: string }>;

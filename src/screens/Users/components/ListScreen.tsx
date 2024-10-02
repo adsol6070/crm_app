@@ -1,27 +1,21 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Linking,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-} from "react-native";
-import { theme } from "../../../constants/theme";
-import Header1 from "../../../components/Header1";
-import SearchBar from "./SearchBar";
-import SkeletonLoader from "../SkeletonLoader";
-import ItemList from "./ItemList";
-import AddButton from "./AddButton";
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { theme } from "../../../constants/theme";
 import { capitalizeFirstLetter } from "../../../utils/CapitalizeFirstLetter";
 import { usePermissions } from "../../../common/context/PermissionContext";
 import { hasPermission } from "../../../utils/HasPermission";
 import { Controller, useForm } from "react-hook-form";
 import { components } from "../../../components";
+import Header1 from "../../../components/Header1";
+import SearchBar from "./SearchBar";
+import SkeletonLoader from "../SkeletonLoader";
+import ItemList from "./ItemList";
+import AddButton from "./AddButton";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 interface ActionConfig {
   iconName: string;
@@ -31,12 +25,20 @@ interface ActionConfig {
   color?: string;
 }
 
+interface SingleInputConfig {
+  name: string;
+  title: string;
+  inputPlaceholder: string;
+  buttonText: string;
+  onSubmit: (data: any) => void;
+  validationSchema?: yup.ObjectSchema<any>;
+}
+
 interface ListScreenProps<T> {
   title: string;
   fetchData: () => Promise<T[]>;
   mapData?: (data: T[]) => any[];
   placeholder: string;
-  noDataMessage: string;
   onItemPress: (item: string) => void;
   addButtonDestination: string;
   actionConfigs?: ActionConfig[];
@@ -51,7 +53,7 @@ interface ListScreenProps<T> {
   deleteAllData?: () => Promise<any>;
   listPermissions?: any;
   showDeleteAll?: boolean;
-  isSingleInput?: boolean;
+  singleInputConfig?: SingleInputConfig;
 }
 
 const ListScreen = <T extends {}>({
@@ -59,7 +61,6 @@ const ListScreen = <T extends {}>({
   fetchData,
   mapData,
   placeholder,
-  noDataMessage,
   onItemPress,
   addButtonDestination,
   actionConfigs,
@@ -74,7 +75,7 @@ const ListScreen = <T extends {}>({
   deleteAllData,
   listPermissions,
   showDeleteAll = false,
-  isSingleInput = false,
+  singleInputConfig,
 }: ListScreenProps<T>) => {
   const navigation = useNavigation();
   const { permissions, refreshPermissions } = usePermissions();
@@ -85,26 +86,34 @@ const ListScreen = <T extends {}>({
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedFilter, setSelectedFilter] = useState<string>("");
 
+  const validationSchema = singleInputConfig?.validationSchema;
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
   } = useForm({
-    // resolver: yupResolver(schema),
+    resolver: validationSchema ? yupResolver(validationSchema) : undefined,
   });
 
-  console.log("Permissions:", permissions);
+  const handleFormSubmit = async (data: any) => {
+    try {
+      await singleInputConfig?.onSubmit(data);
+      reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
 
   const handleSearch = (text: string) => {
     setSearch(text);
 
     let results = allData;
     if (text !== "") {
-      results = results.filter((item) =>
-        item[searchKey].toLowerCase().includes(text.toLowerCase())
-      );
+      results = results.filter((item) => {
+        return item[searchKey].toLowerCase().includes(text.toLowerCase());
+      });
     }
 
     if (selectedFilter && selectedFilter !== "All") {
@@ -195,7 +204,7 @@ const ListScreen = <T extends {}>({
   };
 
   const renderAddButton = () => {
-    if (allData.length === 0 && !loading) {
+    if (allData.length === 0 && !loading && addButtonDestination) {
       return (
         <>
           <AddButton
@@ -210,12 +219,45 @@ const ListScreen = <T extends {}>({
     return null;
   };
 
-  // const handleSingleInputSubmit = async () => {
-  //   if (onSingleInputSubmit) {
-  //     await onSingleInputSubmit(singleInput); // Call the provided submit function
-  //     setSingleInput(""); // Clear input after submission
-  //   }
-  // };
+  function getDynamicName(entityName: string, count: number) {
+    const singularize = (name: string) => {
+      if (name.endsWith("ies")) {
+        return name.slice(0, -3) + "y";
+      }
+
+      if (name.endsWith("s")) {
+        return name.slice(0, -1);
+      }
+      return name;
+    };
+
+    const pluralize = (name: string) => {
+      if (name.endsWith("s") && count !== 1) {
+        return name;
+      }
+      if (name.endsWith("y")) {
+        return name.slice(0, -1) + "ies";
+      } else if (
+        name.endsWith("s") ||
+        name.endsWith("x") ||
+        name.endsWith("z") ||
+        name.endsWith("ch") ||
+        name.endsWith("sh")
+      ) {
+        return name + "es";
+      } else {
+        return name + "s";
+      }
+    };
+
+    if (count === 0) {
+      return `0 ${singularize(entityName)} found`;
+    }
+
+    return `${count} ${
+      count === 1 ? singularize(entityName) : pluralize(entityName)
+    }`;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -224,34 +266,36 @@ const ListScreen = <T extends {}>({
           title={title}
           showBackButton={true}
           onBackPress={() => navigation.goBack()}
-          {...(allData.length > 0
+          {...(allData.length > 0 && addButtonDestination
             ? {
                 actionIcon: "plus",
                 onActionPress: () => navigation.navigate(addButtonDestination),
               }
             : {})}
         />
-        {isSingleInput && (
+        {singleInputConfig && (
           <View style={styles.addContainer}>
             <Controller
-              name="category"
+              name={singleInputConfig.name}
               control={control}
               render={({ field: { onChange, onBlur, value } }) => (
                 <components.InputField
-                  title="Category"
-                  placeholder="Enter category name"
+                  title={singleInputConfig.title}
+                  placeholder={singleInputConfig.inputPlaceholder}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  // error={errors.category?.message}
+                  error={errors[singleInputConfig.name]?.message}
                 />
               )}
             />
             <TouchableOpacity
               style={styles.submitButton}
-              onPress={handleSubmit((data) => console.log("Dta", data))}
+              onPress={handleSubmit(handleFormSubmit)}
             >
-              <Text style={styles.submitButtonText}>Add Category</Text>
+              <Text style={styles.submitButtonText}>
+                {singleInputConfig.buttonText}
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -330,7 +374,7 @@ const ListScreen = <T extends {}>({
                 <TouchableOpacity
                   onPress={() => deleteAllItems()}
                   style={{
-                    backgroundColor: "#007BFF",
+                    backgroundColor: "red",
                     paddingVertical: 10,
                     paddingHorizontal: 15,
                     borderRadius: 5,
@@ -342,7 +386,7 @@ const ListScreen = <T extends {}>({
                     style={{
                       color: theme.COLORS.white,
                       fontSize: 16,
-                      fontWeight: "bold",
+                      ...theme.FONTS.Mulish_600SemiBold,
                     }}
                   >
                     Delete All
@@ -357,11 +401,7 @@ const ListScreen = <T extends {}>({
             <SkeletonLoader countOnly={true} />
           ) : (
             <Text style={styles.countText}>
-              {filteredData.length === 0
-                ? noDataMessage
-                : `${filteredData.length} ${
-                    filteredData.length === 1 ? title.slice(0, -1) : title
-                  }`}
+              {getDynamicName(title, filteredData.length)}
             </Text>
           )}
         </View>
@@ -370,7 +410,7 @@ const ListScreen = <T extends {}>({
             Array.from({ length: 8 }).map((_, index) => (
               <SkeletonLoader key={index} withImage={skeletonWithImage} />
             ))
-          ) : filteredData.length === 0 ? (
+          ) : allData.length === 0 && addButtonDestination ? (
             <View style={styles.addButtonContainer}>{renderAddButton()}</View>
           ) : (
             <ItemList
