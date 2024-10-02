@@ -18,6 +18,7 @@ import { usePermissions } from "../../common/context/PermissionContext";
 import { hasPermission } from "../../utils/HasPermission";
 import Header1 from "../../components/Header1";
 import { theme } from "../../constants/theme";
+import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 
 type RootStackParamList = {
   ReadBlog: { blogId: string };
@@ -117,7 +118,7 @@ const ListBlogs: React.FC = () => {
         <View style={styles.contentContainer}>
           <Text style={styles.title}>{blog.title}</Text>
           <Text style={styles.date}>
-            {new Date(blog.created_at).toLocaleDateString()} - {blog.category}
+            {new Date(blog.created_at).toLocaleDateString()} - {blog.category == "Null"? "N/A": capitalizeFirstLetter(blog.category)}
           </Text>
           <Text style={styles.shortDescription} numberOfLines={2}>
             {blog.description}
@@ -207,19 +208,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
     marginBottom: 8,
     color: "#333333",
+    ...theme.FONTS.Mulish_700Bold
   },
   date: {
     fontSize: 14,
     color: "#888888",
     marginBottom: 12,
+    ...theme.FONTS.Mulish_400Regular
   },
   shortDescription: {
     fontSize: 16,
     color: "#444444",
     lineHeight: 22,
+    ...theme.FONTS.Mulish_400Regular
   },
   readMoreButton: {
     marginTop: 12,

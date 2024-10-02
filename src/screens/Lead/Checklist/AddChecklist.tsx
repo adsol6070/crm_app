@@ -209,10 +209,10 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		marginBottom: 10,
-		width: '150%'
+		width: '170%'
 	},
 	removeButton: {
-		marginLeft: 10,
+		marginLeft: 8,
 	},
 	addButton: {
 		marginVertical: 10,

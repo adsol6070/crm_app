@@ -22,7 +22,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { leadService } from "../../api/lead";
 
 const schema = yup.object().shape({
-	category: yup.string().required("category is required"),
+	category: yup.string().required("category is required").matches(/^[a-z]+$/, "Category name must be lowercase"),
 });
 
 const VisaCategory = () => {

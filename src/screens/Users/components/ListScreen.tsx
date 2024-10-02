@@ -8,6 +8,7 @@ import {
   Linking,
   TouchableOpacity,
   Alert,
+  TextInput,
 } from "react-native";
 import { theme } from "../../../constants/theme";
 import Header1 from "../../../components/Header1";
@@ -19,6 +20,8 @@ import { Picker } from "@react-native-picker/picker";
 import { capitalizeFirstLetter } from "../../../utils/CapitalizeFirstLetter";
 import { usePermissions } from "../../../common/context/PermissionContext";
 import { hasPermission } from "../../../utils/HasPermission";
+import { Controller, useForm } from "react-hook-form";
+import { components } from "../../../components";
 
 interface ActionConfig {
   iconName: string;
@@ -48,6 +51,7 @@ interface ListScreenProps<T> {
   deleteAllData?: () => Promise<any>;
   listPermissions?: any;
   showDeleteAll?: boolean;
+  isSingleInput?: boolean;
 }
 
 const ListScreen = <T extends {}>({
@@ -70,6 +74,7 @@ const ListScreen = <T extends {}>({
   deleteAllData,
   listPermissions,
   showDeleteAll = false,
+  isSingleInput = false,
 }: ListScreenProps<T>) => {
   const navigation = useNavigation();
   const { permissions, refreshPermissions } = usePermissions();
@@ -80,7 +85,15 @@ const ListScreen = <T extends {}>({
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedFilter, setSelectedFilter] = useState<string>("");
 
-  console.log("Permissions:", permissions);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm({
+    // resolver: yupResolver(schema),
+  });
 
   const handleSearch = (text: string) => {
     setSearch(text);
@@ -195,6 +208,13 @@ const ListScreen = <T extends {}>({
     return null;
   };
 
+  // const handleSingleInputSubmit = async () => {
+  //   if (onSingleInputSubmit) {
+  //     await onSingleInputSubmit(singleInput); // Call the provided submit function
+  //     setSingleInput(""); // Clear input after submission
+  //   }
+  // };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1 }}>
@@ -209,6 +229,30 @@ const ListScreen = <T extends {}>({
               }
             : {})}
         />
+        {isSingleInput && (
+          <View style={styles.addContainer}>
+            <Controller
+              name="category"
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <components.InputField
+                  title="Category"
+                  placeholder="Enter category name"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  // error={errors.category?.message}
+                />
+              )}
+            />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmit((data) => console.log("Dta", data))}
+            >
+              <Text style={styles.submitButtonText}>Add Category</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         <SearchBar
           value={search}
           onChangeText={handleSearch}
@@ -379,6 +423,22 @@ const styles = StyleSheet.create({
     marginVertical: 22,
     paddingHorizontal: 12,
     borderRadius: 22,
+  },
+  addContainer: {
+    margin: 20,
+    marginBottom: 5,
+  },
+  submitButton: {
+    backgroundColor: theme.COLORS.black,
+    paddingVertical: 12,
+    marginTop: 5,
+    borderRadius: 5,
+    alignItems: "center",
+    elevation: 2,
+  },
+  submitButtonText: {
+    ...theme.FONTS.H5,
+    color: theme.COLORS.white,
   },
 });
 

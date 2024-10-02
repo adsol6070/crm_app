@@ -3,9 +3,6 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Text,
-  Platform,
-  KeyboardAvoidingView,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -94,8 +91,6 @@ const AddBlog = () => {
   };
 
   const onSubmit = async (data: any) => {
-    console.log("data ", data);
-    console.log("content ", content);
     try {
       const formData = new FormData();
       formData.append("title", data.title);
@@ -122,7 +117,6 @@ const AddBlog = () => {
   const renderContent = () => {
     return (
       <View style={styles.fieldContainer}>
-        <View>
           <Controller
             control={control}
             name="title"
@@ -138,7 +132,6 @@ const AddBlog = () => {
               />
             )}
           />
-        </View>
         <Controller
           control={control}
           name="description"

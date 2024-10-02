@@ -27,7 +27,7 @@ type OnboardingScreenNavigationProp = StackNavigationProp<
 >;
 
 const schema = yup.object().shape({
-  email: yup.string().email("Invalid email").required("Email is required"),
+  email: yup.string().email("Invalid email").required("Email is required").trim(),
   password: yup.string().required("Password is required"),
 });
 

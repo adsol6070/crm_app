@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import React, { useState } from "react";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { components } from "../components";
 import { constants } from "../constants";
@@ -23,7 +23,6 @@ import Header1 from "../components/Header1";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 
 const Profile = () => {
-  const navigation = useNavigation();
   const { logout, user } = useAuth();
   const { theme } = constants;
   const { showActionSheetWithOptions } = useActionSheet();
@@ -134,14 +133,11 @@ const Profile = () => {
     }
   };
 
-  const renderHeader = () => {
-    return <components.Header title="Profile" />;
-  };
-
   const renderContent = () => {
     if (!currentUser) {
       return <ActivityIndicator size="large" color={theme.COLORS.lightGray} />;
     }
+    
     return (
       <ScrollView
         contentContainerStyle={{

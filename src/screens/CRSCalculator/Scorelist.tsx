@@ -267,22 +267,26 @@ const ScoreList = () => {
 								<Text style={styles.modalHeading}>Provincial Nomination: </Text>
 								<Text style={styles.modalText}>{selectedItem.provincial_nomination}</Text>
 							</View>
-							<View style={styles.modalRow}>
-								<Text style={styles.modalHeading}>Spouse: </Text>
-								<Text style={styles.modalText}>{selectedItem.spouse}</Text>
-							</View>
-							<View style={styles.modalRow}>
-								<Text style={styles.modalHeading}>Spouse Education: </Text>
-								<Text style={styles.modalText}>{selectedItem.spouse_education}</Text>
-							</View>
-							<View style={styles.modalRow}>
-								<Text style={styles.modalHeading}>Spouse Experience: </Text>
-								<Text style={styles.modalText}>{selectedItem.spouse_experience}</Text>
-							</View>
-							<View style={styles.modalRow}>
-								<Text style={styles.modalHeading}>Spouse Language: </Text>
-								<Text style={styles.modalText}>{selectedItem.spouse_language}</Text>
-							</View>
+							{selectedItem.spouse != "no" &&
+								<View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse}</Text>
+									</View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse Education: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse_education}</Text>
+									</View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse Experience: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse_experience}</Text>
+									</View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse Language: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse_language}</Text>
+									</View>
+								</View>
+							}
 
 							<TouchableOpacity
 								onPress={() => setModalVisible(false)}

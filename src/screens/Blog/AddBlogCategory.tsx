@@ -23,7 +23,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const schema = yup.object().shape({
-	category: yup.string().required("category is required"),
+	category: yup.string().required("category is required").matches(/^[a-z]+$/, "Category name must be lowercase"),
 });
 
 const BlogCategory = () => {

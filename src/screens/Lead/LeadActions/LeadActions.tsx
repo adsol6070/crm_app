@@ -287,6 +287,7 @@ const AssignModal = ({
         <Text style={styles.modalTitle}>Assign Lead</Text>
         <FlatList
           data={assignees}
+          style={styles.assigneeListContainer}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -426,12 +427,19 @@ const styles = StyleSheet.create({
         color: theme.COLORS.black,
         ...theme.FONTS.Mulish_700Bold
     },
+    assigneeListContainer: {
+      maxHeight: "80%",
+      overflow: "scroll"
+    },
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         paddingVertical: 10,
         borderBottomWidth: 1,
+        borderBottomStartRadius: 20,
+        borderBottomEndRadius: 20,
+        width: "100%",
         borderColor: theme.COLORS.lightGray,
     },
     checkboxLabel: {

@@ -37,8 +37,10 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.COLORS.white,
 	},
 	qrContainer: {
+		height: '78%',
         marginTop: 20, 
         alignItems: 'center', 
+		justifyContent: 'center'
     },
 });
 
