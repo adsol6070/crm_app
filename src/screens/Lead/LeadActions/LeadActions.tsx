@@ -1,18 +1,32 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Modal, TextInput, FlatList, RefreshControl } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { ScrollView } from 'react-native-gesture-handler';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
-import { theme } from '../../../constants/theme';
-import { leadService } from '../../../api/lead';
-import { useAuth } from '../../../common/context/AuthContext';
-import { userService } from '../../../api/user';
-import { skeletonLoader } from '../../../components/skeletonLoaders';
-import { usePermissions } from '../../../common/context/PermissionContext';
-import { hasPermission } from '../../../utils/HasPermission';
-import Header1 from '../../../components/Header1';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Modal,
+  TextInput,
+  FlatList,
+  RefreshControl,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  useNavigation,
+  useRoute,
+  NavigationProp,
+} from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import { theme } from "../../../constants/theme";
+import { leadService } from "../../../api/lead";
+import { useAuth } from "../../../common/context/AuthContext";
+import { userService } from "../../../api/user";
+import { skeletonLoader } from "../../../components/skeletonLoaders";
+import { usePermissions } from "../../../common/context/PermissionContext";
+import { hasPermission } from "../../../utils/HasPermission";
+import Header1 from "../../../components/Header1";
 
 type RootStackParamList = {
   LeadDetail: { leadId: string };
@@ -136,10 +150,6 @@ const LeadActions = () => {
     });
   };
 
-  const renderHeader = () => (
-    <components.Header title="Lead Actions" goBack={true} />
-  );
-
   const renderStatusPicker = () => (
     <View style={styles.pickerContainer}>
       <Picker
@@ -149,6 +159,7 @@ const LeadActions = () => {
           styles.picker,
           { backgroundColor: getPickerBackgroundColor(status) },
         ]}
+        itemStyle={{}}
       >
         {statusOptions.map((option) => (
           <Picker.Item

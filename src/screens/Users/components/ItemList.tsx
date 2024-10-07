@@ -35,7 +35,11 @@ const ItemList: React.FC<ItemListProps> = ({
     return (
       <TouchableOpacity
         key={item.id}
-        onPress={() => onItemPress(item)}
+        onPress={() => {
+          if (onItemPress) {
+            onItemPress(item);
+          }
+        }}
         style={[
           styles.itemContainer,
           index % 2 !== 0

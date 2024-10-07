@@ -144,9 +144,13 @@ const EditLead = () => {
     const getCategories = async () => {
         try {
             const response: any = await leadService.getVisaCategory();
-            const newCategories = response.map((category: any) =>
-                category.category,
-            )
+            const newCategories = response.map((category: any) =>{
+                return {
+                  value: category.category,
+                  label: capitalizeFirstLetter(category.category),
+                }
+              }
+              );
             setVisaCategories(newCategories);
         } catch (error) {
             console.error("Error fetching visa categories", error);
@@ -289,10 +293,9 @@ const EditLead = () => {
                 render={({ field: { onChange, value } }) => (
                     <components.Dropdown
                         options={genderOptions}
-                        selectedValue={capitalizeFirstLetter(value)}
+                        selectedValue={value}
                         onSelect={(value: string) => {
-                            const val = value.toLowerCase();
-                            onChange(val);
+                            onChange(value);
                         }}
                         placeholder="Select a gender"
                         label="Gender"
@@ -404,10 +407,9 @@ const EditLead = () => {
                 render={({ field: { onChange, value } }) => (
                     <components.Dropdown
                         options={nationalityOptions}
-                        selectedValue={capitalizeFirstLetter(value)}
+                        selectedValue={value}
                         onSelect={(value: string) => {
-                            const val = value.toLowerCase();
-                            onChange(val);
+                            onChange(value);
                         }}
                         placeholder="Select a Nationality"
                         label="Nationality"
@@ -421,10 +423,9 @@ const EditLead = () => {
                 render={({ field: { onChange, value } }) => (
                     <components.Dropdown
                         options={maritalStatusOptions}
-                        selectedValue={capitalizeFirstLetter(value)}
+                        selectedValue={value}
                         onSelect={(value: string) => {
-                            const val = value.toLowerCase();
-                            onChange(val);
+                            onChange(value);
                         }}
                         placeholder="Select a Marital Status"
                         label="Marital Status"
@@ -470,10 +471,9 @@ const EditLead = () => {
                 render={({ field: { onChange, value } }) => (
                     <components.Dropdown
                         options={visaCategories}
-                        selectedValue={capitalizeFirstLetter(value)}
+                        selectedValue={value}
                         onSelect={(value: string) => {
-                            const val = value.toLowerCase();
-                            onChange(val);
+                            onChange(value);
                         }}
                         placeholder="Select a category"
                         label="Visa Category"

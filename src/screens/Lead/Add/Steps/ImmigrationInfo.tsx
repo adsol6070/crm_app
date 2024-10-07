@@ -32,19 +32,15 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
     [clearErrors, trigger]
   );
 
-  const formatDate = (date: Date) => {
-    const updatedDate = new Date(date);
-    const day = String(updatedDate.getDate()).padStart(2, "0");
-    const month = String(updatedDate.getMonth() + 1).padStart(2, "0");
-    const year = updatedDate.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
   const fetchVisaCategories = async () => {
     try {
       const response: any = await leadService.getVisaCategory();
-      const newCategories = response.map((category: any) =>
-        capitalizeFirstLetter(category.category)
+      const newCategories = response.map((category: any) => {
+        return {
+          value: category.category,
+          label: capitalizeFirstLetter(category.category),
+        }
+      }
       );
       setVisaCategories(newCategories)
     } catch (error) {
@@ -75,7 +71,7 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
           key={index}
           control={control}
           name={field as keyof ImmigrationInfoData}
-          render={({ field: { onChange, onBlur, value } }) => 
+          render={({ field: { onChange, onBlur, value } }) =>
             field === "passportExpiry" ? (
               <components.InputField
                 title="Passport Expiry"
@@ -91,20 +87,20 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
                 error={errors[field as keyof ImmigrationInfoData]?.message}
               />
             ) : (
-            <components.InputField
-              title={capitalizeFirstLetter(field.replace(/([A-Z])/g, " $1"))}
-              placeholder={getPlaceholder(field)}
-              customBorderColor="#ddd"
-              customBackgroundColor="#f5f5f5"
-              onChangeText={(text) => {
-                onChange(text);
-                handleFieldChange(field as keyof ImmigrationInfoData);
-              }}
-              onBlur={onBlur}
-              value={typeof value === "string" ? value : ""}
-              error={errors[field as keyof ImmigrationInfoData]?.message}
-            />
-          )}
+              <components.InputField
+                title={capitalizeFirstLetter(field.replace(/([A-Z])/g, " $1"))}
+                placeholder={getPlaceholder(field)}
+                customBorderColor="#ddd"
+                customBackgroundColor="#f5f5f5"
+                onChangeText={(text) => {
+                  onChange(text);
+                  handleFieldChange(field as keyof ImmigrationInfoData);
+                }}
+                onBlur={onBlur}
+                value={typeof value === "string" ? value : ""}
+                error={errors[field as keyof ImmigrationInfoData]?.message}
+              />
+            )}
         />
       ))}
 
@@ -118,8 +114,7 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
               options={getDropdownOptions(field, visaCategories)}
               selectedValue={capitalizeFirstLetter(value as string)}
               onSelect={(value: string) => {
-                const val = value.toLowerCase();
-                onChange(val);
+                onChange(value);
                 handleFieldChange(field as keyof ImmigrationInfoData);
               }}
               error={errors[field as keyof ImmigrationInfoData]?.message}

@@ -8,9 +8,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { components } from "../../../../components";
 import { rolesService } from "../../../../api/roles";
-import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
 import { theme } from "../../../../constants/theme";
 import Header1 from "../../../../components/Header1";
+import { formatRoleDisplayName } from "../../../../utils/FormatRoleDisplayName";
 
 interface ImageObject {
   uri: string;
@@ -61,7 +61,9 @@ const UserForm = ({
 }: any) => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [roleOptions, setRoleOptions] = useState<string[]>([]);
+  const [roleOptions, setRoleOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
   const {
     control,
@@ -73,12 +75,16 @@ const UserForm = ({
   });
 
   const fetchRoles = async () => {
-    const roles = await rolesService.getAllRoles();
-    setRoleOptions(
-      roles
-        .map(capitalizeFirstLetter)
-        .filter((role): role is string => role !== undefined)
-    );
+    try {
+      const roles = await rolesService.getAllRoles();
+      const formattedRoles = roles.map((role) => ({
+        label: formatRoleDisplayName(role),
+        value: role.toLowerCase(),
+      }));
+      setRoleOptions(formattedRoles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
   };
 
   useEffect(() => {
@@ -238,7 +244,7 @@ const renderFormInput = (
   image?: ImageObject | null,
   handleImageSelect?: (image: any) => void,
   isDropdown = false,
-  options?: string[]
+  options?: { label: string; value: string }[]
 ) => (
   <Controller
     control={control}
@@ -247,11 +253,8 @@ const renderFormInput = (
       isDropdown ? (
         <components.Dropdown
           options={options || []}
-          selectedValue={capitalizeFirstLetter(value)}
-          onSelect={(value: string) => {
-            const val = value.toLowerCase();
-            onChange(val);
-          }}
+          selectedValue={value}
+          onSelect={(value: string) => onChange(value)}
           placeholder={placeholder}
           label={title}
           error={errors[name]?.message}

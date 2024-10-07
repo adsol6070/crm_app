@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -16,7 +17,6 @@ import { RootStackParamList } from "../../types";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { authService } from "../../api/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../common/context/AuthContext";
 import { Dialog, Portal, Button } from "react-native-paper";
@@ -38,6 +38,7 @@ const SignIn = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -59,6 +60,7 @@ const SignIn = () => {
   const { login } = useAuth();
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     try {
       const response = await login(data);
       if (response == "Invalid email or password") {
@@ -71,6 +73,8 @@ const SignIn = () => {
       console.error("Login Error:", error);
       setErrorMessage("An error occurred. Please try again.");
       setVisible(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,7 +145,10 @@ const SignIn = () => {
           </TouchableOpacity>
         </View>
         <components.Button
-          title="Sign in"
+          title={loading ? <View style={styles.loadingContainer}>
+            <ActivityIndicator size="small" color={theme.COLORS.white} />
+            <Text style={styles.loadingText}>Signing In...</Text>
+          </View> : "Sign In"}
           containerStyle={styles.button}
           onPress={handleSubmit(onSubmit)}
         />
@@ -252,6 +259,16 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: 20,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginLeft: 10,
+    color: theme.COLORS.white,
+    ...theme.FONTS.Mulish_600SemiBold,
+    fontSize: 16,
   },
 });
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import {
   View,
@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { components } from "../../components";
 import { blogService } from "../../api/blog";
 import { skeletonLoader } from "../../components/skeletonLoaders";
 import { usePermissions } from "../../common/context/PermissionContext";
@@ -85,10 +84,10 @@ const ListBlogs: React.FC = () => {
   const renderHeader = () => {
     return (
       <Header1
-            title="Blog Lists"
-            showBackButton={true}
-            onBackPress={() => navigation.goBack()}
-        />
+        title="Blog Lists"
+        showBackButton={true}
+        onBackPress={() => navigation.goBack()}
+      />
     );
   };
 
@@ -140,7 +139,7 @@ const ListBlogs: React.FC = () => {
                     navigation.navigate("EditBlog", { blogId: blog.id })
                   }
                 >
-                  <Ionicons name="pencil" size={24} color="blue" />
+                  <MaterialIcons name="edit" size={24} />
                 </TouchableOpacity>
               )}
               {hasPermission(permissions, "Blogs", "Delete") && (
@@ -148,7 +147,7 @@ const ListBlogs: React.FC = () => {
                   style={styles.actionIcon}
                   onPress={() => handleDelete(blog.id)}
                 >
-                  <Ionicons name="trash" size={24} color="red" />
+                  <MaterialIcons name="delete" size={24} />
                 </TouchableOpacity>
               )}
             </View>
@@ -210,19 +209,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 8,
     color: "#333333",
-    ...theme.FONTS.Mulish_700Bold
+    ...theme.FONTS.Mulish_700Bold,
   },
   date: {
     fontSize: 14,
     color: "#888888",
     marginBottom: 12,
-    ...theme.FONTS.Mulish_400Regular
+    ...theme.FONTS.Mulish_400Regular,
   },
   shortDescription: {
     fontSize: 16,
     color: "#444444",
     lineHeight: 22,
-    ...theme.FONTS.Mulish_400Regular
+    ...theme.FONTS.Mulish_400Regular,
   },
   readMoreButton: {
     marginTop: 12,
@@ -234,7 +233,7 @@ const styles = StyleSheet.create({
   },
   readMoreText: {
     color: theme.COLORS.white,
-    fontSize: 12,
+    fontSize: 14,
     ...theme.FONTS.Mulish_600SemiBold,
   },
   actionIcon: {

@@ -1,17 +1,23 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { theme } from '../constants/theme';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { theme } from "../constants/theme";
 
 interface ColorfulCardProps {
   title?: string;
   description?: string;
   icon?: any;
-  cardColor?: string;  
-  iconColor?: string;  
+  cardColor?: string;
+  iconColor?: string;
 }
 
-const ColorfulCard: React.FC<ColorfulCardProps> = ({ title, description, icon, cardColor = '#FF6F61', iconColor = '#fff' }) => {
+const ColorfulCard: React.FC<ColorfulCardProps> = ({
+  title,
+  description,
+  icon,
+  cardColor = "#FF6F61",
+  iconColor = theme.COLORS.white,
+}) => {
   return (
     <View style={[styles.card, { backgroundColor: cardColor }]}>
       <View style={styles.content}>
@@ -28,11 +34,11 @@ const ColorfulCard: React.FC<ColorfulCardProps> = ({ title, description, icon, c
 const styles = StyleSheet.create({
   card: {
     borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: theme.COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -43,23 +49,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff',
-    ...theme.FONTS.Mulish_700Bold
+    color: theme.COLORS.white,
+    ...theme.FONTS.Mulish_700Bold,
   },
   description: {
     fontSize: 30,
-    fontWeight: 'bold',
-    color: '#fff',
-    ...theme.FONTS.Mulish_400Regular
+    color: theme.COLORS.white,
+    ...theme.FONTS.Mulish_400Regular,
   },
   icon: {
     marginLeft: 20,
-    borderColor: "white",
+    borderColor: theme.COLORS.white,
     borderWidth: 2,
     padding: 10,
-    borderRadius: 50
+    borderRadius: 50,
   },
 });
 

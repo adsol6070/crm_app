@@ -77,7 +77,7 @@ class LeadService {
     return makeRequest<void>("delete", `/lead/${leadId}`);
   }
   async getVisaCategory() {
-    return makeRequest("get", "/lead/visaCategory");
+    return makeRequest<any[]>("get", "/lead/visaCategory");
   }
   async createVisaCategory(payload: any) {
     return makeRequest("post", "/lead/visaCategory", payload);
