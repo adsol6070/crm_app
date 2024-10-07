@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { Controller, useForm } from "react-hook-form";
@@ -127,44 +128,48 @@ const BlogCategory = () => {
         }}
       />
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={isEditModalVisible}
         onRequestClose={closeEditModal}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Category</Text>
-            <Controller
-              name="category"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <components.InputField
-                  title="Category"
-                  placeholder="Enter category name"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                  error={errors.category?.message}
+        <TouchableWithoutFeedback onPress={() => closeEditModal()}>
+          <View style={styles.modalContainer}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Edit Category</Text>
+                <Controller
+                  name="category"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <components.InputField
+                      title="Category"
+                      placeholder="Enter category name"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={errors.category?.message}
+                    />
+                  )}
                 />
-              )}
-            />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={handleSubmit(handleEdit)}
-              >
-                <Text style={styles.modalButtonText}>Save</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButtonCancel}
-                onPress={closeEditModal}
-              >
-                <Text style={styles.modalButtonTextCancel}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleSubmit(handleEdit)}
+                  >
+                    <Text style={styles.modalButtonText}>Save</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalButtonCancel}
+                    onPress={closeEditModal}
+                  >
+                    <Text style={styles.modalButtonTextCancel}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </>
   );
@@ -177,7 +182,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.8)",
   },
   modalContent: {
     width: 300,

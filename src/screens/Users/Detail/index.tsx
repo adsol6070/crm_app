@@ -23,6 +23,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import Header1 from "../../../components/Header1";
 import { PartialUser } from "../../../types";
+import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
 
 const UserDetail = () => {
   const navigation = useNavigation();
@@ -248,7 +249,9 @@ const UserDetail = () => {
           <Text style={styles.userName}>
             {user?.firstname || "John"} {user?.lastname || "Doe"}
           </Text>
-          <Text style={styles.userRole}>{user?.role || "User"}</Text>
+          <Text style={styles.userRole}>
+            {formatRoleDisplayName(user?.role) || "User"}
+          </Text>
         </View>
 
         <View style={styles.detailsContainer}>

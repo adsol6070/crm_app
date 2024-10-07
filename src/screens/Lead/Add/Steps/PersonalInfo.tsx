@@ -4,7 +4,12 @@ import { Control, Controller, FieldErrors } from "react-hook-form";
 import { components } from "../../../../components";
 import { PersonalInfoData } from "../interfaces";
 import { theme } from "../../../../constants/theme";
-import { genderOptions, maritalStatusOptions, nationalityOptions } from "../../../../utils/options";
+import {
+  nationalityOptions,
+  genderOptions,
+  maritalStatusOptions,
+} from "../../../../utils/options";
+import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
 
 interface PersonalInfoProps {
   control: Control<PersonalInfoData>;
@@ -21,9 +26,8 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
   clearErrors,
   trigger,
   countryCode,
-  setCountryCode
+  setCountryCode,
 }) => {
-
   const handleFieldChange = useCallback(
     async (field: keyof PersonalInfoData) => {
       const result = await trigger(field);
@@ -89,21 +93,19 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
         />
       ))}
 
-      {[
-        "gender",
-        "nationality",
-        "maritalStatus",
-        // "country",
-        // "state",
-        // "district",
-      ].map((field, index) => (
+      {["gender", "nationality", "maritalStatus"].map((field, index) => (
         <Controller
           key={index}
           control={control}
           name={field as keyof PersonalInfoData}
           render={({ field: { onChange, value } }) => (
             <components.Dropdown
-              options={getDropdownOptions(field, genderOptions, nationalityOptions, maritalStatusOptions)}
+              options={getDropdownOptions(
+                field,
+                genderOptions,
+                nationalityOptions,
+                maritalStatusOptions
+              )}
               selectedValue={value}
               onSelect={(value: string) => {
                 onChange(value);
@@ -119,9 +121,6 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
     </View>
   );
 };
-
-const capitalizeFirstLetter = (string: string) =>
-  string.charAt(0).toUpperCase() + string.slice(1);
 
 const getPlaceholder = (field: string) => {
   switch (field) {
@@ -139,12 +138,6 @@ const getPlaceholder = (field: string) => {
       return "Select an option";
     case "maritalStatus":
       return "Select an option";
-    // case "country":
-    //   return "Select an option";
-    // case "state":
-    //   return "Select an option";
-    // case "district":
-    //   return "Select an option";
     case "pincode":
       return "000000";
     case "currentAddress":
@@ -156,7 +149,12 @@ const getPlaceholder = (field: string) => {
   }
 };
 
-const getDropdownOptions = (field: string, genderOptions: string[], nationalityOptions: string[], maritalStatusOptions: string[]) => {
+const getDropdownOptions = (
+  field: string,
+  genderOptions: any[],
+  nationalityOptions: any[],
+  maritalStatusOptions: any[]
+) => {
   switch (field) {
     case "gender":
       return genderOptions;
@@ -164,10 +162,6 @@ const getDropdownOptions = (field: string, genderOptions: string[], nationalityO
       return nationalityOptions;
     case "maritalStatus":
       return maritalStatusOptions;
-    // case "country":
-    // case "state":
-    // case "district":
-    //   return ["Option 1", "Option 2", "Option 3"];
     default:
       return [];
   }

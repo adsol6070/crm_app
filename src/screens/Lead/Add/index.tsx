@@ -12,7 +12,7 @@ import { components } from "../../../components";
 import PersonalInfo from "./Steps/PersonalInfo";
 import AcademicInfo from "./Steps/AcademicInfo";
 import ImmigrationInfo from "./Steps/ImmigrationInfo";
-import FinalDetails from "./Steps/FinalDetails"; 
+import FinalDetails from "./Steps/FinalDetails";
 import LeadPreview from "./Steps/LeadPreview";
 
 import {
@@ -25,7 +25,6 @@ import {
 import { VALIDATION_SCHEMAS } from "./validations";
 import { leadService } from "../../../api/lead";
 
-// Constants for the step labels and styles
 const STEP_LABELS = [
   "Personal Details",
   "Academic Details",
@@ -147,8 +146,8 @@ const AddLead = () => {
     } else {
       const updatedData = {
         ...data,
-        phone: `${countryCode} ${data.phone}`
-      }
+        phone: `${countryCode} ${data.phone}`,
+      };
       try {
         await leadService.createLead(updatedData);
         reset();
@@ -229,7 +228,9 @@ const AddLead = () => {
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          currentStep !== STEP_LABELS.length - 1 && (
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          )
         }
       >
         <View style={styles.formContainer}>{renderStepContent()}</View>

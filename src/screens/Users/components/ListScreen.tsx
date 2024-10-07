@@ -4,7 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { theme } from "../../../constants/theme";
-import { capitalizeFirstLetter } from "../../../utils/CapitalizeFirstLetter";
 import { usePermissions } from "../../../common/context/PermissionContext";
 import { hasPermission } from "../../../utils/HasPermission";
 import { Controller, useForm } from "react-hook-form";
@@ -116,11 +115,9 @@ const ListScreen = <T extends {}>({
       });
     }
 
-    if (selectedFilter && selectedFilter !== "All") {
+    if (selectedFilter && selectedFilter !== "all") {
       results = results.filter((item) => {
-        return (
-          item[filterProperty]?.toLowerCase() === selectedFilter.toLowerCase()
-        );
+        return item[filterProperty] === selectedFilter;
       });
     }
 
@@ -348,7 +345,7 @@ const ListScreen = <T extends {}>({
                   {filterOptions?.map((option, index) => (
                     <Picker.Item
                       key={index}
-                      label={capitalizeFirstLetter(option.label)}
+                      label={option.label}
                       value={option.value}
                     />
                   ))}

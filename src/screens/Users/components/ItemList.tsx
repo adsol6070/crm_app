@@ -2,6 +2,7 @@ import React from "react";
 import { View, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { theme } from "../../../constants/theme";
+import { v4 as uuidv4 } from "uuid";
 
 interface ActionConfig {
   iconName: string;
@@ -85,7 +86,7 @@ const ItemList: React.FC<ItemListProps> = ({
     <FlatList
       data={data}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={() => uuidv4()}
       refreshing={refreshing}
       onRefresh={onRefresh}
     />

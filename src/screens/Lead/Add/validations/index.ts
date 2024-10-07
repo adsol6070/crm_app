@@ -13,9 +13,6 @@ export const VALIDATION_SCHEMAS = {
     gender: Yup.string().required("Please select your Gender"),
     nationality: Yup.string().required("Please enter your Nationality"),
     maritalStatus: Yup.string().required("Please select your Marital Status"),
-    // country: Yup.string().required("Please enter your Country"),
-    // state: Yup.string().required("Please enter your State"),
-    // district: Yup.string().required("Please enter your District"),
     pincode: Yup.string()
       .required("Please enter your Pincode")
       .matches(/^[0-9]{6}$/, "Pincode must be exactly 6 digits")

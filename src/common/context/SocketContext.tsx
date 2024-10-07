@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
 import SocketManager from "../../socket";
 
-const socketUrl = "http://192.168.1.14:8000";
+const socketUrl = "http://192.168.1.34:8000";
 const socketManager = SocketManager.getInstance(socketUrl);
 
 const SocketContext = createContext<SocketManager | null>(null);

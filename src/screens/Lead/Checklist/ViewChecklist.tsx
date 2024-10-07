@@ -4,6 +4,7 @@ import { theme } from "../../../constants/theme";
 import ListScreen from "../../Users/components/ListScreen";
 import { checklistService } from "../../../api/checklist";
 import { useRef } from "react";
+import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
 
 const ViewChecklist = () => {
   const navigation = useNavigation();
@@ -48,7 +49,7 @@ const ViewChecklist = () => {
       skeletonWithImage={false}
       onItemPress={handleItemPress}
       centerComponent={(item) => (
-        <Text style={theme.FONTS.H4}>{item.visaType}</Text>
+        <Text style={theme.FONTS.H4}>{formatRoleDisplayName(item.visaType)}</Text>
       )}
       actionConfigs={[
         {

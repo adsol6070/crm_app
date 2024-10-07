@@ -30,6 +30,11 @@ import {
 } from "../../utils/Calculateoptions";
 import { crsService } from "../../api/crscalculator";
 
+interface Option {
+  label: string;
+  value: string;
+}
+
 interface ImageObject {
   uri: string;
   name: string;
@@ -241,7 +246,6 @@ const Calculatecrs = () => {
       };
 
       try {
-        console.log("Data 1", dataToSave);
         await crsService.saveScore(dataToSave);
         Alert.alert("Score saved successfully");
       } catch (error) {
@@ -672,7 +676,7 @@ const renderFormInput = (
   image?: ImageObject | null,
   handleImageSelect?: (image: any) => void,
   isDropdown = false,
-  options?: string[],
+  options?: Option[],
   onSelect?: (value: string) => void
 ) => (
   <Controller
@@ -681,12 +685,11 @@ const renderFormInput = (
     render={({ field: { onChange, onBlur, value } }) =>
       isDropdown ? (
         <components.Dropdown
-          options={options || []}
-          selectedValue={capitalizeFirstLetter(value)}
+          options={options}
+          selectedValue={value}
           onSelect={(value: string) => {
-            const val = value.toLowerCase();
-            onChange(val);
-            if (onSelect) onSelect(val);
+            onChange(value);
+            if (onSelect) onSelect(value);
           }}
           placeholder={placeholder}
           label={title}

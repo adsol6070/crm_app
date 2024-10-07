@@ -1,3 +1,4 @@
+import * as yup from "yup";
 import { useRef, useState } from "react";
 import {
   Alert,
@@ -12,7 +13,7 @@ import { components } from "../../components";
 import { leadService } from "../../api/lead";
 import { theme } from "../../constants/theme";
 import ListScreen from "../Users/components/ListScreen";
-import * as yup from "yup";
+import { formatRoleDisplayName } from "../../utils/FormatRoleDisplayName";
 
 const VisaCategory = () => {
   const refreshRef = useRef<() => void>(() => {});
@@ -31,7 +32,11 @@ const VisaCategory = () => {
       .string()
       .required("Category is required")
       .min(2, "Category must be at least 2 characters")
-      .max(30, "Category must be less than 30 characters"),
+      .max(30, "Category must be less than 30 characters")
+      .matches(
+        /^[a-z_]+$/,
+        "Category name must be lowercase with underscores only."
+      ),
   });
 
   const onSubmit = async (data: any) => {
@@ -99,7 +104,11 @@ const VisaCategory = () => {
         placeholder="Search Category..."
         skeletonWithImage={false}
         centerComponent={(item) => {
-          return <Text style={theme.FONTS.H4}>{item.category}</Text>;
+          return (
+            <Text style={theme.FONTS.H4}>
+              {formatRoleDisplayName(item.category)}
+            </Text>
+          );
         }}
         actionConfigs={[
           {
@@ -120,7 +129,7 @@ const VisaCategory = () => {
         singleInputConfig={{
           name: "category",
           title: "Category",
-          inputPlaceholder: "Enter Visa Category",
+          inputPlaceholder: "e.g. student_visa, visitor_visa",
           buttonText: "Add Category",
           onSubmit: (data) => onSubmit(data),
           validationSchema: validationSchema,

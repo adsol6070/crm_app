@@ -16,6 +16,7 @@ import SkeletonLoader from "./ProfileSkeletonLoader";
 import { IUserProfile } from "../types";
 import { usePermissions } from "../common/context/PermissionContext";
 import { hasPermission } from "../utils/HasPermission";
+import { formatRoleDisplayName } from "../utils/FormatRoleDisplayName";
 
 const Drawer = createDrawerNavigator();
 
@@ -62,7 +63,7 @@ const CustomDrawerContent = (props: any) => {
         <Text style={styles.profileName}>
           {userProfile?.firstname} {userProfile?.lastname}
         </Text>
-        <Text style={styles.profileRole}>{userProfile?.role}</Text>
+        <Text style={styles.profileRole}>{formatRoleDisplayName(userProfile?.role)}</Text>
       </View>
     );
   };
@@ -176,7 +177,7 @@ const CustomDrawerContent = (props: any) => {
   const renderDrawerItems = () => {
     return drawerItems.map((item, index) => {
       if (["Roles and Permissions", "View Roles"].includes(item.label)) {
-        if (user?.role !== "superAdmin") {
+        if (user?.role !== "super_admin") {
           return null;
         }
       }

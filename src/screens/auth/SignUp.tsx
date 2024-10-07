@@ -100,7 +100,7 @@ const SignUp = () => {
       formData.append("email", data.email);
       formData.append("password", data.password);
       formData.append("phone", `${countryCode}${data.phone}`);
-      formData.append("role", "superAdmin");
+      formData.append("role", "super_admin");
       formData.append("uploadType", "User");
 
       if (image) {
@@ -108,7 +108,6 @@ const SignUp = () => {
       }
 
       const response = await authService.register(formData);
-      console.log("Response:", response);
 
       Toast.show({
         type: "success",

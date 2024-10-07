@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import ListScreen from "../Users/components/ListScreen";
 import { leadService } from "../../api/lead";
 import { theme } from "../../constants/theme";
+import { formatRoleDisplayName } from "../../utils/FormatRoleDisplayName";
 
 const ListLeads = () => {
   const navigation = useNavigation();
@@ -20,10 +21,10 @@ const ListLeads = () => {
       const newCategories = response.map((category: any) => {
         return {
           value: category.category,
-          label: category.category,
+          label: formatRoleDisplayName(category.category),
         };
       });
-      setVisaCategories([{ value: "All", label: "All" }, ...newCategories]);
+      setVisaCategories([{ value: "all", label: "All" }, ...newCategories]);
     } catch (error) {
       console.error("Error fetching visa categories", error);
     }
@@ -43,7 +44,6 @@ const ListLeads = () => {
           onPress: async () => {
             try {
               await leadService.deleteLead(id);
-              // refreshPermissions();
               refreshRef.current?.();
             } catch (error) {
               console.error("Error deleting lead:", error);

@@ -1,366 +1,190 @@
-import React, { useState, useCallback } from "react";
+import { useRef, useState } from "react";
 import {
-	View,
-	Text,
-	StyleSheet,
-	TouchableOpacity,
-	TextInput,
-	FlatList,
-	Modal,
-	Alert,
+  Alert,
+  Linking,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import SkeletonLoader from "../Users/SkeletonLoader";
 import { theme } from "../../constants/theme";
 import { crsService } from "../../api/crscalculator";
-import { components } from "../../components";
-import { hasPermission } from "../../utils/HasPermission";
-import { usePermissions } from "../../common/context/PermissionContext";
 import { useAuth } from "../../common/context/AuthContext";
+import ListScreen from "../Users/components/ListScreen";
 
 const ScoreList = () => {
-	const navigation = useNavigation();
-	const [search, setSearch] = useState<string>("");
-	const { user } = useAuth();
-	const [isModalVisible, setModalVisible] = useState(false);
-	const [refreshing, setRefreshing] = useState<boolean>(false);
-	const [selectedItem, setSelectedItem] = useState<any>(null);
-	const [filteredScores, setFilteredScores] = useState<any[]>([]);
-	const [allScores, setAllScores] = useState<any[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
-	const { permissions, refreshPermissions } = usePermissions();
+  const { user } = useAuth();
+  const refreshRef = useRef<() => void>();
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isModalVisible, setModalVisible] = useState<boolean>(false);
 
-	const handleSearch = (text: string) => {
-		setSearch(text);
-		if (text === "") {
-			setFilteredScores(allScores);
-		} else {
-			const filteredData = allScores.filter((score) =>
-				score.name.toLowerCase().includes(text.toLowerCase())
-			);
-			setFilteredScores(filteredData);
-		}
-	};
+  const toggleModal = (item: any) => {
+    setSelectedItem(item);
+    setModalVisible(!isModalVisible);
+  };
 
-	const fetchScores = async () => {
-		setLoading(true);
-		try {
-			const response: any = await crsService.getAllScores();
-			setAllScores(response);
-			setFilteredScores(response);
-		} catch (error) {
-			console.error("Error fetching scores:", error);
-		} finally {
-			setLoading(false);
-		}
-	};
+  const getScoreColor = (score: any) => {
+    if (score >= 80) return "green";
+    if (score >= 50) return "orange";
+    return "red";
+  };
 
-	const onRefresh = useCallback(() => {
-		setRefreshing(true);
-		refreshPermissions();
-		fetchScores().finally(() => setRefreshing(false));
-	}, []);
+  const handleDelete = (id: string) => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this score?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              await crsService.deleteScoreById(id);
+              refreshRef.current?.();
+            } catch (error) {
+              console.error("Error deleting score:", error);
+            }
+          },
+        },
+      ]
+    );
+  };
 
+  const handleDeleteAll = async () => {
+    try {
+      await crsService.deleteAllScores(user?.sub);
+    } catch (error) {
+      console.error("Error deleting score:", error);
+    }
+  };
 
-	const handleDelete = (id: string) => {
-		Alert.alert(
-			"Confirm Deletion",
-			"Are you sure you want to delete this score?",
-			[
-				{
-					text: "Cancel",
-					style: "cancel",
-				},
-				{
-					text: "OK",
-					onPress: async () => {
-						try {
-							await crsService.deleteScoreById(id);
-							fetchScores();
-						} catch (error) {
-							console.error("Error deleting score:", error);
-						}
-					},
-				},
-			]
-		);
-	};
-
-	const handleDeleteAll = () => {
-		Alert.alert(
-			"Confirm Deletion",
-			"Are you sure you want to delete all scores?",
-			[
-				{
-					text: "Cancel",
-					style: "cancel",
-				},
-				{
-					text: "OK",
-					onPress: async () => {
-						try {
-							await crsService.deleteAllScores(user?.sub);
-							fetchScores();
-						} catch (error) {
-							console.error("Error deleting score:", error);
-						}
-					},
-				},
-			]
-		);
-	};
-
-	useFocusEffect(
-		useCallback(() => {
-			fetchScores();
-			refreshPermissions();
-		}, [])
-	);
-
-	const getScoreColor = (score: any) => {
-		if (score >= 80) return "green";
-		if (score >= 50) return "orange";
-		return "red";
-	};
-
-	const renderItem = ({ item }: { item: any }) => {
-		const toggleModal = () => {
-			setSelectedItem(item);
-			setModalVisible(!isModalVisible);
-		};
-
-		return (
-			<View style={styles.itemContainer}>
-				<View>
-					<Text style={styles.nameText}>{item.name}</Text>
-					<Text style={styles.scoreText}>Score: {item.score}</Text>
-				</View>
-				<View style={styles.actionStyles}>
-					<TouchableOpacity onPress={toggleModal} style={styles.detailsButton}>
-						<Text style={styles.detailsButtonText}>View Details</Text>
-					</TouchableOpacity>
-					{hasPermission(permissions, 'Scores', 'Delete') &&
-						<TouchableOpacity onPress={() => { handleDelete(item.id) }}>
-							<MaterialIcons name="delete" size={20} color="red" />
-						</TouchableOpacity>}
-				</View>
-			</View>
-		);
-	};
-
-	return (
-		<SafeAreaView style={styles.container}>
-			<components.Header1
-				title="View Results"
-				showBackButton={true}
-				onBackPress={() => navigation.goBack()}
-			/>
-			<View style={{ flex: 1 }}>
-				<View
-					style={{
-						marginHorizontal: 22,
-						flexDirection: "row",
-						alignItems: "center",
-						backgroundColor: theme.COLORS.secondaryWhite,
-						height: 48,
-						marginVertical: 22,
-						paddingHorizontal: 12,
-						borderRadius: 22,
-					}}
-				>
-					<Ionicons name="search" size={24} color={theme.COLORS.black} />
-					<TextInput
-						style={{ width: "100%", height: "100%", marginHorizontal: 12 }}
-						value={search}
-						onChangeText={handleSearch}
-						placeholder="Search by name..."
-					/>
-				</View>
-				<View style={styles.countContainer}>
-					{loading ? (
-						<SkeletonLoader countOnly={true} withImage={false} />
-					) : (
-						<View style={styles.deleteAll}>
-							{hasPermission(permissions, 'Scores', 'DeleteAll') &&
-								<TouchableOpacity onPress={() => { handleDeleteAll() }}>
-									<Text style={styles.deleteAllBtn}>Delete All</Text>
-								</TouchableOpacity>}
-							<Text style={styles.countText}>
-								{filteredScores.length === 0
-									? "0 Results found"
-									: `${filteredScores.length} ${filteredScores.length === 1 ? "Result" : "Results"
-									}`}
-							</Text>
-						</View>
-					)}
-				</View>
-				<View style={{ flex: 1 }}>
-					{loading ? (
-						Array.from({ length: 8 }).map((_, index) => (
-							<SkeletonLoader key={index} />
-						))
-					) : filteredScores.length === 0 ? (
-						<View style={styles.noTextContainer}><Text style={styles.noText}>No results found</Text></View>
-					) : (
-						<FlatList
-							data={filteredScores}
-							renderItem={renderItem}
-							keyExtractor={(item) => item.id.toString()}
-							refreshing={refreshing}
-							onRefresh={onRefresh}
-						/>
-					)}
-				</View>
-			</View>
-
-			{selectedItem && (
-				<Modal
-					visible={isModalVisible}
-					animationType="slide"
-					transparent={true}
-					onRequestClose={() => setModalVisible(false)}
-				>
-					<View style={styles.modalContainer}>
-						<View style={styles.modalContent}>
-							<Text style={styles.modalTitle}>Score Card</Text>
-							<Text style={{ textAlign: "center", color: getScoreColor(selectedItem.score), fontSize: 24, fontWeight: 'bold' }}>
-								Score: {selectedItem.score}
-							</Text>
-							<Text>Name: {selectedItem.name}</Text>
-							<Text>Age: {selectedItem.age}</Text>
-							<Text>Canadian Degree: {selectedItem.canadian_degree}</Text>
-							<Text>Canadian Experience: {selectedItem.canadian_experience}</Text>
-							<Text>Education: {selectedItem.education}</Text>
-							<Text>Email: {selectedItem.email}</Text>
-							<Text>First Language: {selectedItem.first_language}</Text>
-							<Text>Foreign Experience: {selectedItem.foreign_experience}</Text>
-							<Text>Job Offer: {selectedItem.job_offer}</Text>
-							<Text>Provincial Nomination: {selectedItem.provincial_nomination}</Text>
-							<Text>Spouse: {selectedItem.spouse}</Text>
-							<Text>Spouse Education: {selectedItem.spouse_education}</Text>
-							<Text>Spouse Experience: {selectedItem.spouse_experience}</Text>
-							<Text>Spouse Language: {selectedItem.spouse_language}</Text>
-							<TouchableOpacity
-								onPress={() => setModalVisible(false)}
-								style={styles.closeButton}
-							>
-								<Text style={styles.closeButtonText}>Close</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</Modal>
-			)}
-		</SafeAreaView>
-	);
+  return (
+    <>
+      <ListScreen
+        title="Results"
+        fetchData={crsService.getAllScores}
+        placeholder="Search by name..."
+        centerComponent={(item) => (
+          <View style={{ flexDirection: "column" }}>
+            <Text style={theme.FONTS.H4}>{item.name}</Text>
+            <Text style={theme.FONTS.Mulish_400Regular}>
+              Score: {item.score}
+            </Text>
+          </View>
+        )}
+        actionConfigs={[
+          {
+            iconName: "eye",
+            iconType: "AntDesign",
+            onPress: (item) => toggleModal(item),
+            size: 20,
+          },
+          {
+            iconName: "delete",
+            iconType: "MaterialIcons",
+            onPress: (item) => handleDelete(item.id),
+            size: 20,
+          },
+        ]}
+        refreshRef={refreshRef}
+        deleteAllData={handleDeleteAll}
+        searchKey="name"
+      />
+      {selectedItem && (
+        <Modal
+          visible={isModalVisible}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContent}>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: getScoreColor(selectedItem.score),
+                      fontSize: 24,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Score: {selectedItem.score}
+                  </Text>
+                  <Text>Name: {selectedItem.name}</Text>
+                  <Text>Age: {selectedItem.age}</Text>
+                  <Text>Canadian Degree: {selectedItem.canadian_degree}</Text>
+                  <Text>
+                    Canadian Experience: {selectedItem.canadian_experience}
+                  </Text>
+                  <Text>Education: {selectedItem.education}</Text>
+                  <Text>Email: {selectedItem.email}</Text>
+                  <Text>First Language: {selectedItem.first_language}</Text>
+                  <Text>
+                    Foreign Experience: {selectedItem.foreign_experience}
+                  </Text>
+                  <Text>Job Offer: {selectedItem.job_offer}</Text>
+                  <Text>
+                    Provincial Nomination: {selectedItem.provincial_nomination}
+                  </Text>
+                  <Text>Spouse: {selectedItem.spouse}</Text>
+                  <Text>Spouse Education: {selectedItem.spouse_education}</Text>
+                  <Text>
+                    Spouse Experience: {selectedItem.spouse_experience}
+                  </Text>
+                  <Text>Spouse Language: {selectedItem.spouse_language}</Text>
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(false)}
+                    style={styles.closeButton}
+                  >
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      )}
+    </>
+  );
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: theme.COLORS.white,
-	},
-	itemContainer: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		marginVertical: 10,
-		paddingHorizontal: 20,
-		paddingVertical: 10,
-		backgroundColor: "#f9f9f9",
-		borderRadius: 8,
-	},
-	actionStyles: {
-		width: 150,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-around'
-	},
-	nameText: {
-		fontSize: 18,
-		fontWeight: "bold",
-		color: "#333",
-	},
-	deleteAll: {
-		flex: 1,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-	deleteAllBtn: {
-		backgroundColor: 'red',
-		color: 'white',
-		paddingHorizontal: 10,
-		paddingVertical: 5,
-		borderRadius: 50,
-	},
-	scoreText: {
-		fontSize: 16,
-		color: "#555",
-	},
-	detailsButton: {
-		backgroundColor: "#007bff",
-		paddingVertical: 5,
-		paddingHorizontal: 10,
-		borderRadius: 5,
-	},
-	detailsButtonText: {
-		color: "#fff",
-		fontSize: 14,
-	},
-	modalContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "rgba(0,0,0,0.5)",
-	},
-	modalContent: {
-		width: "90%",
-		backgroundColor: "#fff",
-		padding: 20,
-		borderRadius: 10,
-	},
-	modalTitle: {
-		fontSize: 20,
-		fontWeight: "bold",
-		marginBottom: 10,
-		color: "#333",
-	},
-	closeButton: {
-		marginTop: 20,
-		backgroundColor: "#dc3545",
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-		borderRadius: 5,
-		alignItems: "center",
-	},
-	closeButtonText: {
-		color: "#fff",
-		fontSize: 16,
-	},
-	countContainer: {
-		marginHorizontal: 22,
-		marginBottom: 5,
-		flexDirection: "row",
-		justifyContent: "flex-end",
-	},
-	countText: {
-		fontSize: 18,
-		color: theme.COLORS.black,
-	},
-	noTextContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		paddingBottom: 150,
-		backgroundColor: theme.COLORS.white,
-	},
-	noText: {
-		fontSize: 20,
-		color: theme.COLORS.black,
-		fontWeight: "bold",
-	},
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: "#dc3545",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
 });
 
 export default ScoreList;

@@ -29,6 +29,8 @@ const schema = yup.object().shape({
   role: yup
     .string()
     .required("Role Name is required")
+    .min(2, "Role must be at least 2 characters")
+    .max(30, "Role must be less than 30 characters")
     .matches(/^[a-z_]+$/, "Role name must be lowercase with underscores only."),
 });
 
@@ -212,7 +214,7 @@ const RoleManager = () => {
           render={({ field: { onChange, onBlur, value } }) => (
             <components.InputField
               title="Role"
-              placeholder="Enter role name"
+              placeholder="e.g. admin, technical_staff"
               containerStyle={{ marginBottom: 20 }}
               onChangeText={onChange}
               onBlur={onBlur}
