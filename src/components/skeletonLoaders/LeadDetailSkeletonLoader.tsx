@@ -29,12 +29,10 @@ const LeadDetailSkeletonLoader = () => {
 
   return (
     <View style={styles.skeletonContainer}>
-      {/* Skeleton for the Visa Filter and Delete All button */}
       <View style={styles.skeletonStatusContainer}>
         <Animated.View style={[styles.skeletonStatus, { backgroundColor }]} />
       </View>
 
-      {/* Skeleton items for the leads */}
       {[...Array(4)].map((_, index) => (
         <View key={index} style={styles.skeletonItem}>
           <Animated.View
@@ -57,8 +55,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   skeletonStatus: {
-    width: "40%",
-    height: 30,
+    width: "100%",
+    height: 40,
     borderRadius: 10,
   },
   skeletonItem: {

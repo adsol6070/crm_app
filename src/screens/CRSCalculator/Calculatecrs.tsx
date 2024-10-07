@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Header1 from "../../components/Header1";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../constants/theme";
-import { ScrollView } from "react-native-gesture-handler";
+import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import { components } from "../../components";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -71,7 +71,7 @@ const Calculatecrs = () => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const scaleValue = useState(new Animated.Value(0))[0];
-  const [hasSpouse, setHasSpouse] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const schema = yup.object().shape({
     name: yup.string().required("Please enter your name").trim(),
@@ -121,16 +121,6 @@ const Calculatecrs = () => {
     spouse_experience: yup.string().nullable(),
   });
 
-  // const openModal = () => {
-  //   setModalVisible(true);
-  //   Animated.spring(scaleValue, {
-  //     toValue: 1,
-  //     useNativeDriver: true,
-  //     friction: 5,
-  //     tension: 200,
-  //   }).start();
-  // };
-
   const closeModal = () => {
     Animated.timing(scaleValue, {
       toValue: 0,
@@ -138,6 +128,14 @@ const Calculatecrs = () => {
       useNativeDriver: true,
     }).start(() => setModalVisible(false));
   };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    reset();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
 
   const getScoreColor = (score: any) => {
     if (score >= 80) return "green";
@@ -529,7 +527,9 @@ const Calculatecrs = () => {
   return (
     <SafeAreaView style={styles.container}>
       {renderHeader()}
-      <ScrollView>{renderContent()}</ScrollView>
+      <ScrollView refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>{renderContent()}</ScrollView>
       {loading && <components.Spinner />}
       <Modal
         animationType="fade"
@@ -760,6 +760,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
+    flexWrap: "wrap",
     marginBottom: 4,
   },
   modalHeading: {

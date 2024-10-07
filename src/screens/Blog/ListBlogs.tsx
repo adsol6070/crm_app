@@ -17,6 +17,7 @@ import { usePermissions } from "../../common/context/PermissionContext";
 import { hasPermission } from "../../utils/HasPermission";
 import Header1 from "../../components/Header1";
 import { theme } from "../../constants/theme";
+import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 
 type RootStackParamList = {
   ReadBlog: { blogId: string };
@@ -116,8 +117,7 @@ const ListBlogs: React.FC = () => {
         <View style={styles.contentContainer}>
           <Text style={styles.title}>{blog.title}</Text>
           <Text style={styles.date}>
-            {new Date(blog.created_at).toLocaleDateString()} -{" "}
-            {blog.category == "Null" ? "N/A" : blog.category}
+            {new Date(blog.created_at).toLocaleDateString()} - {blog.category == "Null"? "N/A": capitalizeFirstLetter(blog.category)}
           </Text>
           <Text style={styles.shortDescription} numberOfLines={2}>
             {blog.description}

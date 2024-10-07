@@ -149,10 +149,6 @@ const LeadActions = () => {
     });
   };
 
-  const renderHeader = () => (
-    <components.Header title="Lead Actions" goBack={true} />
-  );
-
   const renderStatusPicker = () => (
     <View style={styles.pickerContainer}>
       <Picker
@@ -301,6 +297,7 @@ const AssignModal = ({
         <Text style={styles.modalTitle}>Assign Lead</Text>
         <FlatList
           data={assignees}
+          style={styles.assigneeListContainer}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -345,131 +342,138 @@ const ActionButton = ({ title, iconName, iconColor, onPress }: any) => (
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.COLORS.tertiaryWhite,
-  },
-  scrollView: {
-    flexGrow: 1,
-  },
-  contentContainer: {
-    flex: 1,
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-  leadDetailArea: {
-    marginBottom: 20,
-    backgroundColor: theme.COLORS.white,
-    borderRadius: 10,
-    padding: 10,
-    shadowColor: theme.COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  leadIdText: {
-    fontSize: 16,
-    color: theme.COLORS.black,
-    ...theme.FONTS.Mulish_700Bold,
-  },
-  leadNameText: {
-    fontSize: 18,
-    color: theme.COLORS.primary,
-    ...theme.FONTS.Mulish_600SemiBold,
-  },
-  statusUpdateContainer: {
-    margin: 10,
-  },
-  statusLabel: {
-    fontSize: 16,
-    color: theme.COLORS.black,
-    marginBottom: 5,
-    ...theme.FONTS.Mulish_700Bold,
-  },
-  pickerContainer: {
-    borderRadius: 5,
-    overflow: "hidden",
-  },
-  picker: {
-    height: 50,
-    color: theme.COLORS.white,
-  },
-  actionContainer: {
-    justifyContent: "space-around",
-    marginBottom: 5,
-  },
-  actionButton: {
-    alignItems: "center",
-    margin: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: theme.COLORS.white,
-    shadowColor: theme.COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  iconWrapper: {
-    marginBottom: 5,
-  },
-  actionButtonText: {
-    fontSize: 14,
-    color: theme.COLORS.black,
-    ...theme.FONTS.Mulish_600SemiBold,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: theme.COLORS.white,
-    marginHorizontal: 20,
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    marginBottom: 15,
-    color: theme.COLORS.black,
-    ...theme.FONTS.Mulish_700Bold,
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: theme.COLORS.lightGray,
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    color: theme.COLORS.black,
-    ...theme.FONTS.Mulish_400Regular,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    marginTop: 20,
-  },
-  modalButton: {
-    backgroundColor: theme.COLORS.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  modalButtonText: {
-    color: theme.COLORS.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
+    container: {
+        flex: 1,
+        backgroundColor: theme.COLORS.tertiaryWhite,
+    },
+    scrollView: {
+        flexGrow: 1,
+    },
+    contentContainer: {
+        flex: 1,
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+    },
+    leadDetailArea: {
+        marginBottom: 20,
+        backgroundColor: theme.COLORS.white,
+        borderRadius: 10,
+        padding: 10,
+        shadowColor: theme.COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 2,
+    },
+    leadIdText: {
+        fontSize: 16,
+        color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_700Bold
+    },
+    leadNameText: {
+        fontSize: 18,
+        color: theme.COLORS.primary,
+        ...theme.FONTS.Mulish_600SemiBold
+    },
+    statusUpdateContainer: {
+        marginBottom: 20,
+    },
+    statusLabel: {
+        fontSize: 16,
+        color: theme.COLORS.black,
+        marginBottom: 5,
+        ...theme.FONTS.Mulish_700Bold
+    },
+    pickerContainer: {
+        borderRadius: 5,
+        overflow: 'hidden',
+    },
+    picker: {
+        height: 50,
+        color: theme.COLORS.white,
+    },
+    actionContainer: {
+        justifyContent: 'space-around',
+        marginBottom: 5,
+    },
+    actionButton: {
+        alignItems: 'center',
+        margin: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        backgroundColor: theme.COLORS.white,
+        shadowColor: theme.COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 2,
+    },
+    iconWrapper: {
+        marginBottom: 5,
+    },
+    actionButtonText: {
+        fontSize: 14,
+        color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_600SemiBold
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: theme.COLORS.white,
+        marginHorizontal: 20,
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 18,
+        marginBottom: 15,
+        color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_700Bold
+    },
+    assigneeListContainer: {
+      maxHeight: "80%",
+      overflow: "scroll"
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomStartRadius: 20,
+        borderBottomEndRadius: 20,
+        width: "100%",
+        borderColor: theme.COLORS.lightGray,
+    },
+    checkboxLabel: {
+        fontSize: 16,
+        color: theme.COLORS.black,
+        ...theme.FONTS.Mulish_400Regular
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+        marginTop: 20,
+    },
+    modalButton: {
+        backgroundColor: theme.COLORS.primary,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+    },
+    modalButtonText: {
+        color: theme.COLORS.white,
+        fontSize: 16,
+        fontWeight: '600',
+    },
 });
 
 export default LeadActions;

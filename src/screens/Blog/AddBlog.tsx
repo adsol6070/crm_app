@@ -3,9 +3,6 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Text,
-  Platform,
-  KeyboardAvoidingView,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -38,9 +35,12 @@ const AddBlog = () => {
   const getCategories = async () => {
     try {
       const response: any = await blogService.getBlogCategory();
-
-      const newCategories = response.map((category: any) =>
-        capitalizeFirstLetter(category.category)
+      const newCategories = response.map((category: any) =>{
+        return {
+          value: category.category,
+          label: capitalizeFirstLetter(category.category),
+        }
+      }
       );
 
       setCategories(newCategories);
@@ -158,10 +158,9 @@ const AddBlog = () => {
           render={({ field: { onChange, value } }) => (
             <components.Dropdown
               options={categories}
-              selectedValue={capitalizeFirstLetter(value)}
+              selectedValue={value}
               onSelect={(value: string) => {
-                const val = value.toLowerCase();
-                onChange(val);
+                onChange(value);
               }}
               placeholder="Select a category"
               label="Category"

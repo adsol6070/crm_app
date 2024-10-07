@@ -65,7 +65,7 @@ const LeadWeekReport = ({ refreshKey }: any) => {
       <BarChart
         data={data}
         width={Dimensions.get('window').width * 0.9}
-        height={220}
+        height={300}
         fromZero={true}
         showBarTops={true}
         chartConfig={{
@@ -86,9 +86,12 @@ const LeadWeekReport = ({ refreshKey }: any) => {
         }}
         yAxisLabel=""
         yAxisSuffix=""
+        verticalLabelRotation={30}
+        horizontalLabelRotation={0}
         style={{
           marginVertical: 8,
           borderRadius: 16,
+          paddingRight: 24,
         }}
       />
     </View>

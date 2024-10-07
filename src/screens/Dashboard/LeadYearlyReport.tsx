@@ -55,11 +55,13 @@ const LeadYearlyReport = ({ refreshKey }: any) => {
       <LineChart
         data={data}
         width={screenWidth - 32}
-        height={220}
+        height={300}
         withVerticalLines={false}
         withHorizontalLines={true}
         withDots={true}
         withShadow={false}
+        verticalLabelRotation={30}
+        horizontalLabelRotation={0}
         chartConfig={{
           backgroundColor: '#2c3e50',
           backgroundGradientFrom: '#2c3e50',

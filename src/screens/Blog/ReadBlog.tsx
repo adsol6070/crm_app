@@ -9,6 +9,7 @@ import HTMLView from "react-native-htmlview";
 import { theme } from "../../constants/theme";
 import { skeletonLoader } from "../../components/skeletonLoaders";
 import Header1 from "../../components/Header1";
+import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 
 const ReadBlog = () => {
   const route = useRoute();
@@ -61,10 +62,10 @@ const ReadBlog = () => {
           </View>
           <Text style={styles.textDesign}>
             {new Date(blogDetail.created_at).toLocaleDateString()} |{" "}
-            {blogDetail.category == "Null"? "N/A": blogDetail.category}
+            {blogDetail.category == "Null"? "N/A": capitalizeFirstLetter(blogDetail.category)}
           </Text>
           <Text style={styles.shortDescription}>{blogDetail.description}</Text>
-          <HTMLView value={blogDetail.content} stylesheet={htmlStyles}  />
+          <HTMLView value={blogDetail.content} stylesheet={htmlStyles} />
         </View>
       </View>
     );

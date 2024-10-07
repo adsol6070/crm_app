@@ -24,21 +24,25 @@ const LeadStatusReport = ({ refreshKey }: any) => {
   const getChartData = () => {
     if (!statusReport) return { labels: [], datasets: [{ data: [] }] };
 
-    const statusLabels = ["completed", "inprogress", "pending", "null"];
-    const leadCounts = [0, 0, 0, 0];
+    const statusLabels = ["Completed", "In Progress", "Pending", "New", "No Status"];
+    const leadCounts = { completed: 0, inprogress: 0, pending: 0, new: 0, null: 0 };
 
     statusReport.forEach((item: any) => {
-      const index = statusLabels.indexOf(item.status || "null");
-      if (index !== -1) {
-        leadCounts[index] += parseInt(item.lead_count, 10);
-      }
+      const status = item.status || "null";
+      leadCounts[status] += parseInt(item.lead_count, 10);
     });
 
     return {
-      labels: ["Completed", "In Progress", "Pending", "New"],
+      labels: statusLabels,
       datasets: [
         {
-          data: leadCounts,
+          data: [
+            leadCounts.completed,
+            leadCounts.inprogress,
+            leadCounts.pending,
+            leadCounts.new,
+            leadCounts.null,
+          ],
         },
       ],
     };
@@ -52,7 +56,7 @@ const LeadStatusReport = ({ refreshKey }: any) => {
       <BarChart
         data={chartData}
         width={Dimensions.get("window").width - 32}
-        height={220}
+        height={320} 
         fromZero={true}
         showBarTops={true}
         chartConfig={{
@@ -60,25 +64,31 @@ const LeadStatusReport = ({ refreshKey }: any) => {
             fontFamily: "Mulish_400Regular",
             fontSize: 14,
           },
-          backgroundColor: "#e67e22",
-          backgroundGradientFrom: "#e67e22",
-          backgroundGradientTo: "#e67e22",
+          backgroundColor: "#4CAF50",
+          backgroundGradientFrom: "#4CAF50",
+          backgroundGradientTo: "#2E7D32",
           decimalPlaces: 0,
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           style: {
             borderRadius: 16,
+            paddingRight: 24,
           },
           propsForBackgroundLines: {
-            strokeWidth: 0,
+            strokeWidth: 1,
             stroke: "#e3e3e3",
           },
+          barPercentage: 0.8,
+          paddingTop: 20, 
         }}
         yAxisLabel=""
         yAxisSuffix=""
+        verticalLabelRotation={30}
+        horizontalLabelRotation={0}
         style={{
           marginVertical: 8,
           borderRadius: 16,
+          paddingRight: 24,
         }}
       />
     </SafeAreaView>
@@ -94,6 +104,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 16,
     ...theme.FONTS.Mulish_600SemiBold,
+    color: "#333", 
   },
 });
 

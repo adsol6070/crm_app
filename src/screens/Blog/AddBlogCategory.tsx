@@ -32,7 +32,8 @@ const BlogCategory = () => {
       .string()
       .required("Category is required")
       .min(2, "Category must be at least 2 characters")
-      .max(30, "Category must be less than 30 characters"),
+      .max(30, "Category must be less than 30 characters")
+	  .matches(/^[a-z]+$/, "Category name must be lowercase"),
   });
 
   const onSubmit = async (data: any) => {
@@ -41,7 +42,7 @@ const BlogCategory = () => {
       refreshRef.current?.();
       Alert.alert("Category added successfully");
     } catch (error) {
-      console.log("Error crefating categories", error);
+      console.log("Error creating categories", error);
     }
   };
 

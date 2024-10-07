@@ -41,6 +41,9 @@ class UserService {
   async getAllUsers() {
     return makeRequest("get", "/users/");
   }
+  async forgetPassword(payload: any) {
+    return makeRequest("post", "/auth/forgot-password", payload);
+  }
 }
 
 const userService = new UserService();
