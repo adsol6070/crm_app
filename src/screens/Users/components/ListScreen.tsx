@@ -156,6 +156,7 @@ const ListScreen = <T extends {}>({
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    refreshPermissions();
     fetchItems().finally(() => setRefreshing(false));
   }, []);
 

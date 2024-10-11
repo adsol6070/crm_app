@@ -24,15 +24,16 @@ const CustomDrawerContent = (props: any) => {
   const { user } = useAuth();
   const { permissions, refreshPermissions } = usePermissions();
   const [userProfile, setUserProfile] = useState<IUserProfile | null>(null);
+  const [profileFetched, setProfileFetched] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const isDrawerOpen = useDrawerStatus() === "open";
 
   useEffect(() => {
-    if (isDrawerOpen) {
+    if (isDrawerOpen && !profileFetched) {
       fetchProfile();
       refreshPermissions();
     }
-  }, [isDrawerOpen]);
+  }, [isDrawerOpen, profileFetched]);
 
   const fetchProfile = async () => {
     if (!user?.sub) return;
@@ -41,6 +42,7 @@ const CustomDrawerContent = (props: any) => {
       const response = await userService.getProfile({ userId: user?.sub });
       const { firstname, lastname, profileImageUrl, role } = response;
       setUserProfile({ firstname, lastname, profileImageUrl, role });
+      setProfileFetched(true);
     } catch (error) {
       console.log("Profile Fetching error ", error);
     } finally {

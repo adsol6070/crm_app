@@ -53,7 +53,9 @@ const ItemList: React.FC<ItemListProps> = ({
           <View style={styles.leadingContainer}>{leadingComponent(item)}</View>
         )}
         <View style={styles.detailsContainer}>
+          <View style={styles.itemDetailDesign}>
           {centerComponent(item)}
+          </View>
           <View style={styles.iconContainer}>
             {actionConfigs.map((action, index) => (
               <TouchableOpacity
@@ -116,6 +118,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
+  },
+  itemDetailDesign: {
+    width: "45%"
   },
   textContainer: {
     flexDirection: "column",

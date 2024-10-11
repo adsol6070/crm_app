@@ -13,12 +13,15 @@ import { theme } from "../../constants/theme";
 import { crsService } from "../../api/crscalculator";
 import { useAuth } from "../../common/context/AuthContext";
 import ListScreen from "../Users/components/ListScreen";
+import { usePermissions } from "../../common/context/PermissionContext";
+import { hasPermission } from "../../utils/HasPermission";
 
 const ScoreList = () => {
   const { user } = useAuth();
   const refreshRef = useRef<() => void>();
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
+  const { permissions } = usePermissions();
 
   const toggleModal = (item: any) => {
     setSelectedItem(item);
@@ -84,12 +87,12 @@ const ScoreList = () => {
             onPress: (item) => toggleModal(item),
             size: 20,
           },
-          {
+          ...(hasPermission(permissions, 'Scores', 'Delete') ? [{
             iconName: "delete",
             iconType: "MaterialIcons",
             onPress: (item) => handleDelete(item.id),
             size: 20,
-          },
+          }] : []),
         ]}
         refreshRef={refreshRef}
         deleteAllData={handleDeleteAll}
@@ -103,7 +106,7 @@ const ScoreList = () => {
           onRequestClose={() => setModalVisible(false)}
         >
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <View style={styles.modalContainer}>
+            {/* <View style={styles.modalContainer}>
               <TouchableWithoutFeedback>
                 <View style={styles.modalContent}>
                   <Text
@@ -146,7 +149,81 @@ const ScoreList = () => {
                   </TouchableOpacity>
                 </View>
               </TouchableWithoutFeedback>
-            </View>
+            </View> */}
+            	<View style={styles.modalContainer}>
+						<View style={styles.modalContent}>
+							<Text style={{ textAlign: "center", color: getScoreColor(selectedItem.score), fontSize: 24, ...theme.FONTS.Mulish_700Bold }}>
+								Score: {selectedItem.score}
+							</Text>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Name: </Text>
+								<Text style={styles.modalText}>{selectedItem.name}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Age: </Text>
+								<Text style={styles.modalText}>{selectedItem.age}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Canadian Degree: </Text>
+								<Text style={styles.modalText}>{selectedItem.canadian_degree}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Canadian Experience: </Text>
+								<Text style={styles.modalText}>{selectedItem.canadian_experience}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Education: </Text>
+								<Text style={styles.modalText}>{selectedItem.education}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Email: </Text>
+								<Text style={styles.modalText}>{selectedItem.email}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>First Language: </Text>
+								<Text style={styles.modalText}>{selectedItem.first_language}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Foreign Experience: </Text>
+								<Text style={styles.modalText}>{selectedItem.foreign_experience}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Job Offer: </Text>
+								<Text style={styles.modalText}>{selectedItem.job_offer}</Text>
+							</View>
+							<View style={styles.modalRow}>
+								<Text style={styles.modalHeading}>Provincial Nomination: </Text>
+								<Text style={styles.modalText}>{selectedItem.provincial_nomination}</Text>
+							</View>
+							{selectedItem.spouse != "no" &&
+								<View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse}</Text>
+									</View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse Education: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse_education}</Text>
+									</View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse Experience: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse_experience}</Text>
+									</View>
+									<View style={styles.modalRow}>
+										<Text style={styles.modalHeading}>Spouse Language: </Text>
+										<Text style={styles.modalText}>{selectedItem.spouse_language}</Text>
+									</View>
+								</View>
+							}
+
+							<TouchableOpacity
+								onPress={() => setModalVisible(false)}
+								style={styles.closeButton}
+							>
+								<Text style={styles.closeButtonText}>Close</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
           </TouchableWithoutFeedback>
         </Modal>
       )}
@@ -185,6 +262,20 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
+  modalRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		marginVertical: 4,
+	},
+	modalHeading: {
+		fontSize: 16,
+		...theme.FONTS.Mulish_700Bold
+	},
+	modalText: {
+		fontSize: 16,
+		...theme.FONTS.Mulish_600SemiBold
+	},
 });
 
 export default ScoreList;

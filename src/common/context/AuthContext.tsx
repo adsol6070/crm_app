@@ -75,7 +75,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(decodedToken);
         setError(null);
 
-        if (decodedToken.exp) {
+        if (decodedToken.iat && decodedToken.exp) {
           setTokenExpiryTimer(decodedToken.iat, decodedToken.exp);
         }
         return null;

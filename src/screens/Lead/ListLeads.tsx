@@ -12,11 +12,14 @@ type ListLeadsNavigationProp = StackNavigationProp<
   RootStackParamList,
   "ListLeads"
 >;
+import { hasPermission } from "../../utils/HasPermission";
+import { usePermissions } from "../../common/context/PermissionContext";
 
 const ListLeads = () => {
   const navigation = useNavigation<ListLeadsNavigationProp>();
   const refreshRef = useRef<() => void>();
   const [visaCategories, setVisaCategories] = useState<any[]>([]);
+  const { permissions } = usePermissions();
 
   useEffect(() => {
     getVisaCategories();
@@ -99,12 +102,12 @@ const ListLeads = () => {
             }),
           size: 20,
         },
-        {
+        ...(hasPermission(permissions, 'Leads', 'Delete') ? [{
           iconName: "delete",
           iconType: "MaterialIcons",
           onPress: (item) => handleDelete(item.id),
           size: 20,
-        },
+        }] : []),
       ]}
       refreshRef={refreshRef}
       isFilterable

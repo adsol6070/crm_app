@@ -23,7 +23,6 @@ import {
   RichToolbar,
   actions,
 } from "react-native-pell-rich-editor";
-import { formatDate } from "../utils/FormatDate";
 import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 interface InputFieldProps extends TextInputProps {

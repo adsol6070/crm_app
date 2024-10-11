@@ -12,10 +12,13 @@ type ViewChecklistNavigationProp = StackNavigationProp<
   RootStackParamList,
   "ViewChecklist"
 >;
+import { usePermissions } from "../../../common/context/PermissionContext";
+import { hasPermission } from "../../../utils/HasPermission";
 
 const ViewChecklist = () => {
   const navigation = useNavigation<ViewChecklistNavigationProp>();
   const refreshRef = useRef<() => void>();
+  const { permissions } = usePermissions();
 
   const handleItemPress = (item: any) => {
     navigation.navigate("ChecklistDetail", {
@@ -67,12 +70,12 @@ const ViewChecklist = () => {
           onPress: (item) => handleItemPress(item),
           size: 20,
         },
-        {
+        ...(hasPermission(permissions, 'Checklists', 'DeleteChecklist') ? [{
           iconName: "delete",
           iconType: "MaterialIcons",
           onPress: (item) => handleDelete(item.id),
           size: 20,
-        },
+        }] : []),
       ]}
       searchKey="visaType"
       refreshRef={refreshRef}

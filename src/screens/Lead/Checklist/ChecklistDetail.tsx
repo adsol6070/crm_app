@@ -15,6 +15,8 @@ import { theme } from "../../../constants/theme";
 import ListScreen from "../../Users/components/ListScreen";
 import { checklistService } from "../../../api/checklist";
 import { RootStackParamList } from "../../../navigation/AppNavigator";
+import { usePermissions } from "../../../common/context/PermissionContext";
+import { hasPermission } from "../../../utils/HasPermission";
 
 type ChecklistDetailRouteProp = RouteProp<
   RootStackParamList,
@@ -24,6 +26,7 @@ type ChecklistDetailRouteProp = RouteProp<
 const ChecklistDetail = () => {
   const refreshRef = useRef<() => void>(() => {});
   const route = useRoute<ChecklistDetailRouteProp>();
+
   const { visaType, checklistId }: any = route?.params;
   const {
     control,
@@ -35,6 +38,7 @@ const ChecklistDetail = () => {
   const [allDocuments, setAllDocuments] = useState<any[]>([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState<boolean>(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const { permissions } = usePermissions();
 
   const validationSchema = yup.object({
     document: yup
@@ -152,29 +156,41 @@ const ChecklistDetail = () => {
           return <Text style={theme.FONTS.H4}>{item.name}</Text>;
         }}
         actionConfigs={[
-          {
-            iconName: "edit",
-            iconType: "MaterialIcons",
-            onPress: (item) => onEditModal(item),
-            size: 20,
-          },
-          {
-            iconName: "delete",
-            iconType: "MaterialIcons",
-            onPress: (item) => handleDelete(item.name),
-            size: 20,
-          },
+          ...(hasPermission(permissions, "Checklists", "EditDocument")
+            ? [
+                {
+                  iconName: "edit",
+                  iconType: "MaterialIcons",
+                  onPress: (item) => onEditModal(item),
+                  size: 20,
+                },
+              ]
+            : []),
+          ...(hasPermission(permissions, "Checklists", "DeleteDocument")
+            ? [
+                {
+                  iconName: "delete",
+                  iconType: "MaterialIcons",
+                  onPress: (item) => handleDelete(item.name),
+                  size: 20,
+                },
+              ]
+            : []),
         ]}
         searchKey="name"
         refreshRef={refreshRef}
-        singleInputConfig={{
-          name: "document",
-          title: "Document",
-          inputPlaceholder: "Enter document name",
-          buttonText: "Add Document",
-          onSubmit: (data) => onSubmit(data),
-          validationSchema: validationSchema,
-        }}
+        singleInputConfig={
+          hasPermission(permissions, "Checklists", "AddDocument")
+            ? {
+                name: "document",
+                title: "Document",
+                inputPlaceholder: "Enter document name",
+                buttonText: "Add Document",
+                onSubmit: (data) => onSubmit(data),
+                validationSchema: validationSchema,
+              }
+            : undefined
+        }
       />
       <Modal
         animationType="slide"
