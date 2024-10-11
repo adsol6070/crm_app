@@ -5,9 +5,16 @@ import ListScreen from "../components/ListScreen";
 import { theme } from "../../../constants/theme";
 import GetPlaceholderImage from "../../../utils/GetPlaceholderImage ";
 import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+
+type UserListNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ViewUsers"
+>;
 
 const UserList = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<UserListNavigationProp>();
 
   const handleItemPress = (id: string) => {
     navigation.navigate("UserDetail", { userId: id });

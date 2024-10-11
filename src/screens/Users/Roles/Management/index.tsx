@@ -18,14 +18,11 @@ import Header1 from "../../../../components/Header1";
 import { components } from "../../../../components";
 import { theme } from "../../../../constants/theme";
 import { rolesService } from "../../../../api/roles";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../../navigation/AppNavigator";
+import { Module, PermissionState, RoleFormData } from "./RoleManager.types";
 
-type RoleManagerRouteParams = {
-  params?: {
-    roleName?: string;
-  };
-};
-
-const schema = yup.object().shape({
+const validationSchema = yup.object().shape({
   role: yup
     .string()
     .required("Role Name is required")
@@ -34,152 +31,228 @@ const schema = yup.object().shape({
     .matches(/^[a-z_]+$/, "Role name must be lowercase with underscores only."),
 });
 
-const modules = [
+const modules: Module[] = [
   {
     id: "users",
     name: "Users",
-    permissions: ["Read", "Create", "Update", "Delete"],
+    permissions: [
+      { name: "Read" },
+      { name: "Create" },
+      { name: "Update", dependsOn: "Read" },
+      { name: "Delete", dependsOn: "Read" },
+    ],
   },
   {
     id: "blogs",
     name: "Blogs",
-    permissions: ["Create", "Read", "Update", "Delete"],
+    permissions: [
+      { name: "Create" },
+      { name: "Read" },
+      { name: "Update" },
+      { name: "Delete" },
+    ],
   },
   {
     id: "leads",
     name: "Leads",
     permissions: [
-      "AddNotes",
-      "Assign",
-      "Create",
-      "Delete",
-      "DeleteAll",
-      "DeleteNote",
-      "DeleteNotes",
-      "DownloadCSV",
-      "DownloadCSVFormat",
-      "Edit",
-      "EditNote",
-      "History",
-      "ImportBulk",
-      "ReadQR",
-      "Status",
-      "View",
+      { name: "AddNotes" },
+      { name: "Assign" },
+      { name: "Create" },
+      { name: "Delete" },
+      {
+        name: "DeleteAll",
+        dependsOn: "Delete",
+      },
+      { name: "DeleteNote" },
+      { name: "DeleteNotes" },
+      { name: "DownloadCSV" },
+      { name: "DownloadCSVFormat" },
+      { name: "Edit" },
+      { name: "EditNote" },
+      { name: "History" },
+      { name: "ImportBulk" },
+      { name: "ReadQR" },
+      { name: "Status" },
+      { name: "View" },
     ],
   },
   {
     id: "scores",
     name: "Scores",
-    permissions: ["Create", "Read", "Delete", "DeleteAll"],
+    permissions: [
+      { name: "Create" },
+      { name: "Read" },
+      { name: "Delete" },
+      {
+        name: "DeleteAll",
+        dependsOn: "Delete",
+      },
+    ],
   },
   {
     id: "visaCategory",
     name: "VisaCategory",
-    permissions: ["Create"],
+    permissions: [{ name: "Create" }],
   },
   {
     id: "reports",
     name: "Reports",
-    permissions: ["view", "export"],
+    permissions: [{ name: "View" }, { name: "Export", dependsOn: "View" }],
   },
 ];
 
-const RoleManager = () => {
-  const navigation = useNavigation();
-  const route = useRoute<RouteProp<RoleManagerRouteParams, "params">>();
+type RoleManagerNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "RoleManager"
+>;
+type RoleManagerRouteProp = RouteProp<RootStackParamList, "RoleManager">;
+
+// Utility function to format permissions for submission
+const formatPermissionsForSubmission = (
+  modules: Module[],
+  permissions: PermissionState
+) => {
+  return modules.reduce((formattedPermissions, module) => {
+    formattedPermissions[module.name] = module.permissions.reduce(
+      (acc, permission) => {
+        acc[permission.name] = !!permissions[module.id]?.[permission.name];
+        return acc;
+      },
+      {} as Record<string, boolean>
+    );
+    return formattedPermissions;
+  }, {} as Record<string, Record<string, boolean>>);
+};
+
+// Format fetched permissions into the required state format
+const formatFetchedPermissions = (rolePermissions: Record<string, any>) => {
+  return modules.reduce((acc, module) => {
+    acc[module.id] = module.permissions.reduce((permAcc, perm) => {
+      permAcc[perm.name] = rolePermissions[module.name]?.[perm.name] || false;
+      return permAcc;
+    }, {} as Record<string, boolean>);
+    return acc;
+  }, {} as PermissionState);
+};
+
+// Utility function to check for permission dependencies
+const checkPermissionDependencies = (
+  moduleId: string,
+  permissionName: string,
+  permissions: PermissionState,
+  modules: Module[]
+) => {
+  const module = modules.find((mod) => mod.id === moduleId);
+  const permission = module?.permissions.find(
+    (perm) => perm.name === permissionName
+  );
+  if (permission?.dependsOn && !permissions[moduleId]?.[permission.dependsOn]) {
+    Alert.alert(
+      "Permission Dependency",
+      `The "${permissionName}" permission depends on the "${permission.dependsOn}" permission. Please select it first.`
+    );
+    return false;
+  }
+  return true;
+};
+
+const RoleManager: React.FC = () => {
+  const navigation = useNavigation<RoleManagerNavigationProp>();
+  const route = useRoute<RoleManagerRouteProp>();
   const { roleName } = route.params || {};
   const isEditMode = !!roleName;
+
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedModule, setSelectedModule] = useState(modules[0].id);
   const [roleID, setRoleID] = useState<string>("");
-  const [permissions, setPermissions] = useState({});
+  const [permissions, setPermissions] = useState<PermissionState>({});
 
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
-    resolver: yupResolver(schema),
+  } = useForm<RoleFormData>({
+    resolver: yupResolver(validationSchema),
   });
 
-  const fetchRoleDetails = async () => {
+  // Fetch role details on initial load
+  useEffect(() => {
+    if (isEditMode) fetchRoleDetails(roleName);
+  }, [isEditMode, roleName]);
+
+  // Fetch role details from the server
+  const fetchRoleDetails = async (roleName: string) => {
     try {
       const roleDetail = await rolesService.getRoleByName({ role: roleName });
       setRoleID(roleDetail.id);
-
-      if (roleDetail) {
-        reset({ role: roleDetail.role });
-
-        const formattedPermissions = {};
-        modules.forEach((module) => {
-          formattedPermissions[module.id] = module.permissions.reduce(
-            (acc, permission) => {
-              const apiPermissionValue =
-                roleDetail.permissions[module.name]?.[permission] || false;
-              acc[permission] = apiPermissionValue;
-              return acc;
-            },
-            {}
-          );
-        });
-
-        setPermissions(formattedPermissions);
-      }
+      reset({ role: roleDetail.role });
+      setPermissions(formatFetchedPermissions(roleDetail.permissions));
     } catch (error) {
       console.error("Error fetching role details:", error);
     }
   };
 
-  useEffect(() => {
-    if (isEditMode) {
-      fetchRoleDetails();
-    }
-  }, [isEditMode, roleName]);
-
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     if (isEditMode) {
-      fetchRoleDetails();
+      fetchRoleDetails(roleName);
     }
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   }, []);
 
-  const handlePermissionChange = (moduleId: string, permission) => {
-    setPermissions((prevPermissions) => ({
-      ...prevPermissions,
-      [moduleId]: {
-        ...prevPermissions[moduleId],
-        [permission]: !prevPermissions[moduleId]?.[permission],
-      },
-    }));
+  // Handle permission change
+  const handlePermissionChange = (moduleId: string, permissionName: string) => {
+    if (
+      !checkPermissionDependencies(
+        moduleId,
+        permissionName,
+        permissions,
+        modules
+      )
+    ) {
+      return;
+    }
+
+    setPermissions((prevPermissions) => {
+      const newPermissions = {
+        ...prevPermissions,
+        [moduleId]: {
+          ...prevPermissions[moduleId],
+          [permissionName]: !prevPermissions[moduleId]?.[permissionName],
+        },
+      };
+
+      if (!newPermissions[moduleId][permissionName]) {
+        // Automatically deselect dependent permissions if a parent permission is deselected
+        modules
+          .find((mod) => mod.id === moduleId)
+          ?.permissions.forEach((perm) => {
+            if (perm.dependsOn === permissionName) {
+              newPermissions[moduleId][perm.name] = false;
+            }
+          });
+      }
+
+      return newPermissions;
+    });
   };
 
-  const onSubmit = async (data) => {
-    const formattedPermissions = {};
-    modules.forEach((module) => {
-      formattedPermissions[module.name] = module.permissions.reduce(
-        (acc, permission) => {
-          acc[permission] = !!permissions[module.id]?.[permission];
-          return acc;
-        },
-        {}
-      );
-    });
-
-    const formData = {
-      ...data,
-      permissions: formattedPermissions,
-    };
+  // Handle form submission
+  const onSubmit = async (data: RoleFormData) => {
+    const formattedPermissions = formatPermissionsForSubmission(
+      modules,
+      permissions
+    );
 
     try {
       await rolesService[isEditMode ? "updateRole" : "createRole"](
-        formData,
+        { ...data, permissions: formattedPermissions },
         isEditMode ? roleID : undefined
       );
-
       Alert.alert(
         "Success",
         `Role ${isEditMode ? "updated" : "created"} successfully.`
@@ -245,43 +318,41 @@ const RoleManager = () => {
           <View style={styles.permissionsHeader}>
             <Text style={styles.permissionsHeaderText}>Permissions:</Text>
           </View>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            {modules
-              .filter((module) => module.id === selectedModule)
-              .map((module) =>
-                module.permissions.length > 0 ? (
-                  module.permissions.map((permission) => (
-                    <TouchableOpacity
-                      key={permission}
-                      style={styles.permissionContainer}
-                      onPress={() =>
-                        handlePermissionChange(module.id, permission)
+          {modules
+            .filter((module) => module.id === selectedModule)
+            .map((module) =>
+              module.permissions.length > 0 ? (
+                module.permissions.map((permission) => (
+                  <TouchableOpacity
+                    key={permission.name}
+                    style={styles.permissionContainer}
+                    onPress={() =>
+                      handlePermissionChange(module.id, permission.name)
+                    }
+                  >
+                    <Checkbox
+                      status={
+                        permissions[module.id]?.[permission.name]
+                          ? "checked"
+                          : "unchecked"
                       }
-                    >
-                      <Checkbox
-                        status={
-                          permissions[module.id]?.[permission]
-                            ? "checked"
-                            : "unchecked"
-                        }
-                        onPress={() =>
-                          handlePermissionChange(module.id, permission)
-                        }
-                        color={theme.COLORS.black}
-                      />
-                      <Text style={styles.permissionLabel}>
-                        {permission.charAt(0).toUpperCase() +
-                          permission.slice(1)}
-                      </Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text key="no-permissions" style={styles.noPermissions}>
-                    No permissions available
-                  </Text>
-                )
-              )}
-          </ScrollView>
+                      onPress={() =>
+                        handlePermissionChange(module.id, permission.name)
+                      }
+                      color={theme.COLORS.black}
+                    />
+                    <Text style={styles.permissionLabel}>
+                      {permission.name.charAt(0).toUpperCase() +
+                        permission.name.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text key="no-permissions" style={styles.noPermissions}>
+                  No permissions available
+                </Text>
+              )
+            )}
         </View>
 
         <components.Button

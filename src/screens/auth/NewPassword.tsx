@@ -1,11 +1,11 @@
-import React from 'react';
-import { Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { Text, StyleSheet, ViewStyle, TextStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { constants } from '../../constants';
-import { components } from '../../components';
+import { constants } from "../../constants";
+import { components } from "../../components";
 
 // Define your navigation stack types
 type RootStackParamList = {
@@ -15,7 +15,7 @@ type RootStackParamList = {
 
 type NewPasswordNavigationProp = StackNavigationProp<
   RootStackParamList,
-  'NewPassword'
+  "NewPassword"
 >;
 
 const { theme } = constants;
@@ -53,7 +53,7 @@ const NewPassword: React.FC = () => {
         />
         <components.Button
           title="change password"
-          onPress={() => navigation.navigate('ForgotPasswordSentEmail')}
+          onPress={() => navigation.navigate("ForgotPasswordSentEmail")}
         />
       </KeyboardAwareScrollView>
     );

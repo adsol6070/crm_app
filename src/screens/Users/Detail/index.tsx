@@ -15,7 +15,7 @@ import {
 import React, { useState, useEffect, useCallback } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons, Ionicons, AntDesign } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { userService } from "../../../api/user";
 import { theme } from "../../../constants/theme";
 import DetailSkeletonLoader from "./SkeletonLoader";
@@ -24,10 +24,18 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import Header1 from "../../../components/Header1";
 import { PartialUser } from "../../../types";
 import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+
+type UserDetailNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "UserDetail"
+>;
+type UserDetailRouteProp = RouteProp<RootStackParamList, "UserDetail">;
 
 const UserDetail = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
+  const navigation = useNavigation<UserDetailNavigationProp>();
+  const route = useRoute<UserDetailRouteProp>();
   const { showActionSheetWithOptions } = useActionSheet();
   const { userId } = route.params as { userId: string };
   const [user, setUser] = useState<PartialUser | null>(null);
@@ -250,7 +258,7 @@ const UserDetail = () => {
             {user?.firstname || "John"} {user?.lastname || "Doe"}
           </Text>
           <Text style={styles.userRole}>
-            {formatRoleDisplayName(user?.role) || "User"}
+            {formatRoleDisplayName(user?.role || "") || "User"}
           </Text>
         </View>
 

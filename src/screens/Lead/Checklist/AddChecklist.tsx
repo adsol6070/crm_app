@@ -21,13 +21,20 @@ import { capitalizeFirstLetter } from "../../../utils/CapitalizeFirstLetter";
 import { checklistService } from "../../../api/checklist";
 import Header1 from "../../../components/Header1";
 import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 const schema = yup.object().shape({
   visaType: yup.string().required("Visa Type is required"),
 });
 
+type AddChecklistNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "AddChecklist"
+>;
+
 const AddChecklist = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<AddChecklistNavigationProp>();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [visaCategories, setVisaCategories] = useState<any[]>([]);
   const [documents, setDocuments] = useState([{ name: "" }]);
@@ -189,46 +196,46 @@ const AddChecklist = () => {
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: theme.COLORS.white,
-	},
-	addContainer: {
-		margin: 20,
-		marginBottom: 5,
-	},
-	submitButton: {
-		backgroundColor: theme.COLORS.black,
-		paddingVertical: 12,
-		borderRadius: 5,
-		marginTop: 5,
-		alignItems: "center",
-		elevation: 2,
-	},
-	submitButtonText: {
-		...theme.FONTS.H5,
-		color: theme.COLORS.white,
-	},
-	documentContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginBottom: 10,
-		width: '170%'
-	},
-	removeButton: {
-		marginLeft: 8,
-	},
-	addButton: {
-		marginVertical: 10,
-		padding: 10,
-		borderRadius: 5,
-		backgroundColor: theme.COLORS.lightGray,
-		alignItems: "center",
-	},
-	addButtonText: {
-		...theme.FONTS.H5,
-		color: theme.COLORS.black,
-	},
+  container: {
+    flex: 1,
+    backgroundColor: theme.COLORS.white,
+  },
+  addContainer: {
+    margin: 20,
+    marginBottom: 5,
+  },
+  submitButton: {
+    backgroundColor: theme.COLORS.black,
+    paddingVertical: 12,
+    borderRadius: 5,
+    marginTop: 5,
+    alignItems: "center",
+    elevation: 2,
+  },
+  submitButtonText: {
+    ...theme.FONTS.H5,
+    color: theme.COLORS.white,
+  },
+  documentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    width: "170%",
+  },
+  removeButton: {
+    marginLeft: 8,
+  },
+  addButton: {
+    marginVertical: 10,
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: theme.COLORS.lightGray,
+    alignItems: "center",
+  },
+  addButtonText: {
+    ...theme.FONTS.H5,
+    color: theme.COLORS.black,
+  },
 });
 
 export default AddChecklist;

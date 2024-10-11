@@ -17,7 +17,6 @@ import { components } from "../../components";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 import {
   canadianDegreeOptions,
   educationOptions,
@@ -29,6 +28,8 @@ import {
   workExperienceOptions,
 } from "../../utils/Calculateoptions";
 import { crsService } from "../../api/crscalculator";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 interface Option {
   label: string;
@@ -62,8 +63,13 @@ interface FormValues {
   spouse_experience: string;
 }
 
+type CalculatecrsNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Calculatecrs"
+>;
+
 const Calculatecrs = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<CalculatecrsNavigationProp>();
   const [countryCode, setCountryCode] = useState<string>("+91");
   const [userData, setUserData] = useState<FormValues | null>(null);
   const [userScore, setUserScore] = useState(0);
@@ -527,9 +533,13 @@ const Calculatecrs = () => {
   return (
     <SafeAreaView style={styles.container}>
       {renderHeader()}
-      <ScrollView refreshControl={
+      <ScrollView
+        refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>{renderContent()}</ScrollView>
+        }
+      >
+        {renderContent()}
+      </ScrollView>
       {loading && <components.Spinner />}
       <Modal
         animationType="fade"

@@ -9,15 +9,21 @@ import {
   View,
 } from "react-native";
 import { Controller, useForm } from "react-hook-form";
-import { useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { components } from "../../../components";
 import { theme } from "../../../constants/theme";
 import ListScreen from "../../Users/components/ListScreen";
 import { checklistService } from "../../../api/checklist";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+
+type ChecklistDetailRouteProp = RouteProp<
+  RootStackParamList,
+  "ChecklistDetail"
+>;
 
 const ChecklistDetail = () => {
   const refreshRef = useRef<() => void>(() => {});
-  const route = useRoute();
+  const route = useRoute<ChecklistDetailRouteProp>();
   const { visaType, checklistId }: any = route?.params;
   const {
     control,

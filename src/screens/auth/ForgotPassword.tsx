@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
-import { Text, StyleSheet, View, ViewStyle, TextStyle, Alert, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import React, { useState } from "react";
+import {
+  Text,
+  StyleSheet,
+  View,
+  ViewStyle,
+  TextStyle,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { components } from '../../components';
-import { constants } from '../../constants';
-import { Controller, useForm } from 'react-hook-form';
-import { userService } from '../../api/user1';
+import { components } from "../../components";
+import { constants } from "../../constants";
+import { Controller, useForm } from "react-hook-form";
+import { userService } from "../../api/user1";
 
 const { theme } = constants;
 
 const schema = yup.object().shape({
-  email: yup.string().email("Invalid email").required("Email is required").trim(),
+  email: yup
+    .string()
+    .email("Invalid email")
+    .required("Email is required")
+    .trim(),
 });
 
 const ForgotPassword: React.FC = () => {
@@ -29,11 +41,11 @@ const ForgotPassword: React.FC = () => {
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
-      await userService.forgetPassword(data)
-      Alert.alert("Reset password link send successfully.")
+      await userService.forgetPassword(data);
+      Alert.alert("Reset password link send successfully.");
       reset();
     } catch (error) {
-      Alert.alert("Failed to send recovery email. Please try again.")
+      Alert.alert("Failed to send recovery email. Please try again.");
       console.error("Login Error:", error);
     } finally {
       setLoading(false);
@@ -56,7 +68,7 @@ const ForgotPassword: React.FC = () => {
           new password via email.
         </Text>
         <View style={styles.inputDesign}>
-           <Controller
+          <Controller
             control={control}
             name="email"
             render={({ field: { onChange, onBlur, value } }) => (
@@ -70,14 +82,12 @@ const ForgotPassword: React.FC = () => {
               />
             )}
           />
-          </View>
-          <components.Button
-          title={loading ? <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color={theme.COLORS.white} />
-          <Text style={styles.loadingText}>Sending...</Text>
-        </View>: "Send"}
+        </View>
+        <components.Button
+          title="Send"
           onPress={handleSubmit(onSubmit)}
-          disabled={loading} 
+          loading={loading}
+          loadingText="Sending..."
         />
       </KeyboardAwareScrollView>
     );
@@ -109,7 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   } as TextStyle,
   inputDesign: {
-    marginVertical: 10
+    marginVertical: 10,
   },
   loadingContainer: {
     flexDirection: "row",

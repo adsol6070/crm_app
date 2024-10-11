@@ -68,7 +68,7 @@ class RolesService {
     return makeRequest<any>("post", `/permissions/by-role`, payload);
   }
 
-  async updateRole(payload: any, roleId: string): Promise<void> {
+  async updateRole(payload: any, roleId: string | undefined): Promise<void> {
     return makeRequest<void>("patch", `/permissions/${roleId}`, payload);
   }
 

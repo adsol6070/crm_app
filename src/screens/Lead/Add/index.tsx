@@ -24,6 +24,8 @@ import {
 } from "./interfaces";
 import { VALIDATION_SCHEMAS } from "./validations";
 import { leadService } from "../../../api/lead";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
 
 const STEP_LABELS = [
   "Personal Details",
@@ -88,8 +90,10 @@ const useFormWithValidation = (currentStep: number) => {
   });
 };
 
+type AddLeadNavigationProp = StackNavigationProp<RootStackParamList, "AddLead">;
+
 const AddLead = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<AddLeadNavigationProp>();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [validatedSteps, setValidatedSteps] = useState<Set<number>>(new Set());

@@ -29,7 +29,38 @@ import DocumentUpload from "../screens/Lead/LeadChecklist/DocumentUpload";
 import ScoreList from "../screens/CRSCalculator/Scorelist";
 import Calculatecrs from "../screens/CRSCalculator/Calculatecrs";
 
-const Stack = createStackNavigator();
+export type RootStackParamList = {
+  Main: undefined;
+  PersonalChat: { userName: string; userId: string };
+  UserManager: { userId?: string };
+  ViewUsers: undefined;
+  RoleManager: { roleName: string };
+  ViewRoles: undefined;
+  RoleDetail: { roleName: string };
+  UserDetail: { userId: string };
+  AddBlog: undefined;
+  ListBlogs: undefined;
+  ReadBlog: { blogId: string };
+  EditBlog: { blogId: string };
+  AddBlogCategory: undefined;
+  AddLead: undefined;
+  EditLead: { leadId: string };
+  ListLeads: undefined;
+  AddVisaCategory: undefined;
+  AddChecklist: undefined;
+  ViewChecklist: undefined;
+  ChecklistDetail: { visaType: string; checklistId: string };
+  Formqr: undefined;
+  LeadActions: { leadId: string; visaType: string };
+  LeadDetail: { leadId: string };
+  LeadHistory: { leadId: string };
+  DocumentChecklist: { leadId: string };
+  DocumentUpload: { leadId: string; documentName: string };
+  Calculatecrs: undefined;
+  ScoreList: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   return (

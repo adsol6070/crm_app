@@ -17,7 +17,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Keyboard } from "react-native";
 import { useSocket } from "../../common/context/SocketContext";
 import GetPlaceholderImage from "../../utils/GetPlaceholderImage ";
-import SkeletonLoader from "../Users/SkeletonLoader";
+import SkeletonLoader from "../Users/components/SkeletonLoader";
 
 interface ChatUser {
   id: string;

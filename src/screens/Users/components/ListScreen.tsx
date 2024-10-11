@@ -10,7 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 import { components } from "../../../components";
 import Header1 from "../../../components/Header1";
 import SearchBar from "./SearchBar";
-import SkeletonLoader from "../SkeletonLoader";
+import SkeletonLoader from "./SkeletonLoader";
 import ItemList from "./ItemList";
 import AddButton from "./AddButton";
 import * as yup from "yup";
@@ -38,7 +38,7 @@ interface ListScreenProps<T> {
   fetchData: () => Promise<T[]>;
   mapData?: (data: T[]) => any[];
   placeholder: string;
-  onItemPress: (item: string) => void;
+  onItemPress: (item: any) => void;
   addButtonDestination: string;
   actionConfigs?: ActionConfig[];
   skeletonWithImage?: boolean;

@@ -1,17 +1,25 @@
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { theme } from "../../../constants/theme";
 import { skeletonLoader } from "../../../components/skeletonLoaders";
 import useLeadData from "../useLeadDetail";
 import Header1 from "../../../components/Header1";
 import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+
+type LeadDetailNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "LeadDetail"
+>;
+type LeadDetailRouteProp = RouteProp<RootStackParamList, "LeadDetail">;
 
 const LeadDetail = () => {
-  const route = useRoute();
-  const navigation = useNavigation();
+  const route = useRoute<LeadDetailRouteProp>();
+  const navigation = useNavigation<LeadDetailNavigationProp>();
   const { leadId }: any = route.params;
   const { leadDetail, loading } = useLeadData(leadId);
   const renderHeader = () => (

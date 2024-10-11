@@ -9,19 +9,26 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { Checkbox } from "react-native-paper";
 import { theme } from "../../../../constants/theme";
 import RoleDetailSkeletonLoader from "./SkeletonLoader";
 import Header1 from "../../../../components/Header1";
 import { rolesService } from "../../../../api/roles";
-import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
 import { formatRoleDisplayName } from "../../../../utils/FormatRoleDisplayName";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../../navigation/AppNavigator";
+
+type RoleDetailNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "RoleDetail"
+>;
+type RoleDetailRouteProp = RouteProp<RootStackParamList, "RoleDetail">;
 
 const RoleDetail = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
+  const navigation = useNavigation<RoleDetailNavigationProp>();
+  const route = useRoute<RoleDetailRouteProp>();
   const { roleName } = route.params;
   const [roleDetails, setRoleDetails] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);

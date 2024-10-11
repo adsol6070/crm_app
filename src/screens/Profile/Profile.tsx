@@ -11,17 +11,17 @@ import {
 import React, { useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import Modal from "react-native-modal";
-import { components } from "../components";
-import { constants } from "../constants";
-import { svg } from "../svg";
-import { useAuth } from "../common/context/AuthContext";
+import { components } from "../../components";
+import { constants } from "../../constants";
+import { svg } from "../../svg";
+import { useAuth } from "../../common/context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { userService } from "../api/user";
-import DetailSkeletonLoader from "./Users/Detail/SkeletonLoader";
+import { userService } from "../../api/user";
+import DetailSkeletonLoader from "../Users/Detail/SkeletonLoader";
 import * as ImagePicker from "expo-image-picker";
-import Header1 from "../components/Header1";
+import Header1 from "../../components/Header1";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { formatRoleDisplayName } from "../utils/FormatRoleDisplayName";
+import { formatRoleDisplayName } from "../../utils/FormatRoleDisplayName";
 
 const Profile = () => {
   const { logout, user } = useAuth();
@@ -138,7 +138,7 @@ const Profile = () => {
     if (!currentUser) {
       return <ActivityIndicator size="large" color={theme.COLORS.lightGray} />;
     }
-    
+
     return (
       <ScrollView
         contentContainerStyle={{

@@ -3,17 +3,25 @@ import React, { useEffect, useState } from "react";
 import { components } from "../../components";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { blogService } from "../../api/blog";
 import HTMLView from "react-native-htmlview";
 import { theme } from "../../constants/theme";
 import { skeletonLoader } from "../../components/skeletonLoaders";
 import Header1 from "../../components/Header1";
 import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+
+type ReadBlogNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ReadBlog"
+>;
+type ReadBlogRouteProp = RouteProp<RootStackParamList, "ReadBlog">;
 
 const ReadBlog = () => {
-  const route = useRoute();
-  const navigation = useNavigation();
+  const route = useRoute<ReadBlogRouteProp>();
+  const navigation = useNavigation<ReadBlogNavigationProp>();
   const { blogId }: any = route.params;
   const [loading, setLoading] = useState<boolean>(true);
   const [blogDetail, setBlogDetail] = useState<any>(null);
@@ -62,7 +70,9 @@ const ReadBlog = () => {
           </View>
           <Text style={styles.textDesign}>
             {new Date(blogDetail.created_at).toLocaleDateString()} |{" "}
-            {blogDetail.category == "Null"? "N/A": capitalizeFirstLetter(blogDetail.category)}
+            {blogDetail.category == "Null"
+              ? "N/A"
+              : capitalizeFirstLetter(blogDetail.category)}
           </Text>
           <Text style={styles.shortDescription}>{blogDetail.description}</Text>
           <HTMLView value={blogDetail.content} stylesheet={htmlStyles} />
@@ -147,32 +157,32 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     borderRadius: 10,
-    ...theme.FONTS.Mulish_700Bold
+    ...theme.FONTS.Mulish_700Bold,
   },
   textDesign: {
     fontSize: 14,
     color: "#888888",
     marginBottom: 12,
-    ...theme.FONTS.Mulish_400Regular
+    ...theme.FONTS.Mulish_400Regular,
   },
   shortDescription: {
     fontSize: 14,
     color: "#444444",
     lineHeight: 20,
     margin: 10,
-    ...theme.FONTS.Mulish_600SemiBold
+    ...theme.FONTS.Mulish_600SemiBold,
   },
   description: {
     fontSize: 16,
     color: "#444444",
     lineHeight: 22,
     margin: 10,
-    ...theme.FONTS.Mulish_600SemiBold
-  }
+    ...theme.FONTS.Mulish_600SemiBold,
+  },
 });
 
 const htmlStyles = StyleSheet.create({
-  "*": {  
+  "*": {
     fontFamily: theme.FONTS.Mulish_400Regular.fontFamily,
   },
   p: {

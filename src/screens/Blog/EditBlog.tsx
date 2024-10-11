@@ -16,9 +16,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { RefreshControl } from "react-native-gesture-handler";
 import { blogService } from "../../api/blog";
 import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { theme } from "../../constants/theme";
 import Header1 from "../../components/Header1";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 interface ImageObject {
   uri: string;
@@ -35,9 +37,15 @@ const schema = yup.object().shape({
   blogImage: yup.mixed(),
 });
 
+type EditBlogNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "EditBlog"
+>;
+type EditBlogRouteProp = RouteProp<RootStackParamList, "EditBlog">;
+
 const EditBlog = () => {
-  const route = useRoute();
-  const navigation = useNavigation();
+  const route = useRoute<EditBlogRouteProp>();
+  const navigation = useNavigation<EditBlogNavigationProp>();
   const { blogId }: any = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
@@ -52,9 +60,8 @@ const EditBlog = () => {
         return {
           value: category.category,
           label: capitalizeFirstLetter(category.category),
-        }
-      }
-      );
+        };
+      });
 
       setCategories(newCategories);
     } catch (error) {

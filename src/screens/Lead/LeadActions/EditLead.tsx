@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { components } from "../../../components";
 import { leadService } from "../../../api/lead";
 import { useAuth } from "../../../common/context/AuthContext";
@@ -22,13 +22,21 @@ import {
 import { theme } from "../../../constants/theme";
 import { skeletonLoader } from "../../../components/skeletonLoaders";
 import { capitalizeFirstLetter } from "../../../utils/CapitalizeFirstLetter";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+
+type EditLeadNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "EditLead"
+>;
+type EditLeadRouteProp = RouteProp<RootStackParamList, "EditLead">;
 
 const EditLead = () => {
-  const route = useRoute();
+  const route = useRoute<EditLeadRouteProp>();
+  const navigation = useNavigation<EditLeadNavigationProp>();
   const { leadId }: any = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
-  const navigation = useNavigation();
   const [visaCategories, setVisaCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [countryCode, setCountryCode] = useState<string>("+91");
@@ -876,12 +884,6 @@ const EditLead = () => {
           renderContent()
         )}
       </ScrollView>
-      {/* <View style={styles.btnContainerStyles}>
-                <components.Button
-                    title="Update Lead"
-                    onPress={handleSubmit(onSubmit)}
-                />
-            </View> */}
     </SafeAreaView>
   );
 };

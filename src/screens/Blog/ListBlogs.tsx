@@ -18,14 +18,16 @@ import { hasPermission } from "../../utils/HasPermission";
 import Header1 from "../../components/Header1";
 import { theme } from "../../constants/theme";
 import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
-type RootStackParamList = {
-  ReadBlog: { blogId: string };
-  EditBlog: { blogId: string };
-};
+type ListBlogsNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ListBlogs"
+>;
 
 const ListBlogs: React.FC = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<ListBlogsNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const { permissions, refreshPermissions } = usePermissions();
   const [loading, setLoading] = useState<boolean>(true);
@@ -117,7 +119,10 @@ const ListBlogs: React.FC = () => {
         <View style={styles.contentContainer}>
           <Text style={styles.title}>{blog.title}</Text>
           <Text style={styles.date}>
-            {new Date(blog.created_at).toLocaleDateString()} - {blog.category == "Null"? "N/A": capitalizeFirstLetter(blog.category)}
+            {new Date(blog.created_at).toLocaleDateString()} -{" "}
+            {blog.category == "Null"
+              ? "N/A"
+              : capitalizeFirstLetter(blog.category)}
           </Text>
           <Text style={styles.shortDescription} numberOfLines={2}>
             {blog.description}

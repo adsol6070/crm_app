@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation, NavigationProp } from "@react-navigation/native";
 import { capitalizeFirstLetter } from "../../../utils/CapitalizeFirstLetter";
-import SkeletonLoader from "../../Users/SkeletonLoader";
+import SkeletonLoader from "../../Users/components/SkeletonLoader";
 import { components } from "../../../components";
 import { checklistService } from "../../../api/checklist";
 import { usePermissions } from "../../../common/context/PermissionContext";

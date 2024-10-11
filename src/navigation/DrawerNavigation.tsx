@@ -63,7 +63,9 @@ const CustomDrawerContent = (props: any) => {
         <Text style={styles.profileName}>
           {userProfile?.firstname} {userProfile?.lastname}
         </Text>
-        <Text style={styles.profileRole}>{formatRoleDisplayName(userProfile?.role)}</Text>
+        <Text style={styles.profileRole}>
+          {formatRoleDisplayName(userProfile?.role || "")}
+        </Text>
       </View>
     );
   };

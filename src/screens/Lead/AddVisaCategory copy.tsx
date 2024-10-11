@@ -14,7 +14,7 @@ import { theme } from "../../constants/theme";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
-import SkeletonLoader from "../Users/SkeletonLoader";
+import SkeletonLoader from "../Users/components/SkeletonLoader";
 import { components } from "../../components";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";

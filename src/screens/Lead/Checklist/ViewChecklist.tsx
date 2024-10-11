@@ -5,9 +5,16 @@ import ListScreen from "../../Users/components/ListScreen";
 import { checklistService } from "../../../api/checklist";
 import { useRef } from "react";
 import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type ViewChecklistNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ViewChecklist"
+>;
 
 const ViewChecklist = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<ViewChecklistNavigationProp>();
   const refreshRef = useRef<() => void>();
 
   const handleItemPress = (item: any) => {
@@ -49,7 +56,9 @@ const ViewChecklist = () => {
       skeletonWithImage={false}
       onItemPress={handleItemPress}
       centerComponent={(item) => (
-        <Text style={theme.FONTS.H4}>{formatRoleDisplayName(item.visaType)}</Text>
+        <Text style={theme.FONTS.H4}>
+          {formatRoleDisplayName(item.visaType)}
+        </Text>
       )}
       actionConfigs={[
         {

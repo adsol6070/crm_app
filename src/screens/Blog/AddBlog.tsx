@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { components } from "../../components";
 import { useForm, Controller } from "react-hook-form";
@@ -16,6 +11,8 @@ import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 import { theme } from "../../constants/theme";
 import Header1 from "../../components/Header1";
 import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
 interface ImageObject {
   uri: string;
@@ -24,8 +21,10 @@ interface ImageObject {
   size: number;
 }
 
+type AddBlogNavigationProp = StackNavigationProp<RootStackParamList, "AddBlog">;
+
 const AddBlog = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<AddBlogNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [image, setImage] = useState<ImageObject | null>(null);
@@ -35,13 +34,12 @@ const AddBlog = () => {
   const getCategories = async () => {
     try {
       const response: any = await blogService.getBlogCategory();
-      const newCategories = response.map((category: any) =>{
+      const newCategories = response.map((category: any) => {
         return {
           value: category.category,
           label: capitalizeFirstLetter(category.category),
-        }
-      }
-      );
+        };
+      });
 
       setCategories(newCategories);
     } catch (error) {
@@ -120,21 +118,21 @@ const AddBlog = () => {
   const renderContent = () => {
     return (
       <View style={styles.fieldContainer}>
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <components.InputField
-                title="Title"
-                placeholder="Enter the title of the blog"
-                customBorderColor="#ddd"
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value}
-                error={errors.title?.message}
-              />
-            )}
-          />
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <components.InputField
+              title="Title"
+              placeholder="Enter the title of the blog"
+              customBorderColor="#ddd"
+              onChangeText={onChange}
+              onBlur={onBlur}
+              value={value}
+              error={errors.title?.message}
+            />
+          )}
+        />
         <Controller
           control={control}
           name="description"

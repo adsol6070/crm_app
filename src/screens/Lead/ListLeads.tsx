@@ -5,9 +5,16 @@ import ListScreen from "../Users/components/ListScreen";
 import { leadService } from "../../api/lead";
 import { theme } from "../../constants/theme";
 import { formatRoleDisplayName } from "../../utils/FormatRoleDisplayName";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../navigation/AppNavigator";
+
+type ListLeadsNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ListLeads"
+>;
 
 const ListLeads = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<ListLeadsNavigationProp>();
   const refreshRef = useRef<() => void>();
   const [visaCategories, setVisaCategories] = useState<any[]>([]);
 

@@ -16,7 +16,7 @@ import ListScreen from "../Users/components/ListScreen";
 import { formatRoleDisplayName } from "../../utils/FormatRoleDisplayName";
 
 const VisaCategory = () => {
-  const refreshRef = useRef<() => void>(() => { });
+  const refreshRef = useRef<() => void>(() => {});
   const {
     control,
     handleSubmit,

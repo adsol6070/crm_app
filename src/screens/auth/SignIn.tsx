@@ -27,7 +27,11 @@ type OnboardingScreenNavigationProp = StackNavigationProp<
 >;
 
 const schema = yup.object().shape({
-  email: yup.string().email("Invalid email").required("Email is required").trim(),
+  email: yup
+    .string()
+    .email("Invalid email")
+    .required("Email is required")
+    .trim(),
   password: yup.string().required("Password is required"),
 });
 
@@ -145,13 +149,13 @@ const SignIn = () => {
           </TouchableOpacity>
         </View>
         <components.Button
-          title={loading ? <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color={theme.COLORS.white} />
-            <Text style={styles.loadingText}>Signing In...</Text>
-          </View> : "Sign In"}
+          title="Sign In"
           containerStyle={styles.button}
           onPress={handleSubmit(onSubmit)}
+          loading={loading}
+          loadingText="Signing In..."
         />
+
         <View
           style={{
             flexDirection: "row",

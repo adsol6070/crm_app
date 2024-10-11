@@ -48,6 +48,7 @@ const SignUp = () => {
   const [image, setImage] = useState<ImageObject | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [countryCode, setCountryCode] = useState<string>("+91");
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -92,6 +93,7 @@ const SignUp = () => {
   };
 
   const onSubmit = async (data: SignUpFormData) => {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("tenantID", data.tenantId);
@@ -118,6 +120,8 @@ const SignUp = () => {
       });
     } catch (error) {
       console.error("Registration Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -274,6 +278,8 @@ const SignUp = () => {
           title="Sign up"
           onPress={handleSubmit(onSubmit)}
           containerStyle={{ marginBottom: 20 }}
+          loading={loading}
+          loadingText="Signing Up..."
         />
         <View
           style={{

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
-  TextInput,
   FlatList,
   RefreshControl,
 } from "react-native";
@@ -16,6 +15,7 @@ import {
   useNavigation,
   useRoute,
   NavigationProp,
+  RouteProp,
 } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
@@ -27,19 +27,20 @@ import { skeletonLoader } from "../../../components/skeletonLoaders";
 import { usePermissions } from "../../../common/context/PermissionContext";
 import { hasPermission } from "../../../utils/HasPermission";
 import Header1 from "../../../components/Header1";
+import { RootStackParamList } from "../../../navigation/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-type RootStackParamList = {
-  LeadDetail: { leadId: string };
-  LeadHistory: { leadId: string };
-  DocumentChecklist: { leadId: string; visaType: string };
-  EditLead: { leadId: string };
-};
+type LeadActionsNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "LeadActions"
+>;
+type LeadActionsRouteProp = RouteProp<RootStackParamList, "LeadActions">;
 
 const LeadActions = () => {
-  const route = useRoute();
+  const route = useRoute<LeadActionsRouteProp>();
   const { user } = useAuth();
   const { permissions, refreshPermissions } = usePermissions();
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<LeadActionsNavigationProp>();
   const { leadId, visaType }: any = route.params;
   const [leadDetail, setLeadDetail] = useState<any>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -342,138 +343,138 @@ const ActionButton = ({ title, iconName, iconColor, onPress }: any) => (
 );
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.COLORS.tertiaryWhite,
-    },
-    scrollView: {
-        flexGrow: 1,
-    },
-    contentContainer: {
-        flex: 1,
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-    },
-    leadDetailArea: {
-        marginBottom: 20,
-        backgroundColor: theme.COLORS.white,
-        borderRadius: 10,
-        padding: 10,
-        shadowColor: theme.COLORS.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 2,
-    },
-    leadIdText: {
-        fontSize: 16,
-        color: theme.COLORS.black,
-        ...theme.FONTS.Mulish_700Bold
-    },
-    leadNameText: {
-        fontSize: 18,
-        color: theme.COLORS.primary,
-        ...theme.FONTS.Mulish_600SemiBold
-    },
-    statusUpdateContainer: {
-        marginBottom: 20,
-    },
-    statusLabel: {
-        fontSize: 16,
-        color: theme.COLORS.black,
-        marginBottom: 5,
-        ...theme.FONTS.Mulish_700Bold
-    },
-    pickerContainer: {
-        borderRadius: 5,
-        overflow: 'hidden',
-    },
-    picker: {
-        height: 50,
-        color: theme.COLORS.white,
-    },
-    actionContainer: {
-        justifyContent: 'space-around',
-        marginBottom: 5,
-    },
-    actionButton: {
-        alignItems: 'center',
-        margin: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        backgroundColor: theme.COLORS.white,
-        shadowColor: theme.COLORS.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 2,
-    },
-    iconWrapper: {
-        marginBottom: 5,
-    },
-    actionButtonText: {
-        fontSize: 14,
-        color: theme.COLORS.black,
-        ...theme.FONTS.Mulish_600SemiBold
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: theme.COLORS.white,
-        marginHorizontal: 20,
-        borderRadius: 10,
-        padding: 20,
-        alignItems: 'center',
-    },
-    modalTitle: {
-        fontSize: 18,
-        marginBottom: 15,
-        color: theme.COLORS.black,
-        ...theme.FONTS.Mulish_700Bold
-    },
-    assigneeListContainer: {
-      maxHeight: "80%",
-      overflow: "scroll"
-    },
-    checkboxContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomStartRadius: 20,
-        borderBottomEndRadius: 20,
-        width: "100%",
-        borderColor: theme.COLORS.lightGray,
-    },
-    checkboxLabel: {
-        fontSize: 16,
-        color: theme.COLORS.black,
-        ...theme.FONTS.Mulish_400Regular
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: '100%',
-        marginTop: 20,
-    },
-    modalButton: {
-        backgroundColor: theme.COLORS.primary,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-    },
-    modalButtonText: {
-        color: theme.COLORS.white,
-        fontSize: 16,
-        fontWeight: '600',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: theme.COLORS.tertiaryWhite,
+  },
+  scrollView: {
+    flexGrow: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  leadDetailArea: {
+    marginBottom: 20,
+    backgroundColor: theme.COLORS.white,
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: theme.COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  leadIdText: {
+    fontSize: 16,
+    color: theme.COLORS.black,
+    ...theme.FONTS.Mulish_700Bold,
+  },
+  leadNameText: {
+    fontSize: 18,
+    color: theme.COLORS.primary,
+    ...theme.FONTS.Mulish_600SemiBold,
+  },
+  statusUpdateContainer: {
+    marginBottom: 20,
+  },
+  statusLabel: {
+    fontSize: 16,
+    color: theme.COLORS.black,
+    marginBottom: 5,
+    ...theme.FONTS.Mulish_700Bold,
+  },
+  pickerContainer: {
+    borderRadius: 5,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    color: theme.COLORS.white,
+  },
+  actionContainer: {
+    justifyContent: "space-around",
+    marginBottom: 5,
+  },
+  actionButton: {
+    alignItems: "center",
+    margin: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: theme.COLORS.white,
+    shadowColor: theme.COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  iconWrapper: {
+    marginBottom: 5,
+  },
+  actionButtonText: {
+    fontSize: 14,
+    color: theme.COLORS.black,
+    ...theme.FONTS.Mulish_600SemiBold,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: theme.COLORS.white,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 15,
+    color: theme.COLORS.black,
+    ...theme.FONTS.Mulish_700Bold,
+  },
+  assigneeListContainer: {
+    maxHeight: "80%",
+    overflow: "scroll",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomStartRadius: 20,
+    borderBottomEndRadius: 20,
+    width: "100%",
+    borderColor: theme.COLORS.lightGray,
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    color: theme.COLORS.black,
+    ...theme.FONTS.Mulish_400Regular,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    marginTop: 20,
+  },
+  modalButton: {
+    backgroundColor: theme.COLORS.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: theme.COLORS.white,
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });
 
 export default LeadActions;

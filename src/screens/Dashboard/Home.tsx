@@ -1,12 +1,11 @@
 import { View, Platform } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Dashboard } from "./Dashboard/";
+import { Dashboard } from ".";
 import { ScrollView, RefreshControl } from "react-native-gesture-handler";
-import { components } from "../components";
-import { theme } from "../constants/theme";
+import { theme } from "../../constants/theme";
 import { useNavigation } from "@react-navigation/native";
-import Header1 from "../components/Header1";
+import Header1 from "../../components/Header1";
 
 const Home = () => {
   const navigation = useNavigation();

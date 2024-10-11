@@ -7,8 +7,8 @@ import {
 } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Home from "../screens/Home";
-import Profile from "../screens/Profile";
+import Home from "../screens/Dashboard/Home";
+import Profile from "../screens/Profile/Profile";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../constants/theme";
 import Chat from "../screens/Chat";

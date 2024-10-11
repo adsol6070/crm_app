@@ -4,9 +4,16 @@ import { rolesService } from "../../../../api/roles";
 import { theme } from "../../../../constants/theme";
 import { formatRoleDisplayName } from "../../../../utils/FormatRoleDisplayName";
 import ListScreen from "../../components/ListScreen";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../../../../navigation/AppNavigator";
+
+type RoleListNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "ViewRoles"
+>;
 
 const RoleList = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RoleListNavigationProp>();
 
   const handleItemPress = (name: string) =>
     navigation.navigate("RoleDetail", { roleName: name });

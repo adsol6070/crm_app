@@ -32,29 +32,19 @@ import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import { theme } from "../../constants/theme";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useSocket } from "../../common/context/SocketContext";
 import { useAuth } from "../../common/context/AuthContext";
 import { chatService } from "../../api/chat";
+import { RootStackParamList } from "../../navigation/AppNavigator";
 
-type RootStackParamList = {
-  PersonalChat: { userName: string; userId: string };
-};
-
-type PersonalChatNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "PersonalChat"
->;
-
+type PersonalChatNavigationProp = StackNavigationProp<RootStackParamList, "PersonalChat">;
 type PersonalChatRouteProp = RouteProp<RootStackParamList, "PersonalChat">;
 
-type PersonalChatProps = {
-  navigation: PersonalChatNavigationProp;
-  route: PersonalChatRouteProp;
-};
-
-const PersonalChat: React.FC<PersonalChatProps> = ({ navigation, route }) => {
-  const { userId, userName } = route.params;
+const PersonalChat = () => {
+  const navigation = useNavigation<PersonalChatNavigationProp>();
+  const route = useRoute<PersonalChatRouteProp>();
+  const { userId, userName } = route.params || {};
   const typingTimeout = useRef<NodeJS.Timeout | null>(null);
   const socketManager = useSocket();
   const { user } = useAuth();
