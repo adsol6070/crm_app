@@ -2,6 +2,7 @@ import React from "react";
 import { View, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { theme } from "../../../constants/theme";
+import { v4 as uuidv4 } from "uuid";
 
 interface ActionConfig {
   iconName: string;
@@ -52,7 +53,9 @@ const ItemList: React.FC<ItemListProps> = ({
           <View style={styles.leadingContainer}>{leadingComponent(item)}</View>
         )}
         <View style={styles.detailsContainer}>
+          <View style={styles.itemDetailDesign}>
           {centerComponent(item)}
+          </View>
           <View style={styles.iconContainer}>
             {actionConfigs.map((action, index) => (
               <TouchableOpacity
@@ -85,7 +88,7 @@ const ItemList: React.FC<ItemListProps> = ({
     <FlatList
       data={data}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={() => uuidv4()}
       refreshing={refreshing}
       onRefresh={onRefresh}
     />
@@ -115,6 +118,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
+  },
+  itemDetailDesign: {
+    width: "45%"
   },
   textContainer: {
     flexDirection: "column",

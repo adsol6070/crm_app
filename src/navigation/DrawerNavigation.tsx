@@ -16,6 +16,7 @@ import SkeletonLoader from "./ProfileSkeletonLoader";
 import { IUserProfile } from "../types";
 import { usePermissions } from "../common/context/PermissionContext";
 import { hasPermission } from "../utils/HasPermission";
+import { formatRoleDisplayName } from "../utils/FormatRoleDisplayName";
 
 const Drawer = createDrawerNavigator();
 
@@ -23,15 +24,16 @@ const CustomDrawerContent = (props: any) => {
   const { user } = useAuth();
   const { permissions, refreshPermissions } = usePermissions();
   const [userProfile, setUserProfile] = useState<IUserProfile | null>(null);
+  const [profileFetched, setProfileFetched] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const isDrawerOpen = useDrawerStatus() === "open";
 
   useEffect(() => {
-    if (isDrawerOpen) {
+    if (isDrawerOpen && !profileFetched) {
       fetchProfile();
       refreshPermissions();
     }
-  }, [isDrawerOpen]);
+  }, [isDrawerOpen, profileFetched]);
 
   const fetchProfile = async () => {
     if (!user?.sub) return;
@@ -40,6 +42,7 @@ const CustomDrawerContent = (props: any) => {
       const response = await userService.getProfile({ userId: user?.sub });
       const { firstname, lastname, profileImageUrl, role } = response;
       setUserProfile({ firstname, lastname, profileImageUrl, role });
+      setProfileFetched(true);
     } catch (error) {
       console.log("Profile Fetching error ", error);
     } finally {
@@ -62,7 +65,7 @@ const CustomDrawerContent = (props: any) => {
         <Text style={styles.profileName}>
           {userProfile?.firstname} {userProfile?.lastname}
         </Text>
-        <Text style={styles.profileRole}>{userProfile?.role}</Text>
+        <Text style={styles.profileRole}>{formatRoleDisplayName(userProfile?.role)}</Text>
       </View>
     );
   };
@@ -176,7 +179,7 @@ const CustomDrawerContent = (props: any) => {
   const renderDrawerItems = () => {
     return drawerItems.map((item, index) => {
       if (["Roles and Permissions", "View Roles"].includes(item.label)) {
-        if (user?.role !== "superAdmin") {
+        if (user?.role !== "super_admin") {
           return null;
         }
       }

@@ -6,6 +6,7 @@ import { ImmigrationInfoData } from "../interfaces";
 import { theme } from "../../../../constants/theme";
 import { leadService } from "../../../../api/lead";
 import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
+import { formatRoleDisplayName } from "../../../../utils/FormatRoleDisplayName";
 
 interface ImmigrationInfoProps {
   control: Control<ImmigrationInfoData>;
@@ -14,13 +15,18 @@ interface ImmigrationInfoProps {
   trigger: any;
 }
 
+interface Option {
+  label: string;
+  value: string;
+}
+
 const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
   control,
   errors,
   clearErrors,
   trigger,
 }) => {
-  const [visaCategories, setVisaCategories] = useState<string[]>([]);
+  const [visaCategories, setVisaCategories] = useState<Option[]>([]);
 
   const handleFieldChange = useCallback(
     async (field: keyof ImmigrationInfoData) => {
@@ -35,14 +41,12 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
   const fetchVisaCategories = async () => {
     try {
       const response: any = await leadService.getVisaCategory();
-      const newCategories = response.map((category: any) => {
-        return {
-          value: category.category,
-          label: capitalizeFirstLetter(category.category),
-        }
-      }
-      );
-      setVisaCategories(newCategories)
+      const newCategories = response.map((category: any) => ({
+        label: formatRoleDisplayName(category.category),
+        value: category.category,
+      }));
+
+      setVisaCategories(newCategories);
     } catch (error) {
       console.error("Error fetching visa categories");
     }
@@ -100,7 +104,8 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
                 value={typeof value === "string" ? value : ""}
                 error={errors[field as keyof ImmigrationInfoData]?.message}
               />
-            )}
+            )
+          }
         />
       ))}
 
@@ -112,7 +117,7 @@ const ImmigrationInfo: React.FC<ImmigrationInfoProps> = ({
           render={({ field: { onChange, value } }) => (
             <components.Dropdown
               options={getDropdownOptions(field, visaCategories)}
-              selectedValue={capitalizeFirstLetter(value as string)}
+              selectedValue={value}
               onSelect={(value: string) => {
                 onChange(value);
                 handleFieldChange(field as keyof ImmigrationInfoData);
@@ -155,7 +160,7 @@ const getPlaceholder = (field: string) => {
   }
 };
 
-const getDropdownOptions = (field: string, visaCategories: string[]) => {
+const getDropdownOptions = (field: string, visaCategories: Option[]) => {
   switch (field) {
     case "visaCategory":
       return visaCategories;

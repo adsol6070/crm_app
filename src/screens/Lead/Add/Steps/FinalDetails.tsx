@@ -4,6 +4,7 @@ import { Control, Controller, FieldErrors } from "react-hook-form";
 import { components } from "../../../../components";
 import { FinalDetailsData } from "../interfaces";
 import { theme } from "../../../../constants/theme";
+import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
 
 interface FinalDetailsProps {
   control: Control<FinalDetailsData>;
@@ -51,44 +52,42 @@ const FinalDetails: React.FC<FinalDetailsProps> = ({
           key={index}
           control={control}
           name={field as keyof FinalDetailsData}
-          render={({ field: { onChange, onBlur, value } }) =>  
+          render={({ field: { onChange, onBlur, value } }) =>
             field === "followUpDates" ? (
-            <components.InputField
-              title="FollowUp Dates"
-              placeholder="DD/MM/YYYY"
-              datePicker
-              customBorderColor="#ddd"
-              customBackgroundColor="#f5f5f5"
-              date={value ? value : undefined}
+              <components.InputField
+                title="FollowUp Dates"
+                placeholder="DD/MM/YYYY"
+                datePicker
+                customBorderColor="#ddd"
+                customBackgroundColor="#f5f5f5"
+                date={value ? value : undefined}
                 onDateChange={(date) => {
                   onChange(date);
                   handleFieldChange(field as keyof FinalDetailsData);
                 }}
-              error={errors[field as keyof FinalDetailsData]?.message}
-            />
-          ) : (
-            <components.InputField
-              title={capitalizeFirstLetter(field.replace(/([A-Z])/g, " $1"))}
-              placeholder={getPlaceholder(field)}
-              customBorderColor="#ddd"
-              customBackgroundColor="#f5f5f5"
-              onChangeText={(text) => {
-                onChange(text);
-                handleFieldChange(field as keyof FinalDetailsData);
-              }}
-              onBlur={onBlur}
-              value={typeof value === "string" ? value : ""}
-              error={errors[field as keyof FinalDetailsData]?.message}
-            />
-          )}
+                error={errors[field as keyof FinalDetailsData]?.message}
+              />
+            ) : (
+              <components.InputField
+                title={capitalizeFirstLetter(field.replace(/([A-Z])/g, " $1"))}
+                placeholder={getPlaceholder(field)}
+                customBorderColor="#ddd"
+                customBackgroundColor="#f5f5f5"
+                onChangeText={(text) => {
+                  onChange(text);
+                  handleFieldChange(field as keyof FinalDetailsData);
+                }}
+                onBlur={onBlur}
+                value={typeof value === "string" ? value : ""}
+                error={errors[field as keyof FinalDetailsData]?.message}
+              />
+            )
+          }
         />
       ))}
     </View>
   );
 };
-
-const capitalizeFirstLetter = (string: string) =>
-  string.charAt(0).toUpperCase() + string.slice(1);
 
 const getPlaceholder = (field: string) => {
   switch (field) {

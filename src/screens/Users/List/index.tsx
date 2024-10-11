@@ -4,6 +4,7 @@ import { userService } from "../../../api/user";
 import ListScreen from "../components/ListScreen";
 import { theme } from "../../../constants/theme";
 import GetPlaceholderImage from "../../../utils/GetPlaceholderImage ";
+import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
 
 const UserList = () => {
   const navigation = useNavigation();
@@ -48,7 +49,9 @@ const UserList = () => {
       centerComponent={(item) => (
         <View style={{ flexDirection: "column" }}>
           <Text style={theme.FONTS.H4}>{item.userName}</Text>
-          <Text style={theme.FONTS.Mulish_400Regular}>{item.role}</Text>
+          <Text style={theme.FONTS.Mulish_400Regular}>
+            {formatRoleDisplayName(item.role)}
+          </Text>
         </View>
       )}
       actionConfigs={[

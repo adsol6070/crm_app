@@ -4,6 +4,7 @@ import { Control, Controller, FieldErrors } from "react-hook-form";
 import { components } from "../../../../components";
 import { AcademicInfoData } from "../interfaces";
 import { theme } from "../../../../constants/theme";
+import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
 
 interface AcademicInfoProps {
   control: Control<AcademicInfoData>;
@@ -64,9 +65,6 @@ const AcademicInfo: React.FC<AcademicInfoProps> = ({
     </View>
   );
 };
-
-const capitalizeFirstLetter = (string: string) =>
-  string.charAt(0).toUpperCase() + string.slice(1);
 
 const getPlaceholder = (field: string) => {
   switch (field) {

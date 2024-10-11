@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { theme } from "../constants/theme";
+import { v4 as uuidv4 } from "uuid";
 
 interface Option {
   label: string;
@@ -18,7 +19,7 @@ interface Option {
 
 interface DropdownProps {
   options: Option[];
-  selectedValue: string | null;
+  selectedValue: string | Date | undefined;
   onSelect: (value: string) => void;
   placeholder?: string;
   label?: string;
@@ -34,7 +35,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   error,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
-
+  
   const toggleDropdown = () => {
     setIsVisible(!isVisible);
   };
@@ -76,7 +77,7 @@ const Dropdown: React.FC<DropdownProps> = ({
               <View style={styles.modalContainer}>
                 <FlatList
                   data={options}
-                  keyExtractor={(item) => item.value}
+                  keyExtractor={() => uuidv4()}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.option}

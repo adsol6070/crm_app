@@ -76,7 +76,7 @@ const LeadActions = () => {
     try {
       const response: any = await userService.getAllUsers();
       const filteredUsers = response.users.filter(
-        (user: any) => user.role !== "superAdmin"
+        (user: any) => user.role !== "super_admin"
       );
       setAssignees(filteredUsers);
     } catch (error) {
@@ -131,7 +131,6 @@ const LeadActions = () => {
         lead_id: leadId,
         user_id: selectedAssignees,
       };
-      console.log(data);
       const response: any = await leadService.assignLead(data);
       getLeadDetail();
       Alert.alert(response.message);

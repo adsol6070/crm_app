@@ -17,6 +17,7 @@ import RoleDetailSkeletonLoader from "./SkeletonLoader";
 import Header1 from "../../../../components/Header1";
 import { rolesService } from "../../../../api/roles";
 import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
+import { formatRoleDisplayName } from "../../../../utils/FormatRoleDisplayName";
 
 const RoleDetail = () => {
   const navigation = useNavigation();
@@ -88,7 +89,7 @@ const RoleDetail = () => {
       {!loading && roleDetails ? (
         <>
           <Header1
-            title={capitalizeFirstLetter(roleDetails.role)}
+            title={formatRoleDisplayName(roleDetails.role)}
             showBackButton={true}
             onBackPress={() => navigation.goBack()}
           />

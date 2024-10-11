@@ -4,10 +4,14 @@ import { theme } from "../../../constants/theme";
 import ListScreen from "../../Users/components/ListScreen";
 import { checklistService } from "../../../api/checklist";
 import { useRef } from "react";
+import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
+import { usePermissions } from "../../../common/context/PermissionContext";
+import { hasPermission } from "../../../utils/HasPermission";
 
 const ViewChecklist = () => {
   const navigation = useNavigation();
   const refreshRef = useRef<() => void>();
+  const { permissions } = usePermissions();
 
   const handleItemPress = (item: any) => {
     navigation.navigate("ChecklistDetail", {
@@ -48,7 +52,7 @@ const ViewChecklist = () => {
       skeletonWithImage={false}
       onItemPress={handleItemPress}
       centerComponent={(item) => (
-        <Text style={theme.FONTS.H4}>{item.visaType}</Text>
+        <Text style={theme.FONTS.H4}>{formatRoleDisplayName(item.visaType)}</Text>
       )}
       actionConfigs={[
         {
@@ -57,12 +61,12 @@ const ViewChecklist = () => {
           onPress: (item) => handleItemPress(item),
           size: 20,
         },
-        {
+        ...(hasPermission(permissions, 'Checklists', 'DeleteChecklist') ? [{
           iconName: "delete",
           iconType: "MaterialIcons",
           onPress: (item) => handleDelete(item.id),
           size: 20,
-        },
+        }] : []),
       ]}
       searchKey="visaType"
       refreshRef={refreshRef}

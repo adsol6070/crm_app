@@ -7,6 +7,7 @@ import { theme } from "../../../constants/theme";
 import { skeletonLoader } from "../../../components/skeletonLoaders";
 import useLeadData from "../useLeadDetail";
 import Header1 from "../../../components/Header1";
+import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
 
 const LeadDetail = () => {
   const route = useRoute();
@@ -121,7 +122,9 @@ const LeadDetail = () => {
             <View style={styles.infoRow} key={key}>
               <Text style={styles.infoLabel}>{formatLabel(key)}:</Text>
               <Text style={styles.infoValue}>
-                {formatValue(leadDetail[key])}
+                {key === "visaCategory"
+                  ? formatRoleDisplayName(leadDetail[key])
+                  : formatValue(leadDetail[key])}
               </Text>
             </View>
           ))}

@@ -2,6 +2,8 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LeadData } from "../interfaces";
 import { theme } from "../../../../constants/theme";
+import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
+import { formatRoleDisplayName } from "../../../../utils/FormatRoleDisplayName";
 
 interface LeadPreviewProps {
   data: LeadData;
@@ -9,6 +11,9 @@ interface LeadPreviewProps {
 }
 
 const formatDate = (date: Date) => {
+  if (!date || isNaN(new Date(date).getTime())) {
+    return "N/A";
+  }
   const updatedDate = new Date(date);
   const day = String(updatedDate.getDate()).padStart(2, "0");
   const month = String(updatedDate.getMonth() + 1).padStart(2, "0");
@@ -16,7 +21,32 @@ const formatDate = (date: Date) => {
   return `${day}/${month}/${year}`;
 };
 
+const TableRow: React.FC<{ label: string; value: string }> = ({
+  label,
+  value,
+}) => (
+  <View style={styles.tableRow}>
+    <Text style={styles.tableLabel}>{label}:</Text>
+    <Text style={styles.tableValue}>{value}</Text>
+  </View>
+);
+
 const LeadPreview: React.FC<LeadPreviewProps> = ({ data, countryCode }) => {
+  const renderValue = (key: string, value: any) => {
+    switch (key) {
+      case "dob":
+      case "passportExpiry":
+      case "followUpDates":
+        return formatDate(value);
+      case "phone":
+        return `${countryCode}${value}`;
+      case "visaCategory":
+        return formatRoleDisplayName(value);
+      default:
+        return capitalizeFirstLetter(value) ?? "N/A";
+    }
+  };
+
   return (
     <View>
       <Text style={styles.stepTitle}>View Lead Details</Text>
@@ -24,23 +54,17 @@ const LeadPreview: React.FC<LeadPreviewProps> = ({ data, countryCode }) => {
         <Text style={styles.previewTitle}>Lead Preview</Text>
         <View style={styles.table}>
           {Object.keys(data).map((key, index) => (
-            <View key={index} style={styles.tableRow}>
-              <Text style={styles.tableLabel}>
-                {capitalizeFirstLetter(key.replace(/([A-Z])/g, " $1"))}:
-              </Text>
-              <Text style={styles.tableValue}>
-                {(key === "dob" || key === "passportExpiry" || key === "followUpDates")? formatDate(data[key]): key === "phone" ? `${countryCode}${data[key]}` : data[key] ?? "N/A"}
-              </Text>
-            </View>
+            <TableRow
+              key={index}
+              label={capitalizeFirstLetter(key.replace(/([A-Z])/g, " $1"))}
+              value={renderValue(key, data[key])}
+            />
           ))}
         </View>
       </View>
     </View>
   );
 };
-
-const capitalizeFirstLetter = (string: string) =>
-  string.charAt(0).toUpperCase() + string.slice(1);
 
 const styles = StyleSheet.create({
   stepTitle: {

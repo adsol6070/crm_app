@@ -21,6 +21,7 @@ import DetailSkeletonLoader from "./Users/Detail/SkeletonLoader";
 import * as ImagePicker from "expo-image-picker";
 import Header1 from "../components/Header1";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { formatRoleDisplayName } from "../utils/FormatRoleDisplayName";
 
 const Profile = () => {
   const { logout, user } = useAuth();
@@ -214,7 +215,7 @@ const Profile = () => {
             categoryNavigation={false}
           />
           <components.ProfileCategory
-            title={currentUser.role ?? "N/A"}
+            title={formatRoleDisplayName(currentUser.role) ?? "N/A"}
             icon={<svg.RoleSvg />}
             categoryNavigation={false}
           />
