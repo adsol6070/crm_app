@@ -161,7 +161,7 @@ const ChecklistDetail = () => {
                 {
                   iconName: "edit",
                   iconType: "MaterialIcons",
-                  onPress: (item) => onEditModal(item),
+                  onPress: (item: any) => onEditModal(item),
                   size: 20,
                 },
               ]
@@ -171,7 +171,7 @@ const ChecklistDetail = () => {
                 {
                   iconName: "delete",
                   iconType: "MaterialIcons",
-                  onPress: (item) => handleDelete(item.name),
+                  onPress: (item: any) => handleDelete(item.name),
                   size: 20,
                 },
               ]

@@ -18,7 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 interface ActionConfig {
   iconName: string;
-  iconType: "AntDesign" | "MaterialIcons";
+  iconType: string;
   onPress: (item: any) => void;
   size?: number;
   color?: string;

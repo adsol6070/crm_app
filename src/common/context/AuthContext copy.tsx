@@ -1,13 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authService } from "../../api/auth/index";
-import { jwtDecode }  from "jwt-decode"; // Removed the braces to use it properly
+import { jwtDecode } from "jwt-decode";
 
 interface DecodedToken {
   tenantID?: string;
   sub?: string;
-  iat?: number; 
-  exp?: number; 
   [key: string]: any;
 }
 
@@ -30,18 +28,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<string | null>(null);
   const [logoutTimer, setLogoutTimer] = useState<NodeJS.Timeout | null>(null);
 
-  const setTokenExpiryTimer = (expiryTime: number) => {
+  const setTokenExpiryTimer = (createdTime: number, expiryTime: number) => {
     if (logoutTimer) {
-      clearTimeout(logoutTimer); 
+      clearTimeout(logoutTimer);
     }
 
-    const currentTime = Math.floor(Date.now() / 1000); 
-    const timeUntilExpiry = expiryTime - currentTime; 
+    const timeoutDuration = (expiryTime - createdTime) * 1000;
 
-    if (timeUntilExpiry > 0) {
+    if (timeoutDuration > 0) {
       const timer = setTimeout(() => {
         logout();
-      }, timeUntilExpiry * 1000);
+      }, timeoutDuration);
 
       setLogoutTimer(timer);
     } else {
@@ -57,10 +54,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const decodedToken = jwtDecode<DecodedToken>(storedToken);
         setUser(decodedToken);
-
-        if (decodedToken.exp) {
-          setTokenExpiryTimer(decodedToken.exp); 
-        }
       } catch (err) {
         console.error("Token decoding failed:", err);
       }
@@ -68,14 +61,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    loadToken(); 
+    loadToken();
   }, []);
 
   const login = async (data: any): Promise<string | null> => {
     try {
       const response = await authService.login(data);
       const token = response.tokens.accessToken;
-
       if (token) {
         const decodedToken = jwtDecode<DecodedToken>(token);
         await AsyncStorage.setItem("accessToken", token);
@@ -83,10 +75,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(decodedToken);
         setError(null);
 
-        if (decodedToken.exp) {
-          setTokenExpiryTimer(decodedToken.exp); 
+        if (decodedToken.iat && decodedToken.exp) {
+          setTokenExpiryTimer(decodedToken.iat, decodedToken.exp);
         }
-
         return null;
       } else {
         console.error("Login Error: Token is undefined");
@@ -107,7 +98,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(undefined);
 
       if (logoutTimer) {
-        clearTimeout(logoutTimer); 
+        clearTimeout(logoutTimer);
       }
     } catch (error) {
       console.error("Logout Error:", error);

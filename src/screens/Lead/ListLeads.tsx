@@ -105,7 +105,7 @@ const ListLeads = () => {
         ...(hasPermission(permissions, 'Leads', 'Delete') ? [{
           iconName: "delete",
           iconType: "MaterialIcons",
-          onPress: (item) => handleDelete(item.id),
+          onPress: (item: any) => handleDelete(item.id),
           size: 20,
         }] : []),
       ]}
