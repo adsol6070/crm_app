@@ -66,7 +66,7 @@ export default function App() {
       <ActionSheetProvider>
         <SocketProvider>
           <PermissionsProvider>
-           <AppContent />
+            <AppContent />
           </PermissionsProvider>
         </SocketProvider>
       </ActionSheetProvider>

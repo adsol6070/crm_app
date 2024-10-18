@@ -3,21 +3,18 @@ import { View, StyleSheet, Animated, Dimensions } from "react-native";
 import { theme } from "../constants/theme";
 
 const SkeletonLoader = () => {
-  // Animation value to move the gradient across
   const shimmerAnim = useRef(new Animated.Value(-1)).current;
 
   useEffect(() => {
-    // Start the shimmer animation on mount
     Animated.loop(
       Animated.timing(shimmerAnim, {
         toValue: 1,
-        duration: 1000, // Speed of the shimmer effect
+        duration: 1000, 
         useNativeDriver: true,
       })
     ).start();
   }, [shimmerAnim]);
 
-  // Translate X position based on animation value
   const translateX = shimmerAnim.interpolate({
     inputRange: [-1, 1],
     outputRange: [

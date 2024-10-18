@@ -242,7 +242,6 @@ const RoleManager: React.FC = () => {
       };
 
       if (!newPermissions[moduleId][permissionName]) {
-        // Automatically deselect dependent permissions if a parent permission is deselected
         modules
           .find((mod) => mod.id === moduleId)
           ?.permissions.forEach((perm) => {
@@ -256,7 +255,6 @@ const RoleManager: React.FC = () => {
     });
   };
 
-  // Handle form submission
   const onSubmit = async (data: RoleFormData) => {
     const formattedPermissions = formatPermissionsForSubmission(
       modules,

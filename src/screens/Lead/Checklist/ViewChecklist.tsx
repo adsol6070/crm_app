@@ -70,16 +70,12 @@ const ViewChecklist = () => {
           onPress: (item) => handleItemPress(item),
           size: 20,
         },
-        ...(hasPermission(permissions, "Checklists", "DeleteChecklist")
-          ? [
-              {
-                iconName: "delete",
-                iconType: "MaterialIcons",
-                onPress: (item: any) => handleDelete(item.id),
-                size: 20,
-              },
-            ]
-          : []),
+        ...(hasPermission(permissions, 'Checklists', 'DeleteChecklist') ? [{
+          iconName: "delete",
+          iconType: "MaterialIcons",
+          onPress: (item: any) => handleDelete(item.id),
+          size: 20,
+        }] : []),
       ]}
       searchKey="visaType"
       refreshRef={refreshRef}

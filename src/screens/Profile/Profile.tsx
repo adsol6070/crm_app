@@ -143,7 +143,7 @@ const Profile = () => {
       <ScrollView
         contentContainerStyle={{
           alignItems: "center",
-          paddingBottom: 20,
+          paddingBottom: 80,
           marginTop: 10,
         }}
         showsVerticalScrollIndicator={false}

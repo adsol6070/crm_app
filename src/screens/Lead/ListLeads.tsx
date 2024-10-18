@@ -102,16 +102,12 @@ const ListLeads = () => {
             }),
           size: 20,
         },
-        ...(hasPermission(permissions, "Leads", "Delete")
-          ? [
-              {
-                iconName: "delete",
-                iconType: "MaterialIcons",
-                onPress: (item) => handleDelete(item.id),
-                size: 20,
-              },
-            ]
-          : []),
+        ...(hasPermission(permissions, 'Leads', 'Delete') ? [{
+          iconName: "delete",
+          iconType: "MaterialIcons",
+          onPress: (item: any) => handleDelete(item.id),
+          size: 20,
+        }] : []),
       ]}
       refreshRef={refreshRef}
       isFilterable
