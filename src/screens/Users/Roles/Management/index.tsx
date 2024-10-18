@@ -57,9 +57,9 @@ const modules: Module[] = [
     name: "Leads",
     permissions: [
       { name: "AddNotes" },
-      { name: "Assign" },
+      { name: "Assign", dependsOn: "View" },
       { name: "Create" },
-      { name: "Delete" },
+      { name: "Delete", dependsOn: "View" },
       {
         name: "DeleteAll",
         dependsOn: "Delete",
@@ -68,13 +68,15 @@ const modules: Module[] = [
       { name: "DeleteNotes" },
       { name: "DownloadCSV" },
       { name: "DownloadCSVFormat" },
-      { name: "Edit" },
+      { name: "Edit", dependsOn: "View" },
       { name: "EditNote" },
-      { name: "History" },
+      { name: "History", dependsOn: "View" },
       { name: "ImportBulk" },
       { name: "ReadQR" },
-      { name: "Status" },
+      { name: "Status", dependsOn: "View" },
       { name: "View" },
+      { name: "Checklist", dependsOn: "View" },
+      { name: "DeleteSelected", dependsOn: "View" },
     ],
   },
   {
@@ -99,6 +101,19 @@ const modules: Module[] = [
     id: "reports",
     name: "Reports",
     permissions: [{ name: "View" }, { name: "Export", dependsOn: "View" }],
+  },
+  {
+    id: "checklists",
+    name: "Checklists",
+    permissions: [
+      { name: "Create" },
+      { name: "Read" },
+      { name: "AddDocument", dependsOn: "Read" },
+      { name: "EditDocument", dependsOn: "Read" },
+      { name: "DeleteDocument", dependsOn: "Read" },
+      { name: "DeleteChecklist", dependsOn: "Read" },
+      { name: "Update", dependsOn: "Read" },
+    ],
   },
 ];
 

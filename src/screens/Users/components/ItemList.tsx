@@ -16,7 +16,7 @@ interface ItemListProps {
   data: any[];
   refreshing: boolean;
   onRefresh: () => void;
-  onItemPress: (item: string) => void;
+  onItemPress?: (item: string) => void;
   leadingComponent?: (item: any) => React.ReactNode;
   centerComponent?: (item: any) => React.ReactNode;
   actionConfigs?: ActionConfig[];

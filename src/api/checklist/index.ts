@@ -1,6 +1,22 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { httpClient } from "../client";
 
+interface ChecklistDocument {
+  name: string;
+  required: boolean;
+}
+
+interface ChecklistResponse {
+  checklists: {
+    checklist: ChecklistDocument[];
+    created_at: string;
+    id: string;
+    tenantID: string;
+    updated_at: string;
+    visaType: string;
+  };
+}
+
 const getAuthHeaders = async (isMultipart: boolean = false) => {
   const token = await AsyncStorage.getItem("accessToken");
   let headers: { [key: string]: string } = {};
@@ -50,11 +66,12 @@ class ChecklistService {
   async deleteChecklistById(checklistId: string) {
     return makeRequest("delete", `/checklists/${checklistId}`);
   }
-  async getChecklistByVisaType(visaType: string) {
-    return makeRequest("get", `/checklists/${visaType}`);
+  async getChecklistByVisaType(visaType: string): Promise<ChecklistResponse> {
+    return makeRequest<ChecklistResponse>("get", `/checklists/${visaType}`);
   }
 }
 
 const checklistService = new ChecklistService();
 
 export { checklistService };
+  

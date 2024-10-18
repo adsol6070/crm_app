@@ -12,16 +12,21 @@ import { Controller, useForm } from "react-hook-form";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { components } from "../../../components";
 import { theme } from "../../../constants/theme";
-import ListScreen from "../../Users/components/ListScreen";
 import { checklistService } from "../../../api/checklist";
 import { RootStackParamList } from "../../../navigation/AppNavigator";
 import { usePermissions } from "../../../common/context/PermissionContext";
 import { hasPermission } from "../../../utils/HasPermission";
+import ListScreen from "../../Users/components/ListScreen";
 
 type ChecklistDetailRouteProp = RouteProp<
   RootStackParamList,
   "ChecklistDetail"
 >;
+
+interface ChecklistDocument {
+  name: string;
+  required: boolean;
+}
 
 const ChecklistDetail = () => {
   const refreshRef = useRef<() => void>(() => {});
@@ -35,7 +40,7 @@ const ChecklistDetail = () => {
     reset,
     setValue,
   } = useForm();
-  const [allDocuments, setAllDocuments] = useState<any[]>([]);
+  const [allDocuments, setAllDocuments] = useState<ChecklistDocument[]>([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState<boolean>(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const { permissions } = usePermissions();
@@ -48,7 +53,7 @@ const ChecklistDetail = () => {
       .max(30, "Category must be less than 30 characters"),
   });
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = async (): Promise<any> => {
     try {
       const documents = await checklistService.getChecklistByVisaType(visaType);
       const checklists = documents?.checklists;
@@ -73,7 +78,7 @@ const ChecklistDetail = () => {
       Alert.alert("Document added successfully");
       refreshRef.current?.();
     } catch (error) {
-      console.log("Error creating categories", error);
+      console.error("Error creating categories", error);
     }
   };
 
@@ -95,7 +100,7 @@ const ChecklistDetail = () => {
       Alert.alert("Document updated successfully");
       closeEditModal();
     } catch (error) {
-      console.log("Error creating categories", error);
+      console.error("Error creating categories", error);
     }
   };
 
@@ -161,7 +166,7 @@ const ChecklistDetail = () => {
                 {
                   iconName: "edit",
                   iconType: "MaterialIcons",
-                  onPress: (item) => onEditModal(item),
+                  onPress: (item: any) => onEditModal(item),
                   size: 20,
                 },
               ]
@@ -171,7 +176,7 @@ const ChecklistDetail = () => {
                 {
                   iconName: "delete",
                   iconType: "MaterialIcons",
-                  onPress: (item) => handleDelete(item.name),
+                  onPress: (item: any) => handleDelete(item.name),
                   size: 20,
                 },
               ]

@@ -18,7 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 interface ActionConfig {
   iconName: string;
-  iconType: "AntDesign" | "MaterialIcons";
+  iconType: string;
   onPress: (item: any) => void;
   size?: number;
   color?: string;
@@ -38,13 +38,13 @@ interface ListScreenProps<T> {
   fetchData: () => Promise<T[]>;
   mapData?: (data: T[]) => any[];
   placeholder: string;
-  onItemPress: (item: any) => void;
-  addButtonDestination: string;
+  onItemPress?: (item: any) => void;
+  addButtonDestination?: string;
   actionConfigs?: ActionConfig[];
   skeletonWithImage?: boolean;
   leadingComponent?: (item: any) => React.ReactNode;
   centerComponent?: (item: any) => React.ReactNode;
-  refreshRef?: React.MutableRefObject<() => void>;
+  refreshRef?: React.MutableRefObject<(() => void) | undefined>;
   isFilterable?: boolean;
   filterOptions?: any[];
   filterProperty?: string;

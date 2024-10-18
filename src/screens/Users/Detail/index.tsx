@@ -26,6 +26,8 @@ import { PartialUser } from "../../../types";
 import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigation/AppNavigator";
+import { hasPermission } from "../../../utils/HasPermission";
+import { usePermissions } from "../../../common/context/PermissionContext";
 
 type UserDetailNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -34,6 +36,7 @@ type UserDetailNavigationProp = StackNavigationProp<
 type UserDetailRouteProp = RouteProp<RootStackParamList, "UserDetail">;
 
 const UserDetail = () => {
+  const { permissions, refreshPermissions } = usePermissions();
   const navigation = useNavigation<UserDetailNavigationProp>();
   const route = useRoute<UserDetailRouteProp>();
   const { showActionSheetWithOptions } = useActionSheet();
@@ -57,6 +60,7 @@ const UserDetail = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchUser();
+    refreshPermissions();
     setRefreshing(false);
   }, [userId]);
 
@@ -290,15 +294,23 @@ const UserDetail = () => {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.iconButton} onPress={handleEdit}>
-            <AntDesign name="edit" size={24} color={theme.COLORS.white} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.iconButton, styles.deleteButton]}
-            onPress={handleDelete}
-          >
-            <MaterialIcons name="delete" size={24} color={theme.COLORS.white} />
-          </TouchableOpacity>
+          {hasPermission(permissions, "Users", "Update") && (
+            <TouchableOpacity style={styles.iconButton} onPress={handleEdit}>
+              <AntDesign name="edit" size={24} color={theme.COLORS.white} />
+            </TouchableOpacity>
+          )}
+          {hasPermission(permissions, "Users", "Delete") && (
+            <TouchableOpacity
+              style={[styles.iconButton, styles.deleteButton]}
+              onPress={handleDelete}
+            >
+              <MaterialIcons
+                name="delete"
+                size={24}
+                color={theme.COLORS.white}
+              />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={[styles.iconButton, styles.shareButton]}
             onPress={handleShare}

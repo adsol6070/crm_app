@@ -41,6 +41,7 @@ export const PermissionsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [permissions, setPermissions] = useState<Permissions>({});
+  console.log("Permissions of current role:", permissions);
   const { user } = useAuth();
   const isSuperAdmin = user?.role === "super_admin";
 
