@@ -29,6 +29,8 @@ import { hasPermission } from "../../../utils/HasPermission";
 import Header1 from "../../../components/Header1";
 import { RootStackParamList } from "../../../navigation/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { checklistService } from "../../../api/checklist";
+import { components } from "../../../components";
 
 type LeadActionsNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -49,6 +51,8 @@ const LeadActions = () => {
   const [assignees, setAssignees] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedAssignees, setSelectedAssignees] = useState<any[]>([]);
+  const [progressData, setProgressData] = useState<{ [key: string]: string }>({});
+  const [checklistData, setChecklistData] = useState<{ [key: string]: string }>({});
 
   const getLeadDetail = async () => {
     try {
@@ -87,6 +91,7 @@ const LeadActions = () => {
 
   useEffect(() => {
     getLeadDetail();
+    renderDocumentStatus();
     getUsers();
     getLeadAssignee();
     refreshPermissions();
@@ -187,6 +192,26 @@ const LeadActions = () => {
     }
   };
 
+  const renderDocumentStatus = async () => {
+    try {
+      const response: any = await leadService.getLeadDocumentStatus();
+      const checklistResponse: any = await checklistService.getAllChecklist();
+      const formattedChecklistData = checklistResponse.checklists.reduce((acc: any, curr: any) => {
+        acc[curr.visaType] = curr.checklist.length
+        return acc
+      }, {})
+      const formattedData = response.reduce((acc: any, curr: any) => {
+        acc[curr.leadID] = curr.documents.length
+        return acc
+      }, {})
+      setChecklistData(formattedChecklistData)
+      setProgressData(formattedData)
+    } catch (error) {
+      Alert.alert('Failed to get lead document status.')
+      console.error(error)
+    }
+  }
+
   const renderContent = () => (
     <View style={styles.contentContainer}>
       <View style={styles.leadDetailArea}>
@@ -201,6 +226,11 @@ const LeadActions = () => {
           {renderStatusPicker()}
         </View>
       )}
+      <View style={styles.statusUpdateContainer}>
+        <Text style={styles.statusLabel}>Checklist Status</Text>
+        {progressData[leadDetail.id] ? <components.ProgressBar totalDocuments={checklistData[leadDetail.visaCategory]} uploadedDocuments={progressData[leadDetail.id]} /> :
+          <components.ProgressBar totalDocuments={checklistData[leadDetail.visaCategory]} uploadedDocuments={0} />}
+      </View>
       <View style={styles.actionContainer}>
         {hasPermission(permissions, "Leads", "View") && (
           <ActionButton
