@@ -6,7 +6,7 @@ class HttpClient {
 
   constructor() {
     this._httpClient = axios.create({
-      baseURL: "http://192.168.1.15:8000/api/v1",
+      baseURL: "http://192.168.1.12:8000/api/v1",
       timeout: 6000,
       headers: {
         "Content-Type": "application/json",

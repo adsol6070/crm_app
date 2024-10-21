@@ -12,6 +12,7 @@ import Spinner from "./Spinner";
 import FilePicker from "./FilePicker";
 import PdfViewer from "./PdfViewer";
 import Header1 from "./Header1";
+import ProgressBar from "./ProgressBar";
 
 const components = {
   InputField,
@@ -28,6 +29,7 @@ const components = {
   FilePicker,
   PdfViewer,
   Header1,
+  ProgressBar,
 };
 
 export { components };

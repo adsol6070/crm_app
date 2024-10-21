@@ -127,6 +127,9 @@ class LeadService {
   async uploadSingleDocument(leadId?: string, payload?: FormData) {
     return makeRequest("post", `/lead/uploadSingleDocument`, payload, true);
   }
+  async getLeadDocumentStatus() {
+    return makeRequest("get", `/lead/getDocumentStatus`);
+  } 
 }
 
 const leadService = new LeadService();
