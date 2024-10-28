@@ -145,6 +145,8 @@ const getPlaceholder = (field: string) => {
       return "Enter Preferred Institutions";
     case "intakeSession":
       return "Enter Intake Session";
+    case "courseOfInterest":
+      return "Enter Course of Interest";
     case "reasonForImmigration":
       return "Enter Reason for Immigration";
     case "financialSupport":

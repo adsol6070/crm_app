@@ -18,12 +18,13 @@ import {
   genderOptions,
   maritalStatusOptions,
   nationalityOptions,
+  sourceOptions,
 } from "../../../utils/options";
 import { theme } from "../../../constants/theme";
 import { skeletonLoader } from "../../../components/skeletonLoaders";
-import { capitalizeFirstLetter } from "../../../utils/CapitalizeFirstLetter";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigation/AppNavigator";
+import { formatRoleDisplayName } from "../../../utils/FormatRoleDisplayName";
 
 type EditLeadNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -177,7 +178,12 @@ const EditLead = () => {
   const getCategories = async () => {
     try {
       const response: any = await leadService.getVisaCategory();
-      const newCategories = response.map((category: any) => category.category);
+      const newCategories = response.map((category: any) => {
+        return {
+          value: category.category,
+          label: formatRoleDisplayName(category.category),
+        };
+      });
       setVisaCategories(newCategories);
     } catch (error) {
       console.error("Error fetching visa categories", error);
@@ -321,10 +327,9 @@ const EditLead = () => {
         render={({ field: { onChange, value } }) => (
           <components.Dropdown
             options={genderOptions}
-            selectedValue={capitalizeFirstLetter(value)}
+            selectedValue={value}
             onSelect={(value: string) => {
-              const val = value.toLowerCase();
-              onChange(val);
+              onChange(value);
             }}
             placeholder="Select a gender"
             label="Gender"
@@ -436,10 +441,9 @@ const EditLead = () => {
         render={({ field: { onChange, value } }) => (
           <components.Dropdown
             options={nationalityOptions}
-            selectedValue={capitalizeFirstLetter(value)}
+            selectedValue={value}
             onSelect={(value: string) => {
-              const val = value.toLowerCase();
-              onChange(val);
+              onChange(value);
             }}
             placeholder="Select a Nationality"
             label="Nationality"
@@ -453,10 +457,9 @@ const EditLead = () => {
         render={({ field: { onChange, value } }) => (
           <components.Dropdown
             options={maritalStatusOptions}
-            selectedValue={capitalizeFirstLetter(value)}
+            selectedValue={value}
             onSelect={(value: string) => {
-              const val = value.toLowerCase();
-              onChange(val);
+              onChange(value);
             }}
             placeholder="Select a Marital Status"
             label="Marital Status"
@@ -502,10 +505,9 @@ const EditLead = () => {
         render={({ field: { onChange, value } }) => (
           <components.Dropdown
             options={visaCategories}
-            selectedValue={capitalizeFirstLetter(value)}
+            selectedValue={value}
             onSelect={(value: string) => {
-              const val = value.toLowerCase();
-              onChange(val);
+              onChange(value);
             }}
             placeholder="Select a category"
             label="Visa Category"
@@ -801,7 +803,7 @@ const EditLead = () => {
           />
         )}
       />
-      <Controller
+      {/* <Controller
         control={control}
         name="leadSource"
         render={({ field: { onChange, onBlur, value } }) => (
@@ -813,6 +815,22 @@ const EditLead = () => {
             onChangeText={onChange}
             onBlur={onBlur}
             value={value}
+            error={errors.leadSource?.message}
+          />
+        )}
+      /> */}
+       <Controller
+        control={control}
+        name="leadSource"
+        render={({ field: { onChange, value } }) => (
+          <components.Dropdown
+            options={sourceOptions}
+            selectedValue={value}
+            onSelect={(value: string) => {
+              onChange(value);
+            }}
+            placeholder="Select a source"
+            label="Source of Lead"
             error={errors.leadSource?.message}
           />
         )}

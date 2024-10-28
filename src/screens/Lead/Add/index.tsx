@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, Button, TouchableOpacity, Text, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import StepIndicator from "react-native-step-indicator";
@@ -154,10 +154,17 @@ const AddLead = () => {
       };
       try {
         await leadService.createLead(updatedData);
+        Alert.alert("Lead created successfully")
         reset();
         setCurrentStep(0);
-      } catch (error) {
-        console.error("Error while creating lead:", error);
+      } catch (error: any) {
+        if (error.response && error.response.data) {
+          const errorMessage = error.response.data.message || "Lead not added";
+          Alert.alert(errorMessage);
+        } else {
+          Alert.alert("Lead not added");
+        }
+        console.error("Error creating lead:", error);
       }
     }
   };

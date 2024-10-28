@@ -5,6 +5,7 @@ import { components } from "../../../../components";
 import { FinalDetailsData } from "../interfaces";
 import { theme } from "../../../../constants/theme";
 import { capitalizeFirstLetter } from "../../../../utils/CapitalizeFirstLetter";
+import { sourceOptions } from "../../../../utils/options";
 
 interface FinalDetailsProps {
   control: Control<FinalDetailsData>;
@@ -12,6 +13,20 @@ interface FinalDetailsProps {
   clearErrors: (name?: keyof FinalDetailsData) => void;
   trigger: any;
 }
+
+interface Option {
+  label: string;
+  value: string;
+}
+
+const getDropdownOptions = (field: string, sourceOptions: Option[]) => {
+  switch (field) {
+    case "leadSource":
+      return sourceOptions;
+    default:
+      return [];
+  }
+};
 
 const FinalDetails: React.FC<FinalDetailsProps> = ({
   control,
@@ -29,21 +44,12 @@ const FinalDetails: React.FC<FinalDetailsProps> = ({
     [clearErrors, trigger]
   );
 
-  const formatDate = (date: Date) => {
-    const updatedDate = new Date(date);
-    const day = String(updatedDate.getDate()).padStart(2, "0");
-    const month = String(updatedDate.getMonth() + 1).padStart(2, "0");
-    const year = updatedDate.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
   return (
     <View>
       <Text style={styles.stepTitle}>Final Details</Text>
       {[
         "communicationMode",
         "preferredContactTime",
-        "leadSource",
         "referralContact",
         "followUpDates",
         "leadRating",
@@ -85,6 +91,26 @@ const FinalDetails: React.FC<FinalDetailsProps> = ({
           }
         />
       ))}
+      {["leadSource"].map((field, index) => (
+        <Controller
+          key={index}
+          control={control}
+          name={field as keyof FinalDetailsData}
+          render={({ field: { onChange, value } }) => (
+            <components.Dropdown
+              options={getDropdownOptions(field, sourceOptions)}
+              selectedValue={value}
+              onSelect={(value: string) => {
+                onChange(value);
+                handleFieldChange(field as keyof FinalDetailsData);
+              }}
+              error={errors[field as keyof FinalDetailsData]?.message}
+              placeholder="Select an option"
+              label={capitalizeFirstLetter(field)}
+            />
+          )}
+        />
+      ))}
     </View>
   );
 };
@@ -95,10 +121,10 @@ const getPlaceholder = (field: string) => {
       return "Write Here";
     case "preferredContactTime":
       return "Write Here";
-    case "leadSource":
-      return "Enter Source of Lead";
     case "referralContact":
       return "Enter Referral Name/Contact";
+    case "leadSource":
+      return "Select an option";
     case "leadRating":
       return "Enter Lead Rating";
     default:

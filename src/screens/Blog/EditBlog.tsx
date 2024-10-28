@@ -15,12 +15,12 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { RefreshControl } from "react-native-gesture-handler";
 import { blogService } from "../../api/blog";
-import { capitalizeFirstLetter } from "../../utils/CapitalizeFirstLetter";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { theme } from "../../constants/theme";
 import Header1 from "../../components/Header1";
 import { RootStackParamList } from "../../navigation/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { formatRoleDisplayName } from "../../utils/FormatRoleDisplayName";
 
 interface ImageObject {
   uri: string;
@@ -59,7 +59,7 @@ const EditBlog = () => {
       const newCategories = response.map((category: any) => {
         return {
           value: category.category,
-          label: capitalizeFirstLetter(category.category),
+          label: formatRoleDisplayName(category.category),
         };
       });
 

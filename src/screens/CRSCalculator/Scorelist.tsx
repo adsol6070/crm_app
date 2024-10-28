@@ -71,6 +71,7 @@ const ScoreList = () => {
       <ListScreen
         title="Results"
         fetchData={crsService.getAllScores}
+        skeletonWithImage={false}
         placeholder="Search by name..."
         centerComponent={(item) => (
           <View style={{ flexDirection: "column" }}>
